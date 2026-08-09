@@ -46,7 +46,12 @@ ES_TERMS = {
 }
 
 _TERMS_FILE = DATA_DIR / "ml_terms.json"
+_TRANSLATIONS_FILE = DATA_DIR / "traducciones.json"
 _WORD = re.compile(r"[A-Za-z][A-Za-z0-9\-]+")
+_WORD_ES = re.compile(r"[A-Za-zÁÉÍÓÚÜÑáéíóúüñ][A-Za-z0-9ÁÉÍÓÚÜÑáéíóúüñ\-]*")
+
+# Palabras que no aportan a una búsqueda en Amazon/Alibaba.
+ES_STOPWORDS = {"de", "del", "la", "el", "los", "las", "para", "con", "sin", "y", "en", "por", "a", "un", "una"}
 
 
 def _extra_terms() -> dict[str, str]:
@@ -83,3 +88,38 @@ def ml_query(title: str, brand: str | None = None) -> str:
     table = {**ES_TERMS, **_extra_terms()}
     words = core_words(title, brand, max_words=3)
     return " ".join(table.get(word, word) for word in words)
+
+
+# --- español -> inglés ----------------------------------------------------
+def _translations() -> dict[str, str]:
+    if not _TRANSLATIONS_FILE.exists():
+        return {}
+    try:
+        raw = json.loads(_TRANSLATIONS_FILE.read_text(encoding="utf-8"))
+    except ValueError:
+        return {}
+    return {k.lower(): str(v) for k, v in raw.items() if not k.startswith("_")}
+
+
+def _reverse_es_terms() -> dict[str, str]:
+    """ES_TERMS va de inglés a español; aquí lo damos vuelta."""
+    reverse: dict[str, str] = {}
+    for english, spanish in ES_TERMS.items():
+        reverse.setdefault(spanish, english)
+    return reverse
+
+
+def to_english(term: str) -> str:
+    """Traduce un término de búsqueda al inglés para consultar Amazon y Alibaba.
+
+    Primero busca la frase completa en `data/traducciones.json`; si no está,
+    traduce palabra por palabra y deja tal cual lo que no reconoce.
+    """
+    clean = term.strip().lower()
+    phrases = _translations()
+    if clean in phrases:
+        return phrases[clean]
+
+    word_table = _reverse_es_terms()
+    words = [w for w in _WORD_ES.findall(clean) if w not in ES_STOPWORDS]
+    return " ".join(word_table.get(word, word) for word in words)

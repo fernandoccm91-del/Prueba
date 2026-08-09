@@ -1,8 +1,16 @@
-"""Command line interface.
+"""Interfaz de línea de comandos.
 
-    python -m productscout scan --keyword "cable organizer" --small-only
-    python -m productscout list --verdict perseguir
-    python -m productscout show B0CQ7XK4M2
+El comando principal es `buscar`:
+
+    python -m productscout buscar                 # nicho por defecto (baño)
+    python -m productscout buscar cocina
+    python -m productscout buscar -t "organizador de ducha"
+    python -m productscout nichos
+
+Comandos avanzados (flujo Amazon FBA):
+
+    python -m productscout scan --keyword "shower caddy" --small-only
+    python -m productscout show B0DN4X8QW2
     python -m productscout export --format csv --out oportunidades.csv
     python -m productscout serve
 """
@@ -18,6 +26,7 @@ from .config import Settings
 from .db import connect, get_opportunity, latest_run_id, list_opportunities, list_runs, save_run
 from .keywords import alibaba_query
 from .models import to_dict
+from .niches import load_niches, niche_names
 from .pipeline import Pipeline, ScanRequest
 
 VERDICT_ICON = {"perseguir": "★", "investigar": "•", "dudoso": "·", "descartar": " "}
@@ -123,6 +132,139 @@ def print_detail(payload: dict) -> None:
     print()
 
 
+SITE_NAMES = {
+    "MLC": "Chile", "MLM": "México", "MLA": "Argentina",
+    "MCO": "Colombia", "MLB": "Brasil", "MPE": "Perú", "MLU": "Uruguay",
+}
+
+
+def money_local(value: float | None, currency: str) -> str:
+    if value is None:
+        return "–"
+    sign = "-" if value < 0 else ""
+    amount = abs(value)
+    if currency in ("CLP", "COP", "ARS"):
+        return sign + "$" + f"{amount:,.0f}".replace(",", ".")
+    return f"{sign}${amount:,.2f}"
+
+
+def print_ideas_table(ideas: list, currency: str) -> None:
+    header = (f"  {'#':>2} {'PUNTAJE':>8}  {'PRODUCTO':<38} {'PUBS':>6} {'U/MES':>7} "
+              f"{'PRECIO ML':>11} {'ALIBABA':>9} {'GANANCIA/U':>12} {'MARGEN':>7}")
+    print(header)
+    print("  " + "-" * (len(header) - 2))
+    for position, idea in enumerate(ideas, start=1):
+        market = idea.ml_market
+        econ = idea.economics
+        quote = idea.quotes[0] if idea.quotes else None
+        icon = VERDICT_ICON.get(idea.verdict, " ")
+        print(
+            f"  {position:>2} {icon} {idea.total_score:>6.1f}  {_truncate(idea.term, 38):<38} "
+            f"{market.total_listings:>6} {market.monthly_units_est:>7.0f} "
+            f"{money_local(market.median_price, currency):>11} "
+            f"{('US$' + format(quote.unit_price_usd, '.2f')) if quote else '–':>9} "
+            f"{money_local(econ.profit_local, currency) if econ else '–':>12} "
+            f"{(format(econ.margin, '.0%') if econ else '–'):>7}"
+        )
+
+
+def print_idea_card(position: int, idea) -> None:
+    market = idea.ml_market
+    econ = idea.economics
+    quote = idea.quotes[0] if idea.quotes else None
+    currency = market.currency
+
+    print(f"\n{position}. {VERDICT_ICON.get(idea.verdict, ' ')} {idea.total_score} — {idea.term.upper()}")
+    print(f"   {'Mercado Libre':<15} {market.total_listings} publicaciones · "
+          f"~{market.monthly_units_est:.0f} unidades/mes · "
+          f"precio típico {money_local(market.median_price, currency)}")
+    if idea.amazon_products:
+        best = idea.amazon_products[0]
+        print(f"   {'Amazon (EE.UU.)':<15} ~{idea.amazon_monthly_units:.0f} unidades/mes · "
+              f"«{_truncate(best.title, 46)}» · {best.reviews_count or 0} reseñas")
+    else:
+        print(f"   {'Amazon (EE.UU.)':<15} sin coincidencias")
+    if quote:
+        print(f"   {'Alibaba':<15} US${quote.unit_price_usd:.2f}/unidad · pedido mínimo {quote.moq} · "
+              f"{_truncate(quote.supplier_name, 40)}")
+    if econ:
+        print(f"   {'Cuentas':<15} cuesta {money_local(econ.landed_cost_local, currency)} puesto en el país · "
+              f"comisión+envío {money_local(econ.commission_local + econ.fixed_fee_local + econ.shipping_local, currency)} · "
+              f"ganas {money_local(econ.profit_local, currency)}/unidad ({econ.margin:.0%})")
+        print(f"   {'Inversión':<15} {money_local(econ.upfront_investment_local, currency)} "
+              f"para traer {econ.order_qty} unidades")
+    if idea.alibaba_url:
+        print(f"   {'Proveedores':<15} {idea.alibaba_url}")
+    for reason in idea.reasons[:3]:
+        print(f"     + {reason}")
+    for warning in idea.warnings[:3]:
+        print(f"     ! {warning}")
+
+
+def cmd_buscar(args: argparse.Namespace, settings: Settings) -> int:
+    from .db import save_niche_run
+    from .ideas import NicheScanner, NicheScanRequest
+
+    request = NicheScanRequest(
+        niche=args.nicho or settings.default_niche,
+        terms=args.termino or [],
+        max_terms=args.max_terminos,
+        min_score=args.min_score,
+        top=args.top,
+    )
+    scanner = NicheScanner(settings)
+    try:
+        terms, niche_name = scanner.resolve_terms(request)
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
+        print(f"Nichos disponibles: {', '.join(niche_names())}", file=sys.stderr)
+        return 1
+
+    site_name = SITE_NAMES.get(settings.ml_site, settings.ml_site)
+    print(f"\nBuscando productos de {niche_name} en Mercado Libre {site_name} ({settings.ml_site})")
+    print(f"Fuentes: Mercado Libre = {scanner.ml.name} · Amazon = {scanner.amazon.name} · "
+          f"Proveedores = {scanner.suppliers.name}")
+    print(f"Revisando {len(terms)} búsquedas...\n")
+
+    result = scanner.scan(request)
+    for error in result.errors:
+        print(f"  ! {error}", file=sys.stderr)
+
+    if not result.ideas:
+        print("No encontré nada con esos filtros. Prueba bajando --min-score.")
+        return 0
+
+    conn = connect(settings.db_path)
+    run_id = save_niche_run(conn, result)
+    conn.close()
+
+    currency = result.ideas[0].ml_market.currency
+    print(f"Revisé {result.terms_scanned} búsquedas. Estas son las mejores {len(result.ideas)} "
+          f"(corrida #{run_id}):\n")
+    print_ideas_table(result.ideas, currency)
+    print("\n  ★ vale la pena    • para investigar    · dudoso")
+
+    detail_count = len(result.ideas) if args.detalle else min(5, len(result.ideas))
+    if detail_count:
+        print(f"\n{'=' * 78}\nDETALLE DE LAS {detail_count} MEJORES\n{'=' * 78}")
+        for position, idea in enumerate(result.ideas[:detail_count], start=1):
+            print_idea_card(position, idea)
+
+    print(f"\n{'=' * 78}\nQUÉ HACER AHORA\n{'=' * 78}")
+    print("  1. Abre el link de Alibaba de los 2-3 primeros y pide cotización a 3 proveedores.")
+    print("     Pregunta: precio por unidad, pedido mínimo, peso por unidad y costo de envío a Chile.")
+    print("  2. Anota esas respuestas en data/supplier_quotes.json y vuelve a correr el comando")
+    print("     con SUPPLIER_SOURCE=manual: ahí la ganancia deja de ser estimada y es real.")
+    print("  3. Antes de comprar, revisa en Mercado Libre las publicaciones que ya venden ese")
+    print("     producto: mira sus fotos, su precio y sus preguntas para ver qué puedes hacer mejor.")
+
+    if scanner.ml.name == "mock":
+        print("\n  NOTA: estás usando datos de EJEMPLO, no datos reales de Mercado Libre.")
+        print("  Para conectar los datos de verdad, mira la sección «Conectar datos reales» del README.")
+    print()
+    return 0
+
+
 def cmd_scan(args: argparse.Namespace, settings: Settings) -> int:
     request = ScanRequest(
         keywords=args.keyword or [],
@@ -174,6 +316,22 @@ def cmd_show(args: argparse.Namespace, settings: Settings) -> int:
         print(f"No encontré {args.asin}. Corre un scan primero.", file=sys.stderr)
         return 1
     print_detail(json.loads(row["payload"]))
+    return 0
+
+
+def cmd_nichos(args: argparse.Namespace, settings: Settings) -> int:
+    niches = load_niches()
+    if not niches:
+        print("No hay nichos definidos. Crea data/nichos.json.")
+        return 0
+    print("\nNichos disponibles (edita data/nichos.json para agregar los tuyos):\n")
+    for niche in niches.values():
+        marker = " (por defecto)" if niche.slug == settings.default_niche else ""
+        print(f"  {niche.slug}{marker}")
+        print(f"    {niche.descripcion}")
+        print(f"    {len(niche.terminos)} búsquedas, por ejemplo: "
+              f"{', '.join(niche.terminos[:3])}...\n")
+    print("Uso:  python -m productscout buscar <nicho>\n")
     return 0
 
 
@@ -248,7 +406,25 @@ def build_parser() -> argparse.ArgumentParser:
     )
     sub = parser.add_subparsers(dest="command", required=True)
 
-    scan = sub.add_parser("scan", help="ejecuta un análisis completo")
+    buscar = sub.add_parser(
+        "buscar",
+        help="busca productos de un nicho (el comando principal)",
+        description="Busca productos con demanda y poca competencia en Mercado Libre, "
+                    "los valida en Amazon y los cotiza en Alibaba.",
+    )
+    buscar.add_argument("nicho", nargs="?", help=f"nicho a revisar ({', '.join(niche_names())})")
+    buscar.add_argument("--termino", "-t", action="append",
+                        help="buscar un producto puntual en vez de un nicho completo (repetible)")
+    buscar.add_argument("--top", type=int, default=15, help="cuántos resultados mostrar")
+    buscar.add_argument("--min-score", type=float, default=0.0, help="puntaje mínimo")
+    buscar.add_argument("--max-terminos", type=int, help="revisar solo los primeros N términos")
+    buscar.add_argument("--detalle", action="store_true", help="ficha completa de todos, no solo del top 5")
+    buscar.set_defaults(func=cmd_buscar)
+
+    nichos = sub.add_parser("nichos", help="lista los nichos disponibles")
+    nichos.set_defaults(func=cmd_nichos)
+
+    scan = sub.add_parser("scan", help="análisis centrado en Amazon FBA (flujo avanzado)")
     scan.add_argument("--keyword", "-k", action="append", help="palabra clave (repetible)")
     scan.add_argument("--category", "-c", help="categoría de Amazon")
     scan.add_argument("--limit", type=int, default=25, help="productos por keyword")

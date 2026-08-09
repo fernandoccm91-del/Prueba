@@ -58,6 +58,61 @@ class CostAssumptions:
     target_margin: float = 0.25
 
 
+# Moneda de cada sitio de Mercado Libre.
+CURRENCY_BY_SITE = {
+    "MLC": "CLP", "MLM": "MXN", "MLA": "ARS",
+    "MCO": "COP", "MLB": "BRL", "MPE": "PEN", "MLU": "UYU",
+}
+# Tipo de cambio por defecto (moneda local por 1 USD). Ajústalo con FX_USD_LOCAL.
+FX_BY_SITE = {"MLC": 950.0, "MLM": 18.0, "MLA": 1200.0, "MCO": 4000.0, "MLB": 5.4, "MPE": 3.7}
+# IVA por país.
+VAT_BY_SITE = {"MLC": 0.19, "MLM": 0.16, "MLA": 0.21, "MCO": 0.19, "MLB": 0.0, "MPE": 0.18}
+# Arancel de importación general (ad valorem sobre CIF).
+DUTY_BY_SITE = {"MLC": 0.06, "MLM": 0.15, "MLA": 0.20, "MCO": 0.10, "MLB": 0.60, "MPE": 0.06}
+
+
+@dataclass
+class MarketAssumptions:
+    """Supuestos para vender en Mercado Libre (por defecto, Chile).
+
+    Son aproximaciones públicas y cambian con el tiempo: revísalas en tu cuenta
+    de vendedor antes de tomar decisiones de plata.
+    """
+
+    site: str = "MLC"
+    fx_usd_to_local: float = 950.0
+    vat_rate: float = 0.19
+    # True = vendes con empresa (inicio de actividades): recuperas el IVA de la
+    # importación, pero el precio de Mercado Libre lleva IVA incluido y se
+    # descuenta del ingreso. False = vendes como persona natural: te quedas con
+    # el precio completo, pero el IVA de importación es un costo perdido.
+    # Importar formalmente exige empresa, así que True es el caso normal.
+    vat_recoverable: bool = True
+    import_duty_rate: float = 0.06
+    commission_rate: float = 0.145        # publicación clásica
+    fixed_fee_local: float = 800.0        # cargo por unidad en productos baratos
+    fixed_fee_threshold_local: float = 9990.0
+    free_shipping_threshold_local: float = 19990.0
+    # (peso máximo en gramos, costo de envío en moneda local)
+    shipping_brackets: tuple[tuple[float, float], ...] = (
+        (500, 2900.0), (1000, 3400.0), (2000, 4200.0), (5000, 5600.0), (float("inf"), 7500.0),
+    )
+
+    @classmethod
+    def for_site(cls, site: str) -> "MarketAssumptions":
+        return cls(
+            site=site,
+            fx_usd_to_local=_f("FX_USD_LOCAL", FX_BY_SITE.get(site, 950.0)),
+            vat_rate=_f("VAT_RATE", VAT_BY_SITE.get(site, 0.19)),
+            vat_recoverable=os.environ.get("VAT_RECOVERABLE", "true").lower() != "false",
+            import_duty_rate=_f("IMPORT_DUTY_RATE", DUTY_BY_SITE.get(site, 0.06)),
+            commission_rate=_f("ML_COMMISSION_RATE", 0.145),
+            fixed_fee_local=_f("ML_FIXED_FEE_LOCAL", 800.0),
+            fixed_fee_threshold_local=_f("ML_FIXED_FEE_THRESHOLD", 9990.0),
+            free_shipping_threshold_local=_f("ML_FREE_SHIPPING_THRESHOLD", 19990.0),
+        )
+
+
 @dataclass
 class Settings:
     # --- source selection -------------------------------------------------
@@ -76,7 +131,7 @@ class Settings:
     paapi_region: str = "us-east-1"
 
     # --- Mercado Libre ----------------------------------------------------
-    ml_site: str = "MLM"                 # MLM=México, MLC=Chile, MLA=Argentina, MCO=Colombia, MLB=Brasil
+    ml_site: str = "MLC"                 # MLC=Chile, MLM=México, MLA=Argentina, MCO=Colombia, MLB=Brasil
     ml_client_id: str = ""
     ml_client_secret: str = ""
 
@@ -95,7 +150,9 @@ class Settings:
     # --- runtime ----------------------------------------------------------
     db_path: str = str(ROOT / "productscout.db")
     request_timeout: int = 25
+    default_niche: str = "bano"
     costs: CostAssumptions = field(default_factory=CostAssumptions)
+    market: MarketAssumptions = field(default_factory=MarketAssumptions)
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -111,6 +168,7 @@ class Settings:
             target_roi=_f("TARGET_ROI", 1.0),
             target_margin=_f("TARGET_MARGIN", 0.25),
         )
+        site = os.environ.get("ML_SITE", "MLC")
         return cls(
             amazon_source=os.environ.get("AMAZON_SOURCE", "mock"),
             ml_source=os.environ.get("ML_SOURCE", "mock"),
@@ -123,7 +181,7 @@ class Settings:
             paapi_partner_tag=os.environ.get("PAAPI_PARTNER_TAG", ""),
             paapi_host=os.environ.get("PAAPI_HOST", "webservices.amazon.com"),
             paapi_region=os.environ.get("PAAPI_REGION", "us-east-1"),
-            ml_site=os.environ.get("ML_SITE", "MLM"),
+            ml_site=site,
             ml_client_id=os.environ.get("ML_CLIENT_ID", ""),
             ml_client_secret=os.environ.get("ML_CLIENT_SECRET", ""),
             supplier_http_endpoint=os.environ.get("SUPPLIER_HTTP_ENDPOINT", ""),
@@ -138,7 +196,9 @@ class Settings:
             max_product_age_days=_i("MAX_PRODUCT_AGE_DAYS", 540),
             db_path=os.environ.get("DB_PATH", str(ROOT / "productscout.db")),
             request_timeout=_i("REQUEST_TIMEOUT", 25),
+            default_niche=os.environ.get("DEFAULT_NICHE", "bano"),
             costs=costs,
+            market=MarketAssumptions.for_site(site),
         )
 
 

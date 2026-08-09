@@ -8,8 +8,8 @@ what the scoring engine actually consumes.
 
 from __future__ import annotations
 
-from .config import CostAssumptions
-from .models import AmazonProduct, Economics, SupplierQuote
+from .config import CURRENCY_BY_SITE, CostAssumptions, MarketAssumptions
+from .models import AmazonProduct, Economics, MLEconomics, SupplierQuote
 
 MM_PER_INCH = 25.4
 G_PER_OZ = 28.3495
@@ -127,6 +127,92 @@ def compute_economics(
         size_tier=size_tier(product),
         upfront_investment_usd=round(landed * qty, 2),
     )
+
+
+def shipping_cost_local(weight_g: float, market: MarketAssumptions) -> float:
+    for max_g, cost in market.shipping_brackets:
+        if weight_g <= max_g:
+            return cost
+    return market.shipping_brackets[-1][1]
+
+
+def compute_ml_economics(
+    sale_price_local: float,
+    quote: SupplierQuote,
+    market: MarketAssumptions,
+    costs: CostAssumptions,
+    weight_g: float | None = None,
+    order_qty: int | None = None,
+) -> MLEconomics:
+    """Cuentas de vender una unidad en Mercado Libre.
+
+    Cadena: precio de venta (con IVA) → ingreso neto → menos comisión, cargo
+    fijo y envío → menos costo puesto en el país (FOB + flete + arancel).
+    """
+    qty = order_qty or max(quote.moq, 100)
+    unit_cost = quote.price_at(qty)
+    weight = weight_g or quote.unit_weight_g or 300.0
+
+    # --- costo puesto en el país (por unidad) ---
+    rate = costs.air_usd_per_kg if costs.freight_mode == "air" else costs.sea_usd_per_kg
+    freight = (weight / 1000.0) * rate
+    cif = unit_cost + freight
+    duty = cif * market.import_duty_rate
+    vat_base = cif + duty
+    vat = vat_base * market.vat_rate
+    landed_usd = cif + duty + costs.inbound_prep_usd_per_unit
+    if not market.vat_recoverable:
+        landed_usd += vat
+    landed_local = landed_usd * market.fx_usd_to_local
+
+    # --- lado de la venta ---
+    net_revenue = (
+        sale_price_local / (1 + market.vat_rate) if market.vat_recoverable else sale_price_local
+    )
+    commission = sale_price_local * market.commission_rate
+    fixed_fee = market.fixed_fee_local if sale_price_local < market.fixed_fee_threshold_local else 0.0
+    shipping = (
+        shipping_cost_local(weight, market)
+        if sale_price_local >= market.free_shipping_threshold_local
+        else 0.0
+    )
+
+    profit = net_revenue - commission - fixed_fee - shipping - landed_local
+    return MLEconomics(
+        currency=CURRENCY_BY_SITE.get(market.site, ""),
+        fx_usd_to_local=market.fx_usd_to_local,
+        order_qty=qty,
+        sale_price_local=round(sale_price_local),
+        net_revenue_local=round(net_revenue),
+        unit_cost_usd=round(unit_cost, 3),
+        freight_usd=round(freight, 3),
+        duty_usd=round(duty, 3),
+        landed_cost_usd=round(landed_usd, 3),
+        landed_cost_local=round(landed_local),
+        vat_prepaid_local=round(vat * market.fx_usd_to_local),
+        commission_local=round(commission),
+        fixed_fee_local=round(fixed_fee),
+        shipping_local=round(shipping),
+        profit_local=round(profit),
+        margin=round(profit / sale_price_local, 4) if sale_price_local else 0.0,
+        roi=round(profit / landed_local, 4) if landed_local else 0.0,
+        upfront_investment_local=round(landed_local * qty),
+    )
+
+
+def best_ml_quote(
+    sale_price_local: float,
+    quotes: list[SupplierQuote],
+    market: MarketAssumptions,
+    costs: CostAssumptions,
+    weight_g: float | None = None,
+) -> tuple[SupplierQuote | None, MLEconomics | None]:
+    best: tuple[SupplierQuote, MLEconomics] | None = None
+    for quote in quotes:
+        econ = compute_ml_economics(sale_price_local, quote, market, costs, weight_g)
+        if best is None or econ.profit_local > best[1].profit_local:
+            best = (quote, econ)
+    return best if best else (None, None)
 
 
 def best_quote(

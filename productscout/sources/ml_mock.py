@@ -10,14 +10,11 @@ import hashlib
 import math
 import random
 
+from ..config import CURRENCY_BY_SITE
 from ..estimators import median, ml_monthly_units, round_or_none
 from ..models import MLListing, MLMarket
 from .base import MercadoLibreSource
 
-CURRENCY_BY_SITE = {
-    "MLM": "MXN", "MLC": "CLP", "MLA": "ARS",
-    "MCO": "COP", "MLB": "BRL", "MPE": "PEN", "MLU": "UYU",
-}
 FX_PER_USD = {"MXN": 18.0, "CLP": 950.0, "ARS": 1200.0, "COP": 4000.0, "BRL": 5.4, "PEN": 3.7, "UYU": 40.0}
 
 

@@ -1,199 +1,226 @@
 # ProductScout
 
-App de investigación de productos: encuentra artículos **nuevos, pequeños, con demanda y poca
-competencia** en Amazon, cruza cada uno contra **Mercado Libre** para ver cuánta competencia y
-cuánta venta hay en LATAM, y cotiza **proveedores en Alibaba** para calcular costo puesto en
-bodega, margen y ROI.
+Un comando que te busca productos para vender en **Mercado Libre Chile**.
 
-```
-Amazon ──► demanda (u/día, u/mes, $/mes) ─┐
-   │       competencia (reseñas, vendedores, antigüedad)
-   │                                       ├──► score 0-100 ──► ranking + veredicto
-Mercado Libre ──► publicaciones, ventas ──┤
-   │                                       │
-Alibaba ──► precio FOB, MOQ, proveedores ─┘──► landed cost, margen, ROI
-```
+Para cada producto de tu nicho revisa:
 
-Funciona **sin credenciales** desde el primer minuto usando fuentes `mock` (datos de ejemplo
-realistas), para que puedas ver el flujo completo y decidir qué API vale la pena pagar.
+1. **Mercado Libre** — cuántos venden lo mismo, cuánto se vende y a qué precio.
+2. **Amazon (EE.UU.)** — busca el mismo producto en inglés para confirmar que la demanda existe.
+3. **Alibaba** — a cuánto sale traerlo y de qué proveedores.
+4. **Las cuentas** — cuánto te queda después del costo, el flete, los impuestos, la comisión de
+   Mercado Libre y el envío.
+
+Y te entrega una lista ordenada: qué vale la pena, qué no, y por qué.
 
 ---
 
-## Instalación
+## Empezar (2 minutos)
 
 ```bash
-git clone <este-repo> && cd Prueba
-pip install -e ".[web]"      # el motor no tiene dependencias; [web] agrega el dashboard
-cp .env.example .env         # opcional, para credenciales
+pip install -e ".[web]"
+python -m productscout buscar
 ```
 
-Requiere Python 3.10+.
+Eso es todo. Por defecto busca el nicho **baño** (38 búsquedas: organizadores de ducha,
+dispensadores, toalleros, etc.) en Mercado Libre Chile.
 
-## Uso
+Otros comandos:
 
 ```bash
-# Buscar (con datos de ejemplo, sin API keys)
-python -m productscout scan --small-only --top 15
-
-# Buscar por palabras clave y categoría
-python -m productscout scan -k "cable organizer" -k "pill organizer" -c "Office Products"
-
-# Solo lo que valga la pena revisar
-python -m productscout scan --min-score 65 --small-only
-
-# Ficha completa de un producto
-python -m productscout show B0D3F8W7RK
-
-# Historial y exportación
-python -m productscout runs
-python -m productscout list --verdict perseguir
-python -m productscout export --format csv --out oportunidades.csv
-
-# Dashboard web en http://127.0.0.1:8000
-python -m productscout serve
+python -m productscout buscar cocina              # otro nicho
+python -m productscout buscar -t "filtro de ducha"  # un producto puntual
+python -m productscout buscar --detalle           # ficha completa de todos
+python -m productscout nichos                     # ver los nichos disponibles
+python -m productscout serve                      # lo mismo pero en el navegador
 ```
 
-Salida típica:
+## Cómo se ve
 
 ```
-   SCORE  ASIN         PRODUCTO                                    U/DÍA   U/MES      $/MES  UTIL/U    ROI  ML
-•   67.3  B0D3F8W7RK   Stainless Steel Herb Stripper Tool            4.1     122  $1,575.70   $5.02   177%  163 pub / 41 u-mes
-•   65.5  B0DKQ2N4SW   Beard Growth Roller Kit with Storage Case     5.7     171  $4,457.37  $11.22   161%  132 pub / 54 u-mes
+Buscando productos de Baño en Mercado Libre Chile (MLC)
+
+   #  PUNTAJE  PRODUCTO                     PUBS   U/MES   PRECIO ML   ALIBABA   GANANCIA/U  MARGEN
+   1 •   66.4  toallero adhesivo              56     252     $30.442   US$6.07       $9.406     31%
+   2 ·   59.5  dispensador de jabon automat 1.249     107     $64.101  US$16.07      $22.665     35%
+
+1. • 66.4 — TOALLERO ADHESIVO
+   Mercado Libre   56 publicaciones · ~252 unidades/mes · precio típico $30.442
+   Amazon (EE.UU.) ~235 unidades/mes · «Adhesive Towel Bar, No-Drill Aluminum» · 41 reseñas
+   Alibaba         US$6.07/unidad · pedido mínimo 200 · Xiamen Adhesive Industrial Co.
+   Cuentas         cuesta $8.862 puesto en Chile · comisión+envío $7.314 · ganas $9.406/u (31%)
+   Inversión       $1.772.358 para traer 200 unidades
+   Proveedores     https://www.alibaba.com/trade/search?SearchText=adhesive+towel+bar
+     + Solo 56 publicaciones compitiendo: poca competencia
+     + Los productos equivalentes en Amazon tienen pocas reseñas (mediana 41)
 ```
+
+El **puntaje** va de 0 a 100 y resume cuatro cosas: cuánto se vende, cuánta competencia hay,
+cuánto ganas y si Amazon confirma la demanda. Arriba de 75 es *vale la pena*, entre 60 y 75 es
+*para investigar*, más abajo es *dudoso* o *descartar*.
 
 ---
 
-## Qué se puede saber de verdad (y qué no)
+## ⚠️ Importante: hoy estás viendo datos de ejemplo
 
-Esto es lo primero que conviene tener claro, porque define qué API necesitas:
+Recién instalado, el programa usa **datos inventados** para que veas cómo funciona. Los números
+que muestra no son reales todavía. Para que lo sean necesitas conectar las fuentes, y ahí hay una
+diferencia grande entre las tres:
 
-| Dato que pediste | ¿Existe? | Cómo lo resuelve la app |
+| Fuente | ¿Se puede conectar? | Qué hay que hacer |
 |---|---|---|
-| Unidades que vende un producto en Amazon | **No hay API oficial.** Amazon nunca publica ventas de terceros | Keepa entrega el *"bought in past month"* para muchos ASIN (dato real); si no está, se estima con la curva BSR→ventas por categoría |
-| Antigüedad del listing ("producto nuevo") | Sí, vía Keepa (`listedSince`) | Se usa tal cual; el score de novedad castiga listings viejos |
-| Competencia en Amazon | Parcial | Reseñas del listing, reseñas medianas de los rivales de la misma búsqueda, número de vendedores en la oferta y si Amazon vende directo |
-| Competencia y ventas en Mercado Libre | **Sí, API oficial** | Total de publicaciones, `sold_quantity`, precio mediano, % de tiendas oficiales |
-| Precios y proveedores en Alibaba | **No hay API pública abierta** | La app genera la búsqueda lista para Alibaba y tú pegas las cotizaciones en un JSON; o conectas tu propio gateway/proveedor de datos |
+| **Mercado Libre** | Sí, gratis | Crear una app en el portal de desarrolladores (15 min) |
+| **Amazon** | Sí, pagando | Suscribirte a Keepa (~€20/mes). Es opcional: sirve para confirmar demanda |
+| **Alibaba** | No hay forma automática | Pides las cotizaciones tú y las pegas en un archivo (5 min por producto) |
 
-Las estimaciones de venta son **señal de orden, no contabilidad**. Sirven para comparar productos
-entre sí, no para proyectar tu facturación al centavo.
+Sobre Alibaba: no existe una API pública para consultar precios, y copiar el sitio con un robot
+va contra sus términos de servicio, así que el programa no lo hace. Lo que sí hace es dejarte el
+link de búsqueda listo y calcular todo apenas le pases los precios reales.
 
-### Fuentes de datos
+### 1. Conectar Mercado Libre (lo más importante, y es gratis)
 
-Cada bloque es intercambiable por configuración (`AMAZON_SOURCE`, `ML_SOURCE`, `SUPPLIER_SOURCE`):
+1. Entra a https://developers.mercadolibre.cl y crea una cuenta de desarrollador.
+2. Crea una aplicación. Te va a dar un **Client ID** y un **Client Secret**.
+3. En la carpeta del proyecto, copia el archivo de ejemplo y pega tus datos:
 
-**Amazon**
-- `mock` — datos de ejemplo, sin credenciales. Default.
-- `keepa` — [Keepa API](https://keepa.com/#!api), de pago (~€/mes por tokens). **La opción
-  recomendada**: es la única accesible que da BSR, reseñas, ofertas, dimensiones, peso, fecha de
-  alta del listing y unidades vendidas del último mes. Incluye el *Product Finder* para filtrar
-  directamente por rango de BSR, precio, reseñas y peso.
-- `paapi` — Product Advertising API 5.0 de Amazon. Gratis pero exige cuenta de Afiliados activa
-  con ventas, y **no** entrega reseñas ni antigüedad. Sirve para precio, dimensiones y ofertas.
-  (La firma AWS SigV4 está implementada a mano, sin SDK.)
+```bash
+cp .env.example .env
+```
 
-**Mercado Libre**
-- `mock` — mercado sintético determinista.
-- `api` — API oficial. Crea una app en el portal de desarrolladores y pon `ML_CLIENT_ID` /
-  `ML_CLIENT_SECRET`: la app pide el token con `client_credentials`, no requiere login de usuario.
-  Ojo: `sold_quantity` es acumulado histórico de la publicación, así que se amortiza sobre una
-  ventana configurable (`ML_SOLD_WINDOW_MONTHS`, 12 meses por defecto) para llegar a u/mes.
+Abre `.env` y déjalo así:
 
-**Alibaba / proveedores**
-- `mock` — cotizaciones sintéticas ancladas al precio de venta.
-- `manual` — **el flujo realista**. La app te arma la búsqueda de Alibaba sin marca ni adjetivos
-  de marketing; pides cotizaciones, y pegas precio, MOQ, escalas de precio, años del proveedor y
-  Trade Assurance en `data/supplier_quotes.json`. De ahí en adelante el margen y el ROI se
-  calculan con datos reales.
-- `http` — apunta `SUPPLIER_HTTP_ENDPOINT` a lo que tengas derecho a usar (Alibaba Open Platform
-  si te aprueban, un proveedor de datos B2B, o tu propio servicio). El mapeador acepta los
-  nombres de campo más comunes.
+```
+ML_SOURCE=api
+ML_SITE=MLC
+ML_CLIENT_ID=tu_client_id
+ML_CLIENT_SECRET=tu_client_secret
+```
 
-> Alibaba no tiene API abierta y hacer scraping del sitio va contra sus términos de servicio, así
-> que la app no lo hace. Por eso el modo `manual` es el camino soportado.
+Vuelve a correr `python -m productscout buscar`. Ahora las publicaciones, las ventas y los precios
+son reales.
+
+### 2. Conectar Amazon (opcional, de pago)
+
+Amazon **no publica** cuántas unidades vende nadie. La forma práctica de saberlo es
+[Keepa](https://keepa.com/#!api): entrega el ranking de ventas, las reseñas, el peso y —para
+muchos productos— las unidades vendidas del último mes. Si te suscribes, agrega a tu `.env`:
+
+```
+AMAZON_SOURCE=keepa
+KEEPA_API_KEY=tu_api_key
+```
+
+Sin esto el programa igual funciona: simplemente no va a poder confirmar la demanda en Amazon y
+te lo va a avisar en cada producto.
+
+### 3. Conectar Alibaba (manual, 5 minutos por producto)
+
+Este es el flujo real, y es el que te va a dar los números que importan:
+
+1. Corre `python -m productscout buscar` y mira los 2-3 primeros resultados.
+2. Abre el link de Alibaba que aparece en cada uno.
+3. Escríbele a tres proveedores y pregunta: **precio por unidad, pedido mínimo, peso por unidad y
+   costo de envío a Chile**.
+4. Anota las respuestas en `data/supplier_quotes.json`:
+
+```json
+[
+  {
+    "match": ["toallero adhesivo", "adhesive towel bar"],
+    "supplier_name": "Xiamen Homeware Co., Ltd.",
+    "unit_price_usd": 4.20,
+    "moq": 200,
+    "unit_weight_g": 310,
+    "url": "https://www.alibaba.com/product-detail/...",
+    "years_active": 7,
+    "trade_assurance": true,
+    "price_tiers": [
+      {"min_qty": 200, "unit_price_usd": 4.20},
+      {"min_qty": 1000, "unit_price_usd": 3.60}
+    ]
+  }
+]
+```
+
+5. Pon `SUPPLIER_SOURCE=manual` en tu `.env` y vuelve a correr el comando. Ahí la ganancia deja de
+   ser una estimación.
 
 ---
 
-## Cómo se calcula el score
-
-Seis sub-scores de 0 a 100 que se combinan con pesos (ver `WEIGHTS` en `productscout/scoring.py`):
-
-| Sub-score | Peso | Qué mide |
-|---|---|---|
-| `demand` | 25% | Unidades y facturación mensual estimada en Amazon |
-| `competition` | 25% | Reseñas del listing y de sus rivales, vendedores en la oferta, si Amazon compite, rating bajo como hueco de calidad |
-| `margin` | 20% | Margen y ROI sobre el costo puesto en bodega |
-| `novelty` | 10% | Días desde que el listing existe |
-| `size` | 10% | Categoría de tamaño FBA y peso — premia lo pequeño |
-| `mercadolibre` | 10% | Demanda vs. saturación en ML, penalizando dominio de tiendas oficiales |
-
-Veredicto: **≥75 perseguir · ≥60 investigar · ≥45 dudoso · <45 descartar**.
-
-Cada oportunidad guarda además las razones a favor y las advertencias en texto plano, para que el
-número nunca sea una caja negra.
-
-### Economía unitaria
+## Cómo calcula la ganancia (Chile)
 
 ```
-costo unitario (según escala de precio del MOQ)
-+ flete            (peso facturable = max(real, volumétrico) × tarifa aérea/marítima)
-+ arancel          (DUTY_RATE sobre FOB)
-+ prep             (INBOUND_PREP_USD)
-= landed cost
-− comisión Amazon  (AMAZON_REFERRAL_RATE, 15% por defecto)
-− tarifa FBA       (según small/large standard u oversize)
-= utilidad por unidad, margen y ROI
+precio de venta en Mercado Libre        $24.990
+− IVA (19%, lo declaras)                −$3.990   → te quedan $21.000
+− comisión de Mercado Libre (14,5%)     −$3.624
+− cargo fijo (productos bajo $9.990)         $0
+− envío (obligatorio sobre $19.990)     −$2.900
+− costo puesto en Chile                 −$5.980   (Alibaba + flete aéreo + 6% arancel)
+= ganancia por unidad                    $8.496   (34% del precio)
 ```
 
-Todas las tarifas y supuestos viven en `.env` y en `productscout/fees.py`. Las tablas FBA son
-aproximaciones del tarifario de EE.UU. y cambian cada año: revísalas antes de confiar en los
-números absolutos.
+Todos esos supuestos se pueden cambiar en el archivo `.env`: tipo de cambio, comisión, costo de
+envío, si el flete es aéreo o marítimo, arancel, y si vendes con empresa o como persona natural.
+**Son aproximaciones** de tarifas públicas que cambian cada año — antes de comprar, verifica la
+comisión exacta en tu cuenta de vendedor y el arancel de tu producto con tu agente de aduana.
+
+## Cambiar el nicho o agregar búsquedas
+
+Todo vive en `data/nichos.json`, y es texto plano:
+
+```json
+{
+  "bano": {
+    "nombre": "Baño",
+    "descripcion": "Accesorios y organización de baño.",
+    "terminos": ["organizador de ducha", "filtro de ducha", "..."]
+  }
+}
+```
+
+Agrega los términos que se te ocurran y vuelve a correr el comando. Si un término tuyo es raro,
+agrega también su traducción al inglés en `data/traducciones.json` para que la búsqueda en Amazon
+y Alibaba sea buena.
+
+## Lo que el programa no puede ver
+
+Antes de comprar, revisa a mano:
+
+- **Marcas y patentes** — que el producto no esté registrado por otro.
+- **Certificaciones** — cosas eléctricas, que tocan agua potable o de uso infantil suelen pedirlas.
+- **Estacionalidad** — un mes bueno no es un año bueno.
+- **La calidad real** — pide siempre una muestra antes del pedido grande.
+- **Las publicaciones que ya venden** — mira sus fotos, su precio y sus preguntas: ahí está lo que
+  puedes hacer mejor.
 
 ---
 
-## Ajustes que probablemente quieras hacer
-
-- **Curvas BSR→ventas** por categoría: `data/bsr_curves.json` (`{"Home & Kitchen": [16560, 0.809]}`)
-  sobreescribe los valores de `productscout/estimators.py`. Si tienes ventas reales de algún
-  producto, calibra con eso: es la mejora de precisión más grande disponible.
-- **Diccionario español** para las búsquedas en Mercado Libre: `data/ml_terms.json`
-  (`{"tumbler": "termo"}`). Los títulos de Amazon vienen en inglés y ML busca en español.
-- **Pesos del score**: `WEIGHTS` en `productscout/scoring.py`.
-- **Filtros de tamaño y precio**: variables `MAX_WEIGHT_G`, `MIN_PRICE_USD`, `MAX_PRICE_USD`.
-
-## Estructura
+## Para el que quiera mirar el código
 
 ```
 productscout/
-  cli.py            comandos scan / list / show / runs / export / serve
-  api.py            API HTTP + dashboard (FastAPI, opcional)
-  pipeline.py       orquestación: Amazon → demanda → ML → proveedores → score
-  scoring.py        los seis sub-scores y el veredicto
-  estimators.py     curva BSR→ventas y demanda de ML
-  fees.py           tamaño FBA, tarifas, flete, landed cost, margen, ROI
-  keywords.py       título de Amazon → búsqueda en ML (español) y en Alibaba (genérica)
-  models.py         modelos de dominio
-  db.py             persistencia SQLite (historial de corridas)
-  http.py           cliente HTTP con reintentos, solo stdlib
-  sources/          adaptadores: amazon_{mock,keepa,paapi}, ml_{mock,api}, alibaba_{mock,manual,http}
-  web/index.html    dashboard
-data/               datos de ejemplo y archivos de ajuste
-tests/              46 pruebas (unittest, sin dependencias)
+  cli.py            los comandos (buscar, nichos, scan, serve…)
+  ideas.py          el flujo principal: ML → Amazon → Alibaba → cuentas
+  scoring.py        cómo se arma el puntaje
+  fees.py           costo puesto en el país, comisión ML, envío, ganancia
+  estimators.py     estimación de ventas de Amazon a partir del ranking
+  keywords.py       traducción español ↔ inglés de las búsquedas
+  niches.py         paquetes de búsquedas por nicho
+  db.py             historial en SQLite
+  api.py + web/     el dashboard
+  sources/          adaptadores: Amazon (mock/Keepa/PA-API), ML (mock/API),
+                    proveedores (mock/manual/HTTP)
+data/               nichos, traducciones, cotizaciones y datos de ejemplo
+tests/              80 pruebas
 ```
 
-Agregar una fuente nueva = implementar una de las tres clases de `sources/base.py` y registrarla
-en las funciones `get_*_source`. Nada más cambia.
+El motor no tiene dependencias (solo la librería estándar de Python 3.10+); FastAPI y uvicorn se
+usan únicamente para el dashboard. Agregar una fuente nueva es implementar una de las tres clases
+de `sources/base.py`.
 
 ```bash
 python -m unittest discover -s tests
 ```
 
-## Flujo de trabajo sugerido
-
-1. `scan --small-only --min-score 60` con Keepa para sacar una lista corta.
-2. Revisar la ficha (`show ASIN`) de los 5-10 mejores: mirar las advertencias, no solo el score.
-3. Abrir la URL de Alibaba que genera la app, pedir 3-5 cotizaciones reales por producto.
-4. Pegarlas en `data/supplier_quotes.json`, cambiar a `SUPPLIER_SOURCE=manual` y volver a correr:
-   ahora el margen y el ROI son de verdad.
-5. Validar a mano lo que la herramienta no puede ver: patentes y marcas registradas, restricciones
-   de categoría, certificaciones (FDA, FCC, CPSIA), estacionalidad y calidad real de la muestra.
+También queda un flujo alternativo centrado en **Amazon FBA** (`python -m productscout scan`), por
+si algún día quieres vender allá: mismo motor, pero descubriendo productos desde Amazon y
+calculando tarifas de FBA en vez de comisiones de Mercado Libre.

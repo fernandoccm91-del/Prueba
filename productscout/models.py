@@ -159,6 +159,51 @@ class Economics:
 
 
 @dataclass
+class MLEconomics:
+    """Cuentas de vender una unidad en Mercado Libre, en moneda local."""
+
+    currency: str
+    fx_usd_to_local: float
+    order_qty: int
+    sale_price_local: float
+    net_revenue_local: float        # descontado el IVA si es recuperable
+    unit_cost_usd: float
+    freight_usd: float
+    duty_usd: float
+    landed_cost_usd: float          # costo puesto en el país, por unidad
+    landed_cost_local: float
+    vat_prepaid_local: float        # IVA de importación que debes adelantar
+    commission_local: float
+    fixed_fee_local: float
+    shipping_local: float
+    profit_local: float
+    margin: float
+    roi: float
+    upfront_investment_local: float
+
+
+@dataclass
+class ProductIdea:
+    """Una idea de producto: un término de búsqueda con su mercado, su
+    validación en Amazon, sus proveedores y sus números."""
+
+    term: str
+    ml_market: MLMarket
+    amazon_products: list[AmazonProduct] = field(default_factory=list)
+    amazon_monthly_units: float = 0.0
+    amazon_reviews_median: float | None = None
+    quotes: list[SupplierQuote] = field(default_factory=list)
+    economics: MLEconomics | None = None
+    alibaba_url: str | None = None
+    scores: dict[str, float] = field(default_factory=dict)
+    total_score: float = 0.0
+    verdict: str = "descartar"
+    reasons: list[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
+    scanned_at: datetime = field(default_factory=datetime.utcnow)
+
+
+@dataclass
 class Opportunity:
     """The end product of the pipeline: one scored candidate."""
 

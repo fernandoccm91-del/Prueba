@@ -1,0 +1,72 @@
+{
+  "bano": {
+    "nombre": "Baño",
+    "descripcion": "Accesorios y organización de baño: ducha, lavamanos, orden y limpieza.",
+    "terminos": [
+      "organizador de ducha",
+      "repisa esquinera ducha",
+      "dispensador de jabon automatico",
+      "portacepillos de dientes",
+      "porta cepillo dental pared",
+      "jabonera de pared",
+      "toallero adhesivo",
+      "colgador de toallas sin perforar",
+      "cortina de baño antihongos",
+      "alfombra de baño antideslizante",
+      "set de baño accesorios",
+      "organizador bajo lavamanos",
+      "espejo de aumento con ventosa",
+      "espejo antiempañante ducha",
+      "filtro de ducha",
+      "cabezal de ducha alta presion",
+      "manguera de ducha flexible",
+      "tapa de wc soft close",
+      "cepillo de baño soporte",
+      "escobilla wc silicona",
+      "atrapa pelos ducha",
+      "desatascador de cañerias",
+      "dispensador de papel higienico",
+      "porta papel higienico pared",
+      "organizador de maquillaje baño",
+      "canasto organizador ducha",
+      "banco de ducha antideslizante",
+      "barra de apoyo baño",
+      "secador de toallas electrico",
+      "difusor aromatico baño",
+      "basurero de baño con pedal",
+      "cesto ropa sucia plegable",
+      "estante sobre inodoro",
+      "ganchos adhesivos baño",
+      "alcachofa de ducha con filtro",
+      "tapete de ducha silicona",
+      "organizador de shampoo",
+      "portarrollos de repuesto"
+    ]
+  },
+  "cocina": {
+    "nombre": "Cocina",
+    "descripcion": "Utensilios y organización de cocina.",
+    "terminos": [
+      "organizador de especias",
+      "escurridor de platos plegable",
+      "dispensador de aceite",
+      "cortador de verduras multiuso",
+      "organizador de tapers",
+      "tabla de picar plegable",
+      "espumador de leche electrico",
+      "set de silicona para cocina"
+    ]
+  },
+  "mascotas": {
+    "nombre": "Mascotas",
+    "descripcion": "Accesorios para perros y gatos.",
+    "terminos": [
+      "quita pelos de mascotas",
+      "bebedero automatico gatos",
+      "cepillo para perros",
+      "dispensador de bolsas para perro",
+      "cama antiestres para perro",
+      "juguete interactivo gatos"
+    ]
+  }
+}

@@ -153,6 +153,121 @@ def ml_score(market: MLMarket | None) -> tuple[float, list[str]]:
     return round(clamp(0.55 * demand + 0.45 * clamp(competition)), 1), notes
 
 
+# --- ideas de producto (flujo Mercado Libre) ------------------------------
+IDEA_WEIGHTS: dict[str, float] = {
+    "demanda": 0.30,
+    "competencia": 0.30,
+    "ganancia": 0.25,
+    "amazon": 0.15,
+}
+
+
+def _fmt_local(value: float, currency: str) -> str:
+    sign = "-" if value < 0 else ""
+    amount = abs(value)
+    if currency in ("CLP", "COP", "ARS"):
+        return sign + "$" + f"{amount:,.0f}".replace(",", ".")
+    return f"{sign}${amount:,.2f}"
+
+
+def demanda_ml_score(market: MLMarket) -> tuple[float, list[str], list[str]]:
+    reasons: list[str] = []
+    warnings: list[str] = []
+    units = market.monthly_units_est
+    score = scale(math.log10(units + 1), 0.5, 3.0)
+    if units >= 100:
+        reasons.append(f"En Mercado Libre se venden ~{units:.0f} unidades al mes entre las publicaciones que revisé")
+    elif units < 20:
+        warnings.append(f"Poca venta en Mercado Libre: ~{units:.0f} unidades al mes")
+    if market.median_price:
+        reasons.append(f"Precio típico en Mercado Libre: {_fmt_local(market.median_price, market.currency)}")
+    return round(score, 1), reasons, warnings
+
+
+def competencia_ml_score(market: MLMarket) -> tuple[float, list[str], list[str]]:
+    reasons: list[str] = []
+    warnings: list[str] = []
+    score = _log_penalty(market.total_listings, 22.0)
+
+    if market.total_listings < 200:
+        reasons.append(f"Solo {market.total_listings} publicaciones compitiendo: poca competencia")
+    elif market.total_listings > 1500:
+        warnings.append(f"{market.total_listings} publicaciones compitiendo: mercado saturado")
+
+    if market.official_store_share > 0.4:
+        score -= 20.0
+        warnings.append(
+            f"{market.official_store_share:.0%} de las publicaciones son tiendas oficiales: cuesta competir"
+        )
+    if market.top_seller_share > 0.5:
+        score -= 10.0
+        warnings.append(f"Un solo vendedor concentra {market.top_seller_share:.0%} de las ventas")
+    return round(clamp(score), 1), reasons, warnings
+
+
+def ganancia_score(econ) -> tuple[float, list[str], list[str]]:
+    reasons: list[str] = []
+    warnings: list[str] = []
+    if econ is None:
+        return 0.0, [], ["Sin cotización de proveedor: no puedo calcular la ganancia"]
+
+    score = 0.5 * scale(econ.margin, 0.05, 0.40) + 0.5 * scale(econ.roi, 0.3, 2.0)
+    money = _fmt_local(econ.profit_local, econ.currency)
+    if econ.profit_local <= 0:
+        warnings.append("A este precio de venta y con este costo no queda ganancia")
+    else:
+        reasons.append(f"Ganancia estimada: {money} por unidad ({econ.margin:.0%} del precio de venta)")
+        reasons.append(
+            f"Costo puesto en el país: {_fmt_local(econ.landed_cost_local, econ.currency)} "
+            f"(US${econ.unit_cost_usd:.2f} en Alibaba + flete e impuestos)"
+        )
+    return round(score, 1), reasons, warnings
+
+
+def amazon_validacion_score(monthly_units: float, matches: int) -> tuple[float, list[str], list[str]]:
+    if matches == 0:
+        return 40.0, [], ["No encontré este producto en Amazon: no pude confirmar la demanda"]
+    score = scale(math.log10(monthly_units + 1), 1.0, 3.0)
+    reasons = []
+    if monthly_units >= 100:
+        reasons.append(f"En Amazon (EE.UU.) se venden ~{monthly_units:.0f} unidades al mes: la demanda existe")
+    return round(score, 1), reasons, []
+
+
+def score_idea(idea) -> object:
+    """Puntúa una :class:`ProductIdea` y llena razones y advertencias."""
+    reasons: list[str] = []
+    warnings: list[str] = []
+
+    d, d_pro, d_con = demanda_ml_score(idea.ml_market)
+    c, c_pro, c_con = competencia_ml_score(idea.ml_market)
+    g, g_pro, g_con = ganancia_score(idea.economics)
+    a, a_pro, a_con = amazon_validacion_score(idea.amazon_monthly_units, len(idea.amazon_products))
+
+    idea.scores = {"demanda": d, "competencia": c, "ganancia": g, "amazon": a}
+    idea.total_score = round(sum(idea.scores[k] * w for k, w in IDEA_WEIGHTS.items()), 1)
+    idea.verdict = verdict_for(idea.total_score)
+
+    if idea.quotes:
+        best = idea.quotes[0]
+        reasons.append(
+            f"En Alibaba lo consigues a US${best.unit_price_usd:.2f} por unidad "
+            f"(pedido mínimo {best.moq})"
+        )
+    else:
+        warnings.append("No hay cotizaciones de proveedor cargadas para este producto")
+
+    if idea.amazon_reviews_median is not None and idea.amazon_reviews_median < 150:
+        reasons.append(
+            f"Los productos equivalentes en Amazon tienen pocas reseñas "
+            f"(mediana {idea.amazon_reviews_median:.0f}): nicho poco explotado"
+        )
+
+    idea.reasons = _dedupe(reasons + d_pro + c_pro + g_pro + a_pro)
+    idea.warnings = _dedupe(warnings + d_con + c_con + g_con + a_con)
+    return idea
+
+
 def verdict_for(score: float) -> str:
     if score >= 75:
         return "perseguir"

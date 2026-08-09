@@ -6,6 +6,7 @@ Lets you run the whole pipeline (and the tests) with no API keys.
 from __future__ import annotations
 
 import json
+import re
 from datetime import date
 
 from ..config import DATA_DIR, Settings
@@ -52,15 +53,26 @@ class MockAmazonSource(AmazonSource):
         )
 
     def search(self, keyword: str, category: str | None = None, limit: int = 25) -> list[AmazonProduct]:
-        needle = (keyword or "").strip().lower()
-        hits = []
+        """Coincidencia por palabras: basta con que la mitad de los términos de
+        la búsqueda aparezcan en el producto, ordenado por cuántos calzan."""
+        wanted = {w for w in re.findall(r"[a-z0-9]+", (keyword or "").lower()) if len(w) > 2}
+        scored: list[tuple[float, AmazonProduct]] = []
+
         for row in self._raw:
-            haystack = " ".join(
-                [row["title"], row.get("brand") or "", row["category"], *row.get("keywords", [])]
-            ).lower()
-            category_ok = not category or row["category"].lower() == category.lower()
-            if category_ok and (not needle or needle in haystack):
-                hits.append(self._build(row))
-        if not hits and not category:
-            hits = [self._build(row) for row in self._raw]
-        return hits[:limit]
+            if category and row["category"].lower() != category.lower():
+                continue
+            haystack = set(
+                re.findall(
+                    r"[a-z0-9]+",
+                    " ".join(
+                        [row["title"], row.get("brand") or "", row["category"], *row.get("keywords", [])]
+                    ).lower(),
+                )
+            )
+            if not wanted:
+                scored.append((0.0, self._build(row)))
+            elif len(wanted & haystack) / len(wanted) >= 0.5:
+                scored.append((len(wanted & haystack) / len(wanted), self._build(row)))
+
+        scored.sort(key=lambda pair: -pair[0])
+        return [product for _, product in scored[:limit]]

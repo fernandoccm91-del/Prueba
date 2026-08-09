@@ -1,0 +1,22 @@
+[
+  {
+    "match": ["herb stripper", "B0D3F8W7RK", "stainless steel herb stripper"],
+    "supplier_name": "Yiwu Kitchen Tools Co., Ltd.",
+    "product_title": "Stainless steel herb stripper con peine, logo OEM",
+    "unit_price_usd": 1.35,
+    "moq": 500,
+    "url": "https://www.alibaba.com/trade/search?SearchText=herb+stripper",
+    "country": "CN",
+    "years_active": 9,
+    "trade_assurance": true,
+    "verified_supplier": true,
+    "rating": 4.8,
+    "lead_time_days": 25,
+    "unit_weight_g": 70,
+    "price_tiers": [
+      {"min_qty": 500, "unit_price_usd": 1.35},
+      {"min_qty": 2000, "unit_price_usd": 1.12},
+      {"min_qty": 10000, "unit_price_usd": 0.95}
+    ]
+  }
+]

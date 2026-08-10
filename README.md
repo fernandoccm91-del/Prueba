@@ -1,31 +1,39 @@
-# Investigación: productos de baño con demanda y margen en MercadoLibre México
+# Investigación: productos de baño con demanda y margen en MercadoLibre
 
-Análisis de la categoría de baño en MercadoLibre México (MLM) para identificar qué productos
-tienen demanda comprobada y cuáles dejan margen después de comisiones, retención de ISR y envío.
+Análisis de la categoría de baño en MercadoLibre para identificar qué productos tienen demanda
+comprobada y cuáles dejan margen después de comisiones y despacho.
 
-- **Informe:** [`informe/README.md`](informe/README.md)
-- **Versión web:** [`informe/index.html`](informe/index.html)
-- **Datos crudos:** [`datos/mercadolibre_bano_mx.csv`](datos/mercadolibre_bano_mx.csv) — 173 productos
-  con precio, descuento, unidades vendidas acumuladas, calificación, vendedor y envío.
-- **Scripts:** [`scripts/`](scripts) — captura, parseo y análisis.
+**Chile (MLC) — mercado principal**
+
+- **Informe:** [`informe/chile.md`](informe/chile.md) · [versión web](informe/chile.html)
+- **Datos:** [`datos/mercadolibre_bano_cl.csv`](datos/mercadolibre_bano_cl.csv) — 273 productos
+- **Análisis:** [`scripts/analyze_cl.py`](scripts/analyze_cl.py)
+
+**México (MLM) — referencia comparativa**
+
+- **Informe:** [`informe/README.md`](informe/README.md) · [versión web](informe/index.html)
+- **Datos:** [`datos/mercadolibre_bano_mx.csv`](datos/mercadolibre_bano_mx.csv) — 173 productos
+- **Análisis:** [`scripts/analyze.py`](scripts/analyze.py)
 
 ## Reproducir la captura
 
 ```bash
-# 1. Descargar las páginas de ofertas por categoría de baño
-for c in MLM1613 MLM1616 MLM437239 MLM12269 MLM31513 MLM412384 MLM151569 MLM443824 MLM193786 MLM189241; do
-  mkdir -p sub/$c
+# 1. Descargar las páginas de ofertas por categoría de baño (Chile)
+for c in MLC1613 MLC1616 MLC175577 MLC440088 MLC175583 MLC412368 MLC412391 \
+         MLC414062 MLC412384 MLC416214 MLC1614 MLC180881 MLC435273; do
+  mkdir -p subcl/$c
   for p in 1 2 3; do
-    scripts/fetch.sh "https://www.mercadolibre.com.mx/ofertas?category=$c&page=$p" sub/$c/p$p.html
+    scripts/fetch.sh "https://www.mercadolibre.cl/ofertas?category=$c&page=$p" subcl/$c/p$p.html
   done
 done
 
-# 2. Clasificar en nichos y calcular métricas de demanda, competencia y margen
-python3 scripts/analyze.py
+# 2. Clasificar en nichos y calcular demanda, competencia y margen
+python3 scripts/analyze_cl.py
 ```
 
-`scripts/analyze.py` genera `dataset_bano.json` (productos clasificados) y `resumen_nichos.json`
-(métricas por nicho), e imprime la tabla comparativa.
+`scripts/analyze_cl.py` genera `datos/dataset_bano_cl.json` (productos clasificados) y
+`datos/resumen_nichos_cl.json` (métricas por nicho), e imprime la tabla comparativa.
+Para México el equivalente es `scripts/analyze.py` sobre `sub/MLM*`.
 
 ## Alcance y limitaciones
 

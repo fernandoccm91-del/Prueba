@@ -25,7 +25,7 @@ def cards(path):
         if not title:
             continue
         link = g(r'<a href="([^"#?]+)[^"]*"[^>]*class="poly-component__title"')
-        seller = g(r'poly-component__seller.*?polylabel-fw-semibold">([^<]+)')
+        seller = g(r'poly-component__seller"?[^>]*>(?:<span[^>]*>)?\s*([^<]+)')
         soldtxt = g(r'(Más de [\d.,]+ (?:mil )?productos vendidos|\+?[\d.,]+ ?(?:mil)? vendidos)')
         rating = g(r'Calificación ([\d.,]+) de 5')
         prices = re.findall(r'andes-money-amount__fraction[^>]*>([\d.,]+)', b)

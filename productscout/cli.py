@@ -21,9 +21,19 @@ import argparse
 import csv
 import json
 import sys
+from pathlib import Path
 
 from .config import Settings
-from .db import connect, get_opportunity, latest_run_id, list_opportunities, list_runs, save_run
+from .db import (
+    connect,
+    get_opportunity,
+    latest_run_id,
+    list_ideas,
+    list_opportunities,
+    list_runs,
+    save_niche_run,
+    save_run,
+)
 from .keywords import alibaba_query
 from .models import to_dict
 from .niches import load_niches, niche_names
@@ -250,6 +260,15 @@ def cmd_buscar(args: argparse.Namespace, settings: Settings) -> int:
         for position, idea in enumerate(result.ideas[:detail_count], start=1):
             print_idea_card(position, idea)
 
+    if not args.sin_html:
+        ideas = [to_dict(idea) for idea in result.ideas]
+        path = _write_html_report(
+            ideas, settings, args.html,
+            niche=niche_name, sources=result.sources, terms_scanned=result.terms_scanned,
+        )
+        print(f"\n  Informe visual escrito en:\n  {path}\n  (ábrelo con doble clic para ver "
+              f"la ficha completa de cada producto)")
+
     print(f"\n{'=' * 78}\nQUÉ HACER AHORA\n{'=' * 78}")
     print("  1. Abre el link de Alibaba de los 2-3 primeros y pide cotización a 3 proveedores.")
     print("     Pregunta: precio por unidad, pedido mínimo, peso por unidad y costo de envío a Chile.")
@@ -316,6 +335,73 @@ def cmd_show(args: argparse.Namespace, settings: Settings) -> int:
         print(f"No encontré {args.asin}. Corre un scan primero.", file=sys.stderr)
         return 1
     print_detail(json.loads(row["payload"]))
+    return 0
+
+
+def _write_html_report(ideas: list[dict], settings: Settings, out_path: str, **meta) -> str:
+    from .report import render
+
+    page = render(
+        ideas,
+        niche=meta.get("niche", ""),
+        site=settings.ml_site,
+        site_name=SITE_NAMES.get(settings.ml_site, settings.ml_site),
+        sources=meta.get("sources"),
+        terms_scanned=meta.get("terms_scanned"),
+    )
+    Path(out_path).write_text(page, encoding="utf-8")
+    return str(Path(out_path).resolve())
+
+
+def cmd_exportar(args: argparse.Namespace, settings: Settings) -> int:
+    """Escribe la última búsqueda a un archivo que puedes abrir."""
+    from .db import list_ideas
+    from .ideas import NicheScanner, NicheScanRequest
+
+    conn = connect(settings.db_path)
+    run_id = args.run or latest_run_id(conn)
+    rows = list_ideas(conn, run_id=run_id, limit=args.limit) if run_id else []
+    conn.close()
+
+    meta: dict = {"niche": args.nicho or settings.default_niche}
+    if not rows:
+        print("No hay búsquedas guardadas todavía; corriendo una ahora...")
+        result = NicheScanner(settings).scan(
+            NicheScanRequest(niche=meta["niche"], top=args.limit)
+        )
+        conn = connect(settings.db_path)
+        run_id = save_niche_run(conn, result)
+        rows = list_ideas(conn, run_id=run_id, limit=args.limit)
+        conn.close()
+        meta.update(niche=result.niche_name, sources=result.sources,
+                    terms_scanned=result.terms_scanned)
+
+    if not rows:
+        print("No hay resultados para exportar.", file=sys.stderr)
+        return 1
+
+    ideas = [json.loads(row["payload"]) for row in rows]
+    default_name = {"html": "productos.html", "csv": "productos.csv", "json": "productos.json"}
+    out = args.out or default_name[args.formato]
+
+    if args.formato == "html":
+        path = _write_html_report(ideas, settings, out, **meta)
+        print(f"\nListo. Abre este archivo con doble clic:\n  {path}\n")
+        return 0
+
+    if args.formato == "json":
+        Path(out).write_text(json.dumps(ideas, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"Escrito {Path(out).resolve()}")
+        return 0
+
+    fields = ["term", "total_score", "verdict", "ml_listings", "ml_monthly_units",
+              "ml_median_price", "currency", "amazon_monthly_units", "supplier_price_usd",
+              "moq", "profit_local", "margin", "roi", "alibaba_url"]
+    with open(out, "w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fields, extrasaction="ignore")
+        writer.writeheader()
+        writer.writerows(rows)
+    print(f"Escrito {Path(out).resolve()}")
     return 0
 
 
@@ -419,7 +505,17 @@ def build_parser() -> argparse.ArgumentParser:
     buscar.add_argument("--min-score", type=float, default=0.0, help="puntaje mínimo")
     buscar.add_argument("--max-terminos", type=int, help="revisar solo los primeros N términos")
     buscar.add_argument("--detalle", action="store_true", help="ficha completa de todos, no solo del top 5")
+    buscar.add_argument("--html", default="productos.html", help="dónde escribir el informe visual")
+    buscar.add_argument("--sin-html", action="store_true", help="no generar el informe visual")
     buscar.set_defaults(func=cmd_buscar)
+
+    exportar = sub.add_parser("exportar", help="guarda la última búsqueda en un archivo")
+    exportar.add_argument("--formato", choices=["html", "csv", "json"], default="html")
+    exportar.add_argument("--out", help="archivo destino")
+    exportar.add_argument("--nicho", help="nicho a usar si no hay búsquedas guardadas")
+    exportar.add_argument("--limit", type=int, default=50)
+    exportar.add_argument("--run", type=int, help="id de una corrida anterior")
+    exportar.set_defaults(func=cmd_exportar)
 
     nichos = sub.add_parser("nichos", help="lista los nichos disponibles")
     nichos.set_defaults(func=cmd_nichos)

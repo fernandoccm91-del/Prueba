@@ -24,9 +24,14 @@ python -m productscout buscar
 Eso es todo. Por defecto busca el nicho **baño** (38 búsquedas: organizadores de ducha,
 dispensadores, toalleros, etc.) en Mercado Libre Chile.
 
+Al terminar te deja un archivo **`productos.html`** en la carpeta: ábrelo con doble clic y ahí
+ves todos los productos con su ficha completa, sin tocar la terminal.
+
 Otros comandos:
 
 ```bash
+python -m productscout exportar                   # vuelve a generar productos.html
+python -m productscout exportar --formato csv     # o productos.csv para Excel
 python -m productscout buscar cocina              # otro nicho
 python -m productscout buscar -t "filtro de ducha"  # un producto puntual
 python -m productscout buscar --detalle           # ficha completa de todos

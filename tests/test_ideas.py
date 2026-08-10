@@ -285,3 +285,103 @@ class BuscarCliTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ReportTests(unittest.TestCase):
+    def setUp(self):
+        from productscout.models import to_dict
+
+        result = NicheScanner(Settings()).scan(NicheScanRequest(niche="bano", max_terms=5))
+        self.ideas = [to_dict(idea) for idea in result.ideas]
+        self.sources = result.sources
+
+    def test_standalone_page_is_a_complete_document(self):
+        from productscout.report import render
+
+        page = render(self.ideas, niche="Baño", site="MLC", site_name="Chile",
+                      sources=self.sources, terms_scanned=5)
+        self.assertTrue(page.startswith("<!doctype html>"))
+        self.assertIn("<title>", page)
+        self.assertIn("</html>", page)
+        self.assertIn("Mercado Libre Chile", page)
+
+    def test_fragment_omits_the_document_shell(self):
+        from productscout.report import render
+
+        page = render(self.ideas, niche="Baño", standalone=False)
+        self.assertNotIn("<!doctype", page.lower())
+        self.assertNotIn("<body", page.lower())
+        self.assertIn("<title>", page)
+
+    def test_mock_data_is_flagged_in_the_page(self):
+        from productscout.report import render
+
+        page = render(self.ideas, niche="Baño", sources=self.sources)
+        self.assertIn("datos de ejemplo", page)
+
+    def test_every_product_appears_with_its_score(self):
+        from productscout.report import render
+
+        page = render(self.ideas, niche="Baño", sources=self.sources)
+        for idea in self.ideas:
+            self.assertIn(idea["term"], page)
+        self.assertIn("Qué hacer ahora", page)
+
+    def test_html_is_escaped(self):
+        from productscout.report import render
+
+        hostile = dict(self.ideas[0])
+        hostile["term"] = '<script>alert("x")</script>'
+        page = render([hostile], niche="Baño")
+        self.assertNotIn("<script>alert", page)
+        self.assertIn("&lt;script&gt;", page)
+
+    def test_empty_result_still_renders(self):
+        from productscout.report import render
+
+        page = render([], niche="Baño", sources=self.sources, terms_scanned=0)
+        self.assertIn("Baño", page)
+
+
+class ExportarCliTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        os.environ["DB_PATH"] = str(Path(self.tmp.name) / "export.db")
+
+    def tearDown(self):
+        os.environ.pop("DB_PATH", None)
+        self.tmp.cleanup()
+
+    def _run(self, argv):
+        buffer = io.StringIO()
+        with redirect_stdout(buffer):
+            code = main(argv)
+        self.assertEqual(code, 0)
+        return buffer.getvalue()
+
+    def test_exportar_runs_a_search_when_there_is_nothing_saved(self):
+        out = str(Path(self.tmp.name) / "productos.html")
+        output = self._run(["exportar", "--out", out, "--limit", "5"])
+        self.assertIn("corriendo una ahora", output)
+        page = Path(out).read_text(encoding="utf-8")
+        self.assertTrue(page.startswith("<!doctype html>"))
+
+    def test_buscar_writes_the_html_report_by_default(self):
+        out = str(Path(self.tmp.name) / "auto.html")
+        output = self._run(["buscar", "--max-terminos", "4", "--html", out])
+        self.assertIn("Informe visual escrito en", output)
+        self.assertTrue(Path(out).exists())
+
+    def test_sin_html_skips_the_report(self):
+        out = str(Path(self.tmp.name) / "skip.html")
+        output = self._run(["buscar", "--max-terminos", "3", "--html", out, "--sin-html"])
+        self.assertNotIn("Informe visual", output)
+        self.assertFalse(Path(out).exists())
+
+    def test_csv_export_has_the_key_columns(self):
+        self._run(["buscar", "--max-terminos", "4", "--sin-html"])
+        out = str(Path(self.tmp.name) / "productos.csv")
+        self._run(["exportar", "--formato", "csv", "--out", out])
+        content = Path(out).read_text(encoding="utf-8")
+        self.assertIn("term,total_score", content)
+        self.assertIn("alibaba.com", content)

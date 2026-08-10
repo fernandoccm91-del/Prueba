@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ProductScout</title>
+<style>
+  :root {
+    --bg: #f7f8fa; --panel: #ffffff; --ink: #16181d; --muted: #6b7280;
+    --line: #e4e7ec; --accent: #2563eb; --good: #15803d; --warn: #b45309; --bad: #b91c1c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#0f1115; --panel:#171a21; --ink:#e8eaed; --muted:#9aa3af;
+            --line:#262b35; --accent:#60a5fa; --good:#4ade80; --warn:#fbbf24; --bad:#f87171; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+         background:var(--bg); color:var(--ink); }
+  header { padding:18px 24px; border-bottom:1px solid var(--line); background:var(--panel);
+           display:flex; gap:14px; align-items:center; flex-wrap:wrap; }
+  h1 { font-size:18px; margin:0; letter-spacing:-0.01em; }
+  .badge { font-size:12px; color:var(--muted); border:1px solid var(--line);
+           padding:2px 8px; border-radius:99px; }
+  .badge.alert { color:var(--warn); border-color:var(--warn); }
+  main { padding:24px; max-width:1320px; margin:0 auto; }
+  .controls { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:8px; }
+  .hint { color:var(--muted); font-size:13px; margin:0 0 20px; }
+  input, select, button { font:inherit; padding:8px 10px; border-radius:8px;
+                          border:1px solid var(--line); background:var(--panel); color:var(--ink); }
+  input[type=text] { min-width:260px; }
+  button { background:var(--accent); color:#fff; border:none; cursor:pointer; font-weight:600; }
+  button.ghost { background:transparent; color:var(--ink); border:1px solid var(--line); font-weight:500; }
+  button:disabled { opacity:.55; cursor:progress; }
+  .wrap { overflow-x:auto; border:1px solid var(--line); border-radius:12px; background:var(--panel); }
+  table { border-collapse:collapse; width:100%; min-width:900px; }
+  th, td { padding:10px 12px; text-align:left; border-bottom:1px solid var(--line); white-space:nowrap; }
+  th { font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted);
+       position:sticky; top:0; background:var(--panel); }
+  td.term { white-space:normal; min-width:230px; font-weight:500; }
+  tbody tr { cursor:pointer; }
+  tbody tr:hover { background:color-mix(in srgb, var(--accent) 8%, transparent); }
+  .num { text-align:right; font-variant-numeric:tabular-nums; }
+  .score { font-weight:700; font-variant-numeric:tabular-nums; }
+  .v-perseguir { color:var(--good); } .v-investigar { color:var(--accent); }
+  .v-dudoso { color:var(--warn); } .v-descartar { color:var(--muted); }
+  .empty { padding:40px; text-align:center; color:var(--muted); }
+  dialog { border:1px solid var(--line); border-radius:14px; background:var(--panel); color:var(--ink);
+           max-width:780px; width:92vw; padding:0; }
+  dialog::backdrop { background:rgba(0,0,0,.5); }
+  .dhead { padding:18px 22px; border-bottom:1px solid var(--line); }
+  .dbody { padding:18px 22px; max-height:70vh; overflow-y:auto; }
+  .bars { display:grid; grid-template-columns:110px 1fr 48px; gap:6px 10px; align-items:center;
+          margin:0 0 20px; font-size:13px; }
+  .bar { height:8px; border-radius:99px; background:var(--line); overflow:hidden; }
+  .bar > i { display:block; height:100%; background:var(--accent); }
+  .kv { display:grid; grid-template-columns:auto 1fr; gap:4px 14px; font-size:14px; margin-bottom:16px; }
+  .kv dt { color:var(--muted); } .kv dd { margin:0; font-variant-numeric:tabular-nums; }
+  h3 { font-size:13px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted);
+       margin:20px 0 8px; }
+  ul.notes { margin:0; padding-left:18px; } ul.notes li { margin-bottom:4px; }
+  ul.notes.bad li { color:var(--warn); }
+  .quote { border:1px solid var(--line); border-radius:10px; padding:10px 12px; margin-bottom:8px; font-size:14px; }
+  a { color:var(--accent); }
+  .status { color:var(--muted); font-size:14px; }
+  .steps { border:1px solid var(--line); border-radius:12px; padding:16px 20px; margin-top:24px;
+           background:var(--panel); font-size:14px; }
+  .steps ol { margin:8px 0 0; padding-left:20px; } .steps li { margin-bottom:6px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>ProductScout</h1>
+  <span class="badge" id="sources">cargando…</span>
+  <span class="badge alert" id="mockWarn" hidden>datos de ejemplo, no reales</span>
+  <span class="status" id="status"></span>
+</header>
+
+<main>
+  <div class="controls">
+    <select id="nicho"></select>
+    <input type="text" id="termino" placeholder="…o busca un producto puntual">
+    <label style="color:var(--muted);font-size:14px">puntaje mín.
+      <input type="number" id="minScore" value="0" min="0" max="100" step="5" style="width:70px"></label>
+    <button id="buscar">Buscar productos</button>
+    <button class="ghost" id="ultimos">Ver última búsqueda</button>
+  </div>
+  <p class="hint">Busca en Mercado Libre cuánto se vende y cuánta competencia hay, lo confirma en
+     Amazon y lo cotiza en Alibaba. Haz clic en una fila para ver el detalle completo.</p>
+
+  <div class="wrap">
+    <table>
+      <thead><tr>
+        <th>Puntaje</th><th>Veredicto</th><th>Producto</th>
+        <th class="num">Publicaciones</th><th class="num">Ventas/mes</th><th class="num">Precio típico</th>
+        <th class="num">Costo Alibaba</th><th class="num">Ganancia/u</th><th class="num">Margen</th>
+        <th class="num">Amazon u/mes</th>
+      </tr></thead>
+      <tbody id="rows"><tr><td colspan="10" class="empty">Elige un nicho y haz clic en «Buscar productos».</td></tr></tbody>
+    </table>
+  </div>
+
+  <div class="steps">
+    <strong>Qué hacer con los resultados</strong>
+    <ol>
+      <li>Abre el link de Alibaba de los 2-3 primeros y pide cotización a tres proveedores:
+          precio por unidad, pedido mínimo, peso y costo de envío.</li>
+      <li>Anota esas respuestas en <code>data/supplier_quotes.json</code> y vuelve a buscar con
+          <code>SUPPLIER_SOURCE=manual</code>: ahí la ganancia deja de ser estimada.</li>
+      <li>Mira en Mercado Libre las publicaciones que ya venden ese producto — fotos, precio y
+          preguntas — para ver qué puedes hacer mejor.</li>
+    </ol>
+  </div>
+</main>
+
+<dialog id="detail"><div class="dhead"><strong id="dTitle"></strong></div>
+  <div class="dbody" id="dBody"></div>
+  <div style="padding:14px 22px; border-top:1px solid var(--line); text-align:right">
+    <button class="ghost" onclick="document.getElementById('detail').close()">Cerrar</button>
+  </div>
+</dialog>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const NO_DECIMALS = ["CLP", "COP", "ARS"];
+const local = (v, c) => v == null ? "–" :
+  (v < 0 ? "-$" : "$") + Math.abs(Number(v)).toLocaleString("es-CL", NO_DECIMALS.includes(c)
+    ? {maximumFractionDigits: 0} : {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const usd = (v) => v == null ? "–" : "US$" + Number(v).toFixed(2);
+const pct = (v) => v == null ? "–" : Math.round(v * 100) + "%";
+const num = (v) => v == null ? "–" : Math.round(v).toLocaleString("es-CL");
+let CURRENT = [];
+
+async function loadConfig() {
+  const [cfg, nichos] = await Promise.all([
+    (await fetch("/api/config")).json(),
+    (await fetch("/api/nichos")).json(),
+  ]);
+  $("sources").textContent =
+    `Mercado Libre ${cfg.sources.mercadolibre} (${cfg.ml_site}) · Amazon ${cfg.sources.amazon} · proveedores ${cfg.sources.suppliers}`;
+  $("mockWarn").hidden = cfg.sources.mercadolibre !== "mock";
+  $("nicho").innerHTML = nichos.items
+    .map((n) => `<option value="${n.slug}" ${n.slug === nichos.default ? "selected" : ""}>${n.nombre} (${n.terminos.length} búsquedas)</option>`)
+    .join("");
+}
+
+function renderRows(items) {
+  CURRENT = items;
+  const tbody = $("rows");
+  if (!items.length) {
+    tbody.innerHTML = '<tr><td colspan="10" class="empty">Sin resultados.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = items.map((it, i) => `
+    <tr data-i="${i}">
+      <td class="score">${it.total_score.toFixed(1)}</td>
+      <td class="v-${it.verdict}">${it.verdict}</td>
+      <td class="term">${it.term}</td>
+      <td class="num">${num(it.ml_listings)}</td>
+      <td class="num">${num(it.ml_monthly_units)}</td>
+      <td class="num">${local(it.ml_median_price, it.currency)}</td>
+      <td class="num">${usd(it.supplier_price_usd)}</td>
+      <td class="num">${local(it.profit_local, it.currency)}</td>
+      <td class="num">${pct(it.margin)}</td>
+      <td class="num">${num(it.amazon_monthly_units)}</td>
+    </tr>`).join("");
+  tbody.querySelectorAll("tr[data-i]").forEach((tr) =>
+    tr.addEventListener("click", () => showDetail(CURRENT[tr.dataset.i].payload)));
+}
+
+function showDetail(p) {
+  $("dTitle").textContent = p.term;
+  const m = p.ml_market, e = p.economics, q = p.quotes?.[0];
+  const c = m.currency;
+  const bars = Object.entries(p.scores).map(([k, v]) =>
+    `<span>${k}</span><span class="bar"><i style="width:${v}%"></i></span><span class="num">${v}</span>`).join("");
+
+  $("dBody").innerHTML = `
+    <div class="bars">${bars}</div>
+    <dl class="kv">
+      <dt>Puntaje</dt><dd><strong>${p.total_score}</strong> → <span class="v-${p.verdict}">${p.verdict}</span></dd>
+    </dl>
+    <h3>Mercado Libre (${m.site})</h3>
+    <dl class="kv">
+      <dt>Competencia</dt><dd>${num(m.total_listings)} publicaciones${m.official_store_share ? ` · ${pct(m.official_store_share)} tiendas oficiales` : ""}</dd>
+      <dt>Se vende</dt><dd>~${num(m.monthly_units_est)} unidades al mes (${num(m.sold_total)} vendidas acumuladas en la muestra)</dd>
+      <dt>Precio típico</dt><dd>${local(m.median_price, c)}</dd>
+    </dl>
+    <h3>Amazon (EE.UU.) — validación de demanda</h3>
+    <dl class="kv">
+      <dt>Se vende</dt><dd>~${num(p.amazon_monthly_units)} unidades al mes</dd>
+      <dt>Reseñas (mediana)</dt><dd>${p.amazon_reviews_median == null ? "–" : num(p.amazon_reviews_median)}</dd>
+      ${p.amazon_products?.length ? `<dt>Ejemplo</dt><dd><a href="${p.amazon_products[0].url}" target="_blank" rel="noopener">${p.amazon_products[0].title}</a></dd>` : ""}
+    </dl>
+    ${e ? `<h3>Cuentas por unidad</h3>
+      <dl class="kv">
+        <dt>Precio de venta</dt><dd>${local(e.sale_price_local, c)}</dd>
+        <dt>Costo puesto en el país</dt><dd>${local(e.landed_cost_local, c)} (${usd(e.unit_cost_usd)} en Alibaba + flete + arancel)</dd>
+        <dt>Comisión ML</dt><dd>${local(e.commission_local + e.fixed_fee_local, c)}</dd>
+        <dt>Envío</dt><dd>${local(e.shipping_local, c)}</dd>
+        <dt>Ganancia</dt><dd><strong>${local(e.profit_local, c)}</strong> por unidad · margen ${pct(e.margin)} · ROI ${pct(e.roi)}</dd>
+        <dt>Inversión inicial</dt><dd>${local(e.upfront_investment_local, c)} por ${num(e.order_qty)} unidades</dd>
+      </dl>` : ""}
+    ${p.quotes?.length ? `<h3>Proveedores</h3>${p.quotes.slice(0, 4).map((x) => `
+      <div class="quote"><strong>${usd(x.unit_price_usd)}/unidad</strong> · pedido mínimo ${x.moq} · ${x.supplier_name}
+      <br><small style="color:var(--muted)">${x.years_active ?? "?"} años · rating ${x.rating ?? "?"}
+      ${x.trade_assurance ? "· Trade Assurance" : ""} ${x.verified_supplier ? "· Verified" : ""}</small></div>`).join("")}` : ""}
+    ${p.alibaba_url ? `<p><a href="${p.alibaba_url}" target="_blank" rel="noopener">Buscar proveedores en Alibaba →</a></p>` : ""}
+    ${p.reasons?.length ? `<h3>A favor</h3><ul class="notes">${p.reasons.map((r) => `<li>${r}</li>`).join("")}</ul>` : ""}
+    ${p.warnings?.length ? `<h3>Ojo</h3><ul class="notes bad">${p.warnings.map((w) => `<li>${w}</li>`).join("")}</ul>` : ""}
+  `;
+  $("detail").showModal();
+}
+
+async function loadSaved() {
+  $("status").textContent = "cargando…";
+  const data = await (await fetch("/api/ideas?limit=100&last=true")).json();
+  renderRows(data.items);
+  $("status").textContent = data.count ? `${data.count} resultados guardados` : "sin búsquedas previas";
+}
+
+async function buscar() {
+  const btn = $("buscar");
+  btn.disabled = true;
+  $("status").textContent = "buscando… esto puede tardar un poco";
+  try {
+    const termino = $("termino").value.trim();
+    const body = {
+      niche: $("nicho").value,
+      terms: termino ? [termino] : [],
+      min_score: Number($("minScore").value) || 0,
+      top: 50,
+    };
+    const res = await fetch("/api/buscar", {
+      method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body),
+    });
+    if (!res.ok) throw new Error((await res.json()).detail || res.statusText);
+    const data = await res.json();
+    await loadSaved();
+    $("status").textContent =
+      `${data.terms_scanned} búsquedas revisadas · ${data.count} resultados` +
+      (data.errors.length ? ` · ${data.errors.length} errores` : "");
+  } catch (err) {
+    $("status").textContent = "error: " + err.message;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+$("buscar").addEventListener("click", buscar);
+$("ultimos").addEventListener("click", loadSaved);
+$("termino").addEventListener("keydown", (e) => { if (e.key === "Enter") buscar(); });
+loadConfig();
+loadSaved();
+</script>
+</body>
+</html>

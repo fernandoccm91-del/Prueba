@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "productscout"
+version = "0.1.0"
+description = "Investigación de productos: demanda y competencia en Amazon, mercado en Mercado Libre y proveedores en Alibaba"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+web = ["fastapi>=0.110", "uvicorn>=0.27", "pydantic>=2.5"]
+
+[project.scripts]
+productscout = "productscout.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["productscout*"]
+
+[tool.setuptools.package-data]
+productscout = ["web/*.html"]

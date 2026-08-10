@@ -82,9 +82,15 @@ contienen la palabra baño" no lo es). Para cada producto, asigna:
   para el modelo de envío del paso siguiente). No hace falta precisión
   perfecta — una coladera pesa ~0.4kg, un mueble de baño ~12kg, un sanitario
   ~25kg; usa criterio de sentido común sobre qué es el objeto.
+- **`src_cat`** (opcional): la subcategoría de origen, si la guardaste al
+  recorrer categorías en el paso 2. Si no la tienes, déjala en `null` — no es
+  obligatoria.
 
 Guarda el resultado enriquecido (mismo `productos.json`, con `nicho` y
-`peso_kg` agregados a cada registro).
+`peso_kg` agregados a cada registro) **usando exactamente esos nombres de
+clave**. `scripts/build_report_xlsx.py` lee `productos.json` buscando esas
+claves literales — si en vez de `peso_kg` escribes `peso` o `pesoKg`, la
+columna correspondiente sale vacía sin ningún error visible en pantalla.
 
 ## 5. Calcular demanda, competencia y margen por nicho
 
@@ -119,6 +125,43 @@ Para cada nicho, calcula:
           × %disponible_tras_costos
           × 100
   ```
+
+**Guarda cada nicho con exactamente estas claves** — no un subconjunto, no
+sinónimos. `scripts/build_report_xlsx.py` valida esto y avisa si detecta que
+una columna quedó vacía en (casi) todas las filas, pero es mucho mejor
+evitarlo desde el origen:
+
+```json
+{
+  "nicho": "Barras de seguridad para baño",
+  "score": 80.4,
+  "ofertas": 7,
+  "vendedores": 6,
+  "uds_publ": 1729,
+  "uds_tot": 12100,
+  "p50": 33666,
+  "pmin": 7590,
+  "pmax": 48180,
+  "peso": 2.5,
+  "catalogo": 29,
+  "full": 29,
+  "desc": 24,
+  "disp": 67
+}
+```
+
+Un error real que ya pasó: en una sesión se calcularon bien todas estas
+métricas como variables intermedias (el `score` salió correcto), pero al
+armar el diccionario final para guardar en `resumen_nichos.json` solo se
+incluyeron `nicho`, `score` y `ofertas` — el resto de las claves nunca se
+escribió. El Excel se generó sin errores (`build_report_xlsx.py` no inventa
+datos que no recibió) pero la hoja "Resumen por nicho" quedó prácticamente
+vacía. Desde entonces el script detecta este patrón y estampa una fila de
+alerta roja bien visible en el archivo — si la ves, no es un problema del
+Excel, es que `resumen_nichos.json` no tiene las claves de arriba. Antes de
+entregar el archivo al usuario, revisa la salida de la consola: si
+`build_report_xlsx.py` imprimió una `ADVERTENCIA`, arregla el JSON y vuelve
+a correrlo — no entregues un archivo con esa advertencia.
 
   La intuición detrás de cada factor: `log10` porque la demanda importa pero
   con rendimientos decrecientes (10.000 ventas no es 100x mejor que 1.000);

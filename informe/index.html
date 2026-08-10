@@ -1,0 +1,388 @@
+<title>Productos de baño en MercadoLibre México — demanda y margen</title>
+<style>
+  :root{
+    --ground:#F4F5F3; --surface:#FFFFFF; --surface-2:#EDEFEC;
+    --ink:#141A18; --ink-soft:#3B4643; --muted:#65736F;
+    --line:#D9DEDA; --line-soft:#E7EAE7;
+    --accent:#0D6B5F; --accent-soft:#D8E7E3;
+    --copper:#A8522C; --copper-soft:#F0E1D8;
+    --good:#0D6B5F; --warn:#A8522C;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0F1413; --surface:#161C1A; --surface-2:#1D2422;
+      --ink:#E9EEEB; --ink-soft:#C2CDC9; --muted:#8C9B96;
+      --line:#2A3330; --line-soft:#222A28;
+      --accent:#54C1AD; --accent-soft:#17332E;
+      --copper:#DC8F63; --copper-soft:#33231A;
+      --good:#54C1AD; --warn:#DC8F63;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0F1413; --surface:#161C1A; --surface-2:#1D2422;
+    --ink:#E9EEEB; --ink-soft:#C2CDC9; --muted:#8C9B96;
+    --line:#2A3330; --line-soft:#222A28;
+    --accent:#54C1AD; --accent-soft:#17332E;
+    --copper:#DC8F63; --copper-soft:#33231A;
+    --good:#54C1AD; --warn:#DC8F63;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    background:var(--ground); color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    font-size:16.5px; line-height:1.62; margin:0;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:960px; margin:0 auto; padding:0 24px 96px; display:flex; flex-direction:column; gap:52px}
+  .prose{max-width:66ch}
+
+  h1,h2,h3{font-family:"Iowan Old Style",Georgia,"Times New Roman",serif; font-weight:600; text-wrap:balance; margin:0}
+  h1{font-size:clamp(2rem,4.4vw,3rem); line-height:1.1; letter-spacing:-.015em}
+  h2{font-size:1.55rem; line-height:1.2}
+  h3{font-size:1.12rem; line-height:1.3}
+  p{margin:0}
+  a{color:var(--accent); text-underline-offset:3px}
+  a:focus-visible,summary:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:3px}
+
+  .eyebrow{
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    font-size:.7rem; letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
+  }
+
+  header.masthead{
+    border-bottom:1px solid var(--line); padding:64px 0 36px;
+    display:flex; flex-direction:column; gap:18px;
+  }
+  .meta{
+    display:flex; flex-wrap:wrap; gap:8px 10px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.74rem; color:var(--muted);
+  }
+  .meta span{border:1px solid var(--line); border-radius:2px; padding:3px 8px; background:var(--surface)}
+
+  section{display:flex; flex-direction:column; gap:20px}
+  .sec-head{display:flex; flex-direction:column; gap:6px; border-top:2px solid var(--ink); padding-top:14px}
+
+  ol.findings{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:14px; counter-reset:f}
+  ol.findings li{
+    counter-increment:f; display:grid; grid-template-columns:34px 1fr; gap:14px;
+    max-width:72ch;
+  }
+  ol.findings li::before{
+    content:counter(f,decimal-leading-zero);
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.78rem;
+    color:var(--accent); padding-top:.28em;
+  }
+
+  .tablewrap{overflow-x:auto; border:1px solid var(--line); border-radius:4px; background:var(--surface)}
+  table{border-collapse:collapse; width:100%; font-size:.9rem}
+  caption{text-align:left; color:var(--muted); font-size:.82rem; padding:0 0 8px}
+  th,td{padding:9px 14px; text-align:left; border-bottom:1px solid var(--line-soft); white-space:nowrap}
+  thead th{
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-weight:500;
+    font-size:.7rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted);
+    background:var(--surface-2); border-bottom:1px solid var(--line); position:sticky; top:0;
+  }
+  tbody tr:last-child td{border-bottom:none}
+  .num{text-align:right; font-variant-numeric:tabular-nums; font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .prod{white-space:normal; min-width:22ch}
+  tr.dim td{color:var(--muted)}
+  tr.hl td{background:var(--accent-soft)}
+
+  .bar{display:flex; align-items:center; gap:8px; min-width:132px}
+  .bar i{display:block; height:7px; border-radius:1px; background:var(--accent)}
+  .bar.warn i{background:var(--copper)}
+  .bar b{font-weight:500; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.8rem; font-variant-numeric:tabular-nums}
+
+  .picks{display:flex; flex-direction:column; gap:18px}
+  .pick{
+    background:var(--surface); border:1px solid var(--line); border-radius:5px;
+    padding:22px 24px; display:flex; flex-direction:column; gap:14px;
+  }
+  .pick-head{display:flex; flex-wrap:wrap; align-items:baseline; gap:10px 14px}
+  .rank{
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.72rem;
+    color:var(--accent); border:1px solid var(--accent); border-radius:2px; padding:2px 6px;
+  }
+  .price{margin-left:auto; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.95rem; color:var(--ink-soft)}
+  .stats{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(118px,1fr)); gap:1px;
+    background:var(--line-soft); border:1px solid var(--line-soft); border-radius:3px; overflow:hidden;
+  }
+  .stat{background:var(--surface); padding:10px 12px; display:flex; flex-direction:column; gap:2px}
+  .stat b{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:1.02rem; font-weight:600; font-variant-numeric:tabular-nums}
+  .stat span{font-size:.68rem; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .pick dl{margin:0; display:flex; flex-direction:column; gap:9px}
+  .pick dt{
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.68rem;
+    letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-bottom:2px;
+  }
+  .pick dd{margin:0; max-width:70ch; color:var(--ink-soft)}
+  .pick dd.risk{color:var(--copper)}
+
+  .callout{
+    border-left:3px solid var(--copper); background:var(--copper-soft);
+    padding:16px 20px; border-radius:0 4px 4px 0; max-width:72ch;
+  }
+  .callout .eyebrow{color:var(--copper)}
+
+  ul.plain{margin:0; padding-left:1.1em; display:flex; flex-direction:column; gap:9px; max-width:70ch; color:var(--ink-soft)}
+
+  details{border:1px solid var(--line); border-radius:4px; background:var(--surface); padding:0}
+  summary{cursor:pointer; padding:13px 18px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.78rem; letter-spacing:.05em; text-transform:uppercase; color:var(--muted)}
+  details[open] summary{border-bottom:1px solid var(--line-soft)}
+  details .inner{padding:16px 18px; display:flex; flex-direction:column; gap:14px}
+
+  footer{border-top:1px solid var(--line); padding-top:22px; color:var(--muted); font-size:.86rem; display:flex; flex-direction:column; gap:8px}
+  footer ul{margin:0; padding-left:1.1em; display:flex; flex-direction:column; gap:4px}
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Investigación de mercado · MercadoLibre México</p>
+    <h1>Productos de baño: dónde hay demanda real y dónde queda margen</h1>
+    <p class="prose">Análisis de 173 productos de baño con oferta activa en MercadoLibre México, clasificados en 17 nichos y evaluados por demanda, competencia y economía unitaria después de comisiones, retención de ISR y envío.</p>
+    <div class="meta">
+      <span>Captura 10 ago 2026</span><span>Sitio MLM</span><span>173 productos</span><span>10 categorías</span><span>17 nichos</span>
+    </div>
+  </header>
+
+  <section>
+    <div class="sec-head"><p class="eyebrow">Resumen</p><h2>Cinco hallazgos</h2></div>
+    <ol class="findings">
+      <li><p>La demanda del baño se concentra en <b>piezas baratas y ligeras, no en muebles</b>. Los diez productos más vendidos son coladeras, toallas, organizadores, regaderas y sets de accesorios entre $89 y $488 MXN. El 68% de la oferta activa está por debajo de $299.</p></li>
+      <li><p>El mejor equilibrio demanda/competencia está en <b>barras de seguridad, coladeras antiolores y cortinas con barra telescópica</b>: 625–1,200 unidades vendidas por publicación con apenas 4–6 vendedores compitiendo.</p></li>
+      <li><p>Hay un <b>acantilado de rentabilidad en $299</b>. A ese precio el envío gratis se vuelve obligatorio y borra el 24% del precio de un producto de 1 kg. A $289 quedan $225 libres de comisiones; a $299 quedan $161.</p></li>
+      <li><p><b>Mercado Envíos Full ya es requisito de entrada</b>: el 92% de los productos de baño con oferta activa se envían por Full.</p></li>
+      <li><p>El <b>65% de las publicaciones compite en catálogo</b>, donde gana el precio. Los nichos con poca ficha de catálogo —porta-rollos y toalleros (27%), coladeras (50%), cortinas (50%)— son los que todavía permiten construir publicación propia.</p></li>
+    </ol>
+  </section>
+
+  <section>
+    <div class="sec-head"><p class="eyebrow">Ranking</p><h2>Oportunidad por nicho</h2></div>
+    <p class="prose">El score combina demanda por publicación, número de vendedores, cuánto del nicho vive en fichas de catálogo y qué porcentaje del precio sobrevive a comisión, ISR y envío.</p>
+    <div class="tablewrap">
+      <table>
+        <caption class="prose">Nichos con 4 o más publicaciones en la muestra. "% disponible" = lo que queda del precio para producto y utilidad.</caption>
+        <thead>
+          <tr><th>Nicho</th><th>Score</th><th class="num">Uds/publ.</th><th class="num">Vendedores</th><th class="num">% catálogo</th><th class="num">Precio mediano</th><th class="num">Peso</th><th class="num">Envío</th><th class="num">% disponible</th></tr>
+        </thead>
+        <tbody>
+          <tr class="hl"><td class="prod">Barras de seguridad / agarraderas</td><td><div class="bar"><i style="width:100%"></i><b>55.6</b></div></td><td class="num">625</td><td class="num">4</td><td class="num">80%</td><td class="num">$315</td><td class="num">1.0 kg</td><td class="num">23%</td><td class="num">55%</td></tr>
+          <tr class="hl"><td class="prod">Coladeras / rejillas antiolores</td><td><div class="bar"><i style="width:92%"></i><b>51.1</b></div></td><td class="num">1,200</td><td class="num">6</td><td class="num">50%</td><td class="num">$219</td><td class="num">0.4 kg</td><td class="num">29%</td><td class="num">49%</td></tr>
+          <tr class="hl"><td class="prod">Cortinas y barras de cortina</td><td><div class="bar"><i style="width:80%"></i><b>44.5</b></div></td><td class="num">593</td><td class="num">5</td><td class="num">50%</td><td class="num">$208</td><td class="num">0.9 kg</td><td class="num">35%</td><td class="num">43%</td></tr>
+          <tr><td class="prod">Mezcladoras y llaves</td><td><div class="bar"><i style="width:71%"></i><b>39.4</b></div></td><td class="num">316</td><td class="num">8</td><td class="num">70%</td><td class="num">$452</td><td class="num">1.5 kg</td><td class="num">19%</td><td class="num">59%</td></tr>
+          <tr class="hl"><td class="prod">Porta-rollos / toalleros / ganchos</td><td><div class="bar"><i style="width:69%"></i><b>38.2</b></div></td><td class="num">230</td><td class="num">7</td><td class="num">27%</td><td class="num">$203</td><td class="num">0.5 kg</td><td class="num">31%</td><td class="num">47%</td></tr>
+          <tr><td class="prod">Toallas y batas</td><td><div class="bar"><i style="width:67%"></i><b>37.4</b></div></td><td class="num">832</td><td class="num">4</td><td class="num">68%</td><td class="num">$196</td><td class="num">1.2 kg</td><td class="num">44%</td><td class="num">34%</td></tr>
+          <tr><td class="prod">Organizadores / repisas de ducha</td><td><div class="bar"><i style="width:66%"></i><b>36.7</b></div></td><td class="num">900</td><td class="num">8</td><td class="num">79%</td><td class="num">$294</td><td class="num">1.2 kg</td><td class="num">30%</td><td class="num">48%</td></tr>
+          <tr><td class="prod">Dispensadores / sets de accesorios</td><td><div class="bar"><i style="width:61%"></i><b>34.1</b></div></td><td class="num">1,352</td><td class="num">7</td><td class="num">67%</td><td class="num">$178</td><td class="num">0.8 kg</td><td class="num">40%</td><td class="num">38%</td></tr>
+          <tr><td class="prod">Regaderas / cabezales de ducha</td><td><div class="bar"><i style="width:60%"></i><b>33.3</b></div></td><td class="num">1,312</td><td class="num">12</td><td class="num">79%</td><td class="num">$266</td><td class="num">1.0 kg</td><td class="num">27%</td><td class="num">51%</td></tr>
+          <tr class="dim"><td class="prod">Sanitarios / WC / asientos</td><td><div class="bar warn"><i style="width:4%"></i><b>2.3</b></div></td><td class="num">204</td><td class="num">1</td><td class="num">0%</td><td class="num">$207</td><td class="num">20 kg</td><td class="num">110%</td><td class="num">−32%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><p class="eyebrow">Recomendaciones</p><h2>Cinco apuestas concretas</h2></div>
+    <div class="picks">
+
+      <article class="pick">
+        <div class="pick-head"><span class="rank">01</span><h3>Kit de 2 barras de seguridad, acero inox 50 cm</h3><span class="price">objetivo $349</span></div>
+        <div class="stats">
+          <div class="stat"><b>4</b><span>vendedores</span></div>
+          <div class="stat"><b>+1,000</b><span>uds top listing</span></div>
+          <div class="stat"><b>4.8</b><span>calificación</span></div>
+          <div class="stat"><b>$113</b><span>costo máximo</span></div>
+          <div class="stat"><b>3.1×</b><span>múltiplo</span></div>
+        </div>
+        <dl>
+          <div><dt>Por qué</dt><dd>El nicho con menos competencia de toda la categoría y con demanda probada: las tres publicaciones principales acumulan más de 1,000 unidades cada una. Los precios van de $212 a $694 por un producto casi idéntico, señal de que nadie ha exprimido el nicho por precio. Detrás hay demanda estructural —envejecimiento y accesibilidad— y es compra por necesidad, no por moda.</dd></div>
+          <div><dt>Economía a $349</dt><dd>Comisión $68 · envío estimado $72 · ISR $9 → quedan <b>$200</b>. Para 25% de margen neto, el costo puesto en almacén debe ser de $113 o menos.</dd></div>
+          <div><dt>Riesgo</dt><dd class="risk">80% de las publicaciones son de catálogo. Hay que entrar con ficha propia (medida, acabado o formato de kit distinto) o ganar el buy box con Full más precio.</dd></div>
+        </dl>
+      </article>
+
+      <article class="pick">
+        <div class="pick-head"><span class="rank">02</span><h3>Coladera antiolores de acero inoxidable, pack de 2</h3><span class="price">objetivo $249</span></div>
+        <div class="stats">
+          <div class="stat"><b>6</b><span>vendedores</span></div>
+          <div class="stat"><b>+10,000</b><span>uds top listing</span></div>
+          <div class="stat"><b>1,200</b><span>uds/publicación</span></div>
+          <div class="stat"><b>$132</b><span>costo máximo</span></div>
+          <div class="stat"><b>1.9×</b><span>múltiplo</span></div>
+        </div>
+        <dl>
+          <div><dt>Por qué</dt><dd>El producto individual más vendido de toda la muestra es una coladera antiolores de $92 con más de 10,000 unidades y 4.7 estrellas. El nicho promedia 1,200 unidades por publicación con solo seis vendedores, y la mitad de las publicaciones no son de catálogo.</dd></div>
+          <div><dt>La jugada</dt><dd>El mercado está anclado en $92–$120 por pieza. Vender en pack de 2 o de 4 sube el ticket sin cruzar los $299 y saca la comparación directa de precio unitario.</dd></div>
+          <div><dt>Economía a $249</dt><dd>Bajo $299 no aplica envío gratis obligatorio: comisión $49 · ISR $6 → quedan <b>$194</b>, con costo objetivo de $132.</dd></div>
+          <div><dt>Riesgo</dt><dd class="risk">Producto genérico y ligero: la competencia nueva entra rápido. La defensa es la ficha propia y acumular reseñas antes que el resto.</dd></div>
+        </dl>
+      </article>
+
+      <article class="pick">
+        <div class="pick-head"><span class="rank">03</span><h3>Cortina impermeable de tela + barra telescópica sin taladro</h3><span class="price">objetivo $289 y $199</span></div>
+        <div class="stats">
+          <div class="stat"><b>5</b><span>vendedores</span></div>
+          <div class="stat"><b>+5,000</b><span>uds top listing</span></div>
+          <div class="stat"><b>4.9</b><span>calificación</span></div>
+          <div class="stat"><b>$153</b><span>costo máx. cortina</span></div>
+          <div class="stat"><b>$105</b><span>costo máx. barra</span></div>
+        </div>
+        <dl>
+          <div><dt>Por qué</dt><dd>La cortina de tela de $272 lleva más de 5,000 unidades con 4.9 estrellas, y las barras telescópicas de $112–$159 llevan entre 500 y 1,000 cada una. Cinco vendedores en la muestra y la mitad de las publicaciones son propias.</dd></div>
+          <div><dt>La jugada</dt><dd>Venderlos como conjunto y como recambio: la cortina se reemplaza cada 12 a 18 meses, así que hay recompra dentro del mismo comprador.</dd></div>
+          <div><dt>Economía</dt><dd>Ambos precios quedan bajo el umbral. La cortina a $289 deja <b>$225</b> después de comisión e ISR; la barra a $199 deja <b>$155</b>.</dd></div>
+          <div><dt>Riesgo</dt><dd class="risk">Descuento mediano del 48% en el nicho: ya se pelea con promoción. Hay que entrar con precio de lista realista, no inflado.</dd></div>
+        </dl>
+      </article>
+
+      <article class="pick">
+        <div class="pick-head"><span class="rank">04</span><h3>Set de toallero, porta-rollo y ganchos adhesivos</h3><span class="price">objetivo $279</span></div>
+        <div class="stats">
+          <div class="stat"><b>27%</b><span>en catálogo</span></div>
+          <div class="stat"><b>7</b><span>vendedores</span></div>
+          <div class="stat"><b>+1,000</b><span>uds top listing</span></div>
+          <div class="stat"><b>$148</b><span>costo máximo</span></div>
+          <div class="stat"><b>1.9×</b><span>múltiplo</span></div>
+        </div>
+        <dl>
+          <div><dt>Por qué</dt><dd>Es el nicho menos dominado por catálogo de todos: solo 27%. Un porta-rollo adhesivo de $89 lleva más de 1,000 unidades, y un juego de 15 piezas de $249 también. Se puede construir marca propia sin pelear el buy box.</dd></div>
+          <div><dt>La jugada</dt><dd>"Sin taladro" es el ángulo de venta —rentas, departamentos, azulejo— y el kit completo vende mejor que la pieza suelta.</dd></div>
+          <div><dt>Economía a $279</dt><dd>Comisión $54 · ISR $7 → quedan <b>$218</b>, con costo objetivo de $148.</dd></div>
+          <div><dt>Riesgo</dt><dd class="risk">El adhesivo que falla es la principal fuente de reseñas de una estrella en este nicho. Hay que validar el pegamento con muestra física antes de comprar volumen.</dd></div>
+        </dl>
+      </article>
+
+      <article class="pick">
+        <div class="pick-head"><span class="rank">05</span><h3>Regadera de alta presión con filtro y tubo extensor</h3><span class="price">objetivo $449</span></div>
+        <div class="stats">
+          <div class="stat"><b>36,750</b><span>uds del nicho</span></div>
+          <div class="stat"><b>12</b><span>vendedores</span></div>
+          <div class="stat"><b>+5,000</b><span>uds a $488</span></div>
+          <div class="stat"><b>$166</b><span>costo máximo</span></div>
+          <div class="stat"><b>2.7×</b><span>múltiplo</span></div>
+        </div>
+        <dl>
+          <div><dt>Por qué</dt><dd>El nicho de mayor demanda absoluta de la categoría, y la prueba de que el precio alto sí vende: HOMELYA a $349 y SKBE a $488 llevan más de 5,000 unidades cada una.</dd></div>
+          <div><dt>La jugada</dt><dd>Arriba de $400 el envío pesa solo 16% del precio y la comparación deja de ser puramente de precio. Diferenciar con filtro de sedimentos, tubo extensor y acabado negro mate.</dd></div>
+          <div><dt>Economía a $449</dt><dd>Comisión $88 · envío $72 · ISR $11 → quedan <b>$278</b>, con costo objetivo de $166.</dd></div>
+          <div><dt>Riesgo</dt><dd class="risk">El nicho más competido: 12 vendedores, 79% de catálogo y un incumbente fuerte (HAWOO, con 7 publicaciones). Es la apuesta de mayor volumen y menor facilidad.</dd></div>
+        </dl>
+      </article>
+
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><p class="eyebrow">Economía unitaria</p><h2>El acantilado de los $299</h2></div>
+    <div class="callout">
+      <p class="eyebrow">Regla de precio</p>
+      <p>Subir un producto de 1 kg de $289 a $299 destruye <b>$64 de contribución por unidad</b>, y hay que llegar a ~$390 para recuperarla. Las dos zonas sanas son <b>$150–$289</b> y <b>$400 en adelante</b>. La franja $299–$390 es tierra quemada.</p>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <caption class="prose">Producto de 1 kg, publicación Premium, reputación verde. El envío es estimado y debe confirmarse en el simulador de MercadoLibre.</caption>
+        <thead><tr><th class="num">Precio</th><th class="num">Envío que absorbe el vendedor</th><th class="num">% del precio</th><th>Queda tras comisión + ISR + envío</th></tr></thead>
+        <tbody>
+          <tr><td class="num">$249</td><td class="num">$0</td><td class="num">0%</td><td><div class="bar"><i style="width:55%"></i><b>$194</b></div></td></tr>
+          <tr class="hl"><td class="num">$289</td><td class="num">$0</td><td class="num">0%</td><td><div class="bar"><i style="width:63%"></i><b>$225</b></div></td></tr>
+          <tr class="dim"><td class="num">$299</td><td class="num">$72</td><td class="num">24%</td><td><div class="bar warn"><i style="width:45%"></i><b>$161</b></div></td></tr>
+          <tr><td class="num">$349</td><td class="num">$72</td><td class="num">21%</td><td><div class="bar"><i style="width:56%"></i><b>$200</b></div></td></tr>
+          <tr><td class="num">$399</td><td class="num">$72</td><td class="num">18%</td><td><div class="bar"><i style="width:67%"></i><b>$239</b></div></td></tr>
+          <tr><td class="num">$449</td><td class="num">$72</td><td class="num">16%</td><td><div class="bar"><i style="width:78%"></i><b>$278</b></div></td></tr>
+          <tr><td class="num">$549</td><td class="num">$72</td><td class="num">13%</td><td><div class="bar"><i style="width:100%"></i><b>$356</b></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <caption class="prose">Modelo de costos aplicado: categoría Hogar, Muebles y Jardín en MercadoLibre México.</caption>
+        <thead><tr><th>Concepto</th><th>Valor usado</th></tr></thead>
+        <tbody>
+          <tr><td>Comisión publicación Clásica</td><td class="num">15%</td></tr>
+          <tr><td>Comisión publicación Premium</td><td class="num">19.5%</td></tr>
+          <tr><td class="prod">Costo fijo por unidad (solo Clásica, precio &lt; $299)</td><td class="num">$25 / $30 / $37</td></tr>
+          <tr><td>Retención de ISR (2026)</td><td class="num">2.5%</td></tr>
+          <tr><td class="prod">Envío gratis</td><td class="prod">Obligatorio desde $299, con subsidio de hasta 60% por reputación verde</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><p class="eyebrow">Descartes</p><h2>Qué evitar</h2></div>
+    <ul class="plain">
+      <li><b>Sanitarios, lavabos, tinas y muebles de baño.</b> El envío de un producto de 20–30 kg supera el 100% del precio mediano de la muestra. Solo funcionan con venta local, recolección en tienda o tickets de $3,000 en adelante.</li>
+      <li><b>Toallas.</b> Demanda alta —832 unidades por publicación— pero es el nicho con el descuento mediano más agresivo (50%) y el envío pesa 44% del precio mediano. Es negocio de volumen y capital, no de margen.</li>
+      <li><b>Entrar sin Full.</b> Con 92% de los competidores en Full, una publicación sin él pierde posición y pierde el badge de envío rápido.</li>
+      <li><b>Pelear precio en fichas de catálogo maduras.</b> Regaderas y organizadores tienen 79% de catálogo: ahí la única palanca es bajar el precio, y el incumbente ya tiene mejor costo.</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="sec-head"><p class="eyebrow">Siguiente paso</p><h2>Cómo validar antes de comprar inventario</h2></div>
+    <ul class="plain">
+      <li>Confirmar la comisión exacta por subcategoría y el costo de envío real con peso y medidas en el simulador de costos de MercadoLibre. El modelo de arriba usa estimaciones públicas.</li>
+      <li>Verificar el peso volumétrico: largo × ancho × alto ÷ 5,000. En organizadores y cortinas suele mandar el volumen, no la báscula.</li>
+      <li>Pedir muestra física y probar el punto de falla del nicho: adhesivo en toalleros, sello en la coladera, presión real en la regadera.</li>
+      <li>Arrancar con 50 a 100 piezas por SKU en Full, medir tres o cuatro semanas de venta orgánica y solo después decidir el volumen.</li>
+      <li>Repetir esta captura en 30 días y comparar la variación de unidades por publicación: es la única forma de convertir el acumulado en tasa de venta.</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="sec-head"><p class="eyebrow">Método</p><h2>De dónde salen los datos</h2></div>
+    <p class="prose">MercadoLibre bloquea el acceso automatizado a las páginas de búsqueda y a la API pública, que responde 403 sin token de aplicación. La superficie accesible fue la de <b>ofertas por categoría</b>, que expone título, precio, precio de lista, descuento, vendedor, calificación, unidades vendidas acumuladas y tipo de envío. Se recorrieron las diez categorías de baño del sitio mexicano, se deduplicaron los resultados y se clasificaron en 17 nichos por reglas sobre el título.</p>
+    <details>
+      <summary>Limitaciones que hay que tener presentes</summary>
+      <div class="inner">
+        <ul class="plain">
+          <li>La muestra es de <b>productos con oferta o descuento activo</b>, no del catálogo completo. Mide bien qué se mueve y subestima la oferta total de cada nicho.</li>
+          <li><b>"Vendidos" es acumulado histórico y viene en cubos</b> (+100, +1,000, +5,000, +10,000), no es venta mensual. Sirve para comparar nichos entre sí, no para proyectar facturación.</li>
+          <li>El <b>número de vendedores</b> es el de la muestra, no el total del nicho: indica concentración, no censo.</li>
+          <li>Los <b>costos de envío del modelo son estimaciones</b> a partir de rangos públicos y del descuento por reputación verde.</li>
+        </ul>
+      </div>
+    </details>
+    <details>
+      <summary>Los 15 productos más vendidos de la muestra</summary>
+      <div class="inner">
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th class="num">Uds.</th><th class="num">Precio</th><th class="num">Desc.</th><th class="num">★</th><th>Vendedor</th><th>Producto</th></tr></thead>
+            <tbody>
+              <tr><td class="num">+10,000</td><td class="num">$92</td><td class="num">6%</td><td class="num">4.7</td><td>VARMI</td><td class="prod">Coladera redonda antiolores de acero inoxidable</td></tr>
+              <tr><td class="num">+10,000</td><td class="num">$109</td><td class="num">54%</td><td class="num">4.5</td><td>SHENDY VENDY</td><td class="prod">Toalla de baño grande 100% algodón</td></tr>
+              <tr><td class="num">+10,000</td><td class="num">$158</td><td class="num">36%</td><td class="num">4.4</td><td>MXGAA</td><td class="prod">Organizador de baño con 3 estantes de plástico</td></tr>
+              <tr><td class="num">+10,000</td><td class="num">$189</td><td class="num">33%</td><td class="num">4.8</td><td>HAWOO</td><td class="prod">Regadera cuadrada tipo lluvia 20×20 con tubo</td></tr>
+              <tr><td class="num">+5,000</td><td class="num">$169</td><td class="num">43%</td><td class="num">4.8</td><td>FSY FASILYT</td><td class="prod">Set de accesorios de baño 4 piezas con bambú</td></tr>
+              <tr><td class="num">+5,000</td><td class="num">$175</td><td class="num">26%</td><td class="num">4.8</td><td>HAWOO</td><td class="prod">Regadera cuadrada alta presión 20 cm</td></tr>
+              <tr><td class="num">+5,000</td><td class="num">$209</td><td class="num">52%</td><td class="num">4.6</td><td>TORISE</td><td class="prod">Set accesorios de baño 16 piezas acero inoxidable</td></tr>
+              <tr><td class="num">+5,000</td><td class="num">$272</td><td class="num">61%</td><td class="num">4.9</td><td>—</td><td class="prod">Cortina de baño impermeable tela lino 200×200</td></tr>
+              <tr><td class="num">+5,000</td><td class="num">$349</td><td class="num">41%</td><td class="num">4.6</td><td>HOMELYA</td><td class="prod">Regadera cuadrada con ducha de mano alta presión</td></tr>
+              <tr><td class="num">+5,000</td><td class="num">$488</td><td class="num">40%</td><td class="num">4.8</td><td>SKBE</td><td class="prod">Regadera cuadrada de lujo acero inoxidable</td></tr>
+              <tr><td class="num">+1,000</td><td class="num">$89</td><td class="num">47%</td><td class="num">4.9</td><td>EDECOR</td><td class="prod">Porta-rollo autoadhesivo acero inoxidable negro</td></tr>
+              <tr><td class="num">+1,000</td><td class="num">$112</td><td class="num">50%</td><td class="num">4.8</td><td>HALMAN</td><td class="prod">Barra retráctil para cortina 70–120 cm</td></tr>
+              <tr><td class="num">+1,000</td><td class="num">$120</td><td class="num">48%</td><td class="num">4.7</td><td>PATHOO</td><td class="prod">Coladera redonda inoxidable 12 cm antiolores</td></tr>
+              <tr><td class="num">+1,000</td><td class="num">$218</td><td class="num">53%</td><td class="num">4.8</td><td>HAIMO</td><td class="prod">Barra de seguridad inoxidable 50 cm, 2 piezas</td></tr>
+              <tr><td class="num">+1,000</td><td class="num">$315</td><td class="num">35%</td><td class="num">4.8</td><td>HALMAN</td><td class="prod">4 agarraderas / barras de seguridad para baño</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <footer>
+    <p>Fuentes de comisiones y costos:</p>
+    <ul>
+      <li><a href="https://www.profitosapp.com/blog/cuanto-cobra-mercado-libre-por-vender-mexico-2026">Comisiones de Mercado Libre México 2026 — ProfitOS</a></li>
+      <li><a href="https://www.tiendanube.com/blog/comision-mercado-libre-mexico/">¿Cuánto cobra de comisión Mercado Libre? — Tiendanube</a></li>
+      <li><a href="https://www.mercadolibre.com.mx/ayuda/costos-de-envios_3667">Costos por ofrecer envíos gratis — Ayuda de Mercado Libre</a></li>
+    </ul>
+    <p>Datos de producto capturados de la superficie de ofertas de MercadoLibre México el 10 de agosto de 2026. Documento independiente, sin relación con MercadoLibre.</p>
+  </footer>
+
+</div>

@@ -1,0 +1,418 @@
+<title>Productos de baño en MercadoLibre Chile — demanda y margen</title>
+<style>
+  :root{
+    --ground:#F4F5F3; --surface:#FFFFFF; --surface-2:#EDEFEC;
+    --ink:#141A18; --ink-soft:#3B4643; --muted:#65736F;
+    --line:#D9DEDA; --line-soft:#E7EAE7;
+    --accent:#0D6B5F; --accent-soft:#D8E7E3;
+    --copper:#A8522C; --copper-soft:#F0E1D8;
+    --good:#0D6B5F; --warn:#A8522C;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0F1413; --surface:#161C1A; --surface-2:#1D2422;
+      --ink:#E9EEEB; --ink-soft:#C2CDC9; --muted:#8C9B96;
+      --line:#2A3330; --line-soft:#222A28;
+      --accent:#54C1AD; --accent-soft:#17332E;
+      --copper:#DC8F63; --copper-soft:#33231A;
+      --good:#54C1AD; --warn:#DC8F63;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0F1413; --surface:#161C1A; --surface-2:#1D2422;
+    --ink:#E9EEEB; --ink-soft:#C2CDC9; --muted:#8C9B96;
+    --line:#2A3330; --line-soft:#222A28;
+    --accent:#54C1AD; --accent-soft:#17332E;
+    --copper:#DC8F63; --copper-soft:#33231A;
+    --good:#54C1AD; --warn:#DC8F63;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    background:var(--ground); color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    font-size:16.5px; line-height:1.62; margin:0;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:960px; margin:0 auto; padding:0 24px 96px; display:flex; flex-direction:column; gap:52px}
+  .prose{max-width:66ch}
+
+  h1,h2,h3{font-family:"Iowan Old Style",Georgia,"Times New Roman",serif; font-weight:600; text-wrap:balance; margin:0}
+  h1{font-size:clamp(2rem,4.4vw,3rem); line-height:1.1; letter-spacing:-.015em}
+  h2{font-size:1.55rem; line-height:1.2}
+  h3{font-size:1.12rem; line-height:1.3}
+  p{margin:0}
+  a{color:var(--accent); text-underline-offset:3px}
+  a:focus-visible,summary:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:3px}
+
+  .eyebrow{
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    font-size:.7rem; letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
+  }
+
+  header.masthead{
+    border-bottom:1px solid var(--line); padding:64px 0 36px;
+    display:flex; flex-direction:column; gap:18px;
+  }
+  .meta{
+    display:flex; flex-wrap:wrap; gap:8px 10px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.74rem; color:var(--muted);
+  }
+  .meta span{border:1px solid var(--line); border-radius:2px; padding:3px 8px; background:var(--surface)}
+
+  section{display:flex; flex-direction:column; gap:20px}
+  .sec-head{display:flex; flex-direction:column; gap:6px; border-top:2px solid var(--ink); padding-top:14px}
+
+  ol.findings{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:14px; counter-reset:f}
+  ol.findings li{
+    counter-increment:f; display:grid; grid-template-columns:34px 1fr; gap:14px;
+    max-width:72ch;
+  }
+  ol.findings li::before{
+    content:counter(f,decimal-leading-zero);
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.78rem;
+    color:var(--accent); padding-top:.28em;
+  }
+
+  .tablewrap{overflow-x:auto; border:1px solid var(--line); border-radius:4px; background:var(--surface)}
+  table{border-collapse:collapse; width:100%; font-size:.9rem}
+  caption{text-align:left; color:var(--muted); font-size:.82rem; padding:0 0 8px}
+  th,td{padding:9px 14px; text-align:left; border-bottom:1px solid var(--line-soft); white-space:nowrap}
+  thead th{
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-weight:500;
+    font-size:.7rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted);
+    background:var(--surface-2); border-bottom:1px solid var(--line); position:sticky; top:0;
+  }
+  tbody tr:last-child td{border-bottom:none}
+  .num{text-align:right; font-variant-numeric:tabular-nums; font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .prod{white-space:normal; min-width:22ch}
+  tr.dim td{color:var(--muted)}
+  tr.hl td{background:var(--accent-soft)}
+
+  .bar{display:flex; align-items:center; gap:8px; min-width:132px}
+  .bar i{display:block; height:7px; border-radius:1px; background:var(--accent)}
+  .bar.warn i{background:var(--copper)}
+  .bar b{font-weight:500; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.8rem; font-variant-numeric:tabular-nums}
+
+  .picks{display:flex; flex-direction:column; gap:18px}
+  .pick{
+    background:var(--surface); border:1px solid var(--line); border-radius:5px;
+    padding:22px 24px; display:flex; flex-direction:column; gap:14px;
+  }
+  .pick-head{display:flex; flex-wrap:wrap; align-items:baseline; gap:10px 14px}
+  .rank{
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.72rem;
+    color:var(--accent); border:1px solid var(--accent); border-radius:2px; padding:2px 6px;
+  }
+  .price{margin-left:auto; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.95rem; color:var(--ink-soft)}
+  .stats{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(118px,1fr)); gap:1px;
+    background:var(--line-soft); border:1px solid var(--line-soft); border-radius:3px; overflow:hidden;
+  }
+  .stat{background:var(--surface); padding:10px 12px; display:flex; flex-direction:column; gap:2px}
+  .stat b{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:1.02rem; font-weight:600; font-variant-numeric:tabular-nums}
+  .stat span{font-size:.68rem; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .pick dl{margin:0; display:flex; flex-direction:column; gap:9px}
+  .pick dt{
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.68rem;
+    letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-bottom:2px;
+  }
+  .pick dd{margin:0; max-width:70ch; color:var(--ink-soft)}
+  .pick dd.risk{color:var(--copper)}
+
+  .callout{
+    border-left:3px solid var(--copper); background:var(--copper-soft);
+    padding:16px 20px; border-radius:0 4px 4px 0; max-width:72ch;
+  }
+  .callout .eyebrow{color:var(--copper)}
+
+  ul.plain{margin:0; padding-left:1.1em; display:flex; flex-direction:column; gap:9px; max-width:70ch; color:var(--ink-soft)}
+
+  details{border:1px solid var(--line); border-radius:4px; background:var(--surface); padding:0}
+  summary{cursor:pointer; padding:13px 18px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.78rem; letter-spacing:.05em; text-transform:uppercase; color:var(--muted)}
+  details[open] summary{border-bottom:1px solid var(--line-soft)}
+  details .inner{padding:16px 18px; display:flex; flex-direction:column; gap:14px}
+
+  footer{border-top:1px solid var(--line); padding-top:22px; color:var(--muted); font-size:.86rem; display:flex; flex-direction:column; gap:8px}
+  footer ul{margin:0; padding-left:1.1em; display:flex; flex-direction:column; gap:4px}
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Investigación de mercado · MercadoLibre Chile</p>
+    <h1>Productos de baño en Chile: dónde hay demanda y dónde queda margen</h1>
+    <p class="prose">Análisis de 273 productos de baño con oferta activa en MercadoLibre Chile, clasificados en 17 nichos y evaluados por demanda, competencia y economía unitaria después de comisión, cargo fijo y despacho.</p>
+    <div class="meta">
+      <span>Captura 10 ago 2026</span><span>Sitio MLC</span><span>273 productos</span><span>13 categorías</span><span>Cifras en CLP</span>
+    </div>
+  </header>
+
+  <section>
+    <div class="sec-head"><p class="eyebrow">Resumen</p><h2>Cinco hallazgos</h2></div>
+    <ol class="findings">
+      <li><p><b>Chile está mucho menos saturado que México.</b> Solo el 49% de las publicaciones usa Full —en México es 92%— y apenas el 38% compite en ficha de catálogo, contra 65%. El descuento mediano por nicho va de 10% a 24%, frente a 26%–50% en México. Todavía se puede entrar con publicación propia, y Full es ventaja competitiva real, no requisito de supervivencia.</p></li>
+      <li><p><b>El nicho más desatendido es accesibilidad</b> —barras de seguridad, alzabaño, sillas de ducha—: 1.729 unidades por publicación con solo 7 publicaciones en oferta, 29% de Full y 24% de descuento mediano. El mejor ratio demanda/competencia de toda la categoría.</p></li>
+      <li><p><b>La ducha bidet árabe es un producto característicamente chileno con demanda masiva.</b> Una sola publicación de $8.714 acumula más de 10.000 unidades y el nicho promedia 1.736 por publicación. Pesa 0,8 kg y se vende bajo el umbral de envío gratis: la logística más limpia de la muestra.</p></li>
+      <li><p><b>El escalón de los $19.990 castiga menos que en México, pero existe.</b> Un producto de 2 kg a $19.490 deja $15.577 después de comisión; a $19.990 deja $12.472. Hay que llegar a ~$24.000 para recuperar la diferencia.</p></li>
+      <li><p><b>La grifería monomando es el nicho grande con menos catálogo (22%)</b>: 1.067 unidades por publicación, precio mediano $24.656 y solo 33% de los competidores en Full. Es donde más se puede construir marca propia con ticket medio.</p></li>
+    </ol>
+  </section>
+
+  <section>
+    <div class="sec-head"><p class="eyebrow">Ranking</p><h2>Oportunidad por nicho</h2></div>
+    <p class="prose">El score combina demanda por publicación, número de competidores, cuánto del nicho vive en fichas de catálogo y qué porcentaje del precio sobrevive a comisión y despacho.</p>
+    <div class="tablewrap">
+      <table>
+        <caption class="prose">Nichos con 4 o más publicaciones en la muestra. Precios medianos en pesos chilenos.</caption>
+        <thead>
+          <tr><th>Nicho</th><th>Score</th><th class="num">Uds/publ.</th><th class="num">Ofertas</th><th class="num">Compet.</th><th class="num">% catálogo</th><th class="num">% Full</th><th class="num">Precio mediano</th><th class="num">Desc.</th></tr>
+        </thead>
+        <tbody>
+          <tr class="hl"><td class="prod">Accesibilidad: barras, alzabaño, sillas</td><td><div class="bar"><i style="width:100%"></i><b>80.4</b></div></td><td class="num">1.729</td><td class="num">7</td><td class="num">6</td><td class="num">29%</td><td class="num">29%</td><td class="num">$33.666</td><td class="num">24%</td></tr>
+          <tr class="hl"><td class="prod">Dispensadores e higiene institucional</td><td><div class="bar"><i style="width:75%"></i><b>60.1</b></div></td><td class="num">1.085</td><td class="num">12</td><td class="num">8</td><td class="num">33%</td><td class="num">83%</td><td class="num">$20.979</td><td class="num">14%</td></tr>
+          <tr class="hl"><td class="prod">Ducha bidet árabe / bidet para WC</td><td><div class="bar"><i style="width:66%"></i><b>53.2</b></div></td><td class="num">1.736</td><td class="num">9</td><td class="num">9</td><td class="num">44%</td><td class="num">78%</td><td class="num">$13.774</td><td class="num">27%</td></tr>
+          <tr class="hl"><td class="prod">Asientos y tapas de WC</td><td><div class="bar"><i style="width:64%"></i><b>51.7</b></div></td><td class="num">1.500</td><td class="num">6</td><td class="num">6</td><td class="num">83%</td><td class="num">50%</td><td class="num">$19.494</td><td class="num">22%</td></tr>
+          <tr class="hl"><td class="prod">Grifería: monomando y llaves</td><td><div class="bar"><i style="width:56%"></i><b>45.0</b></div></td><td class="num">1.067</td><td class="num">18</td><td class="num">17</td><td class="num">22%</td><td class="num">33%</td><td class="num">$24.656</td><td class="num">19%</td></tr>
+          <tr><td class="prod">Bombas y presurizadoras</td><td><div class="bar"><i style="width:48%"></i><b>38.6</b></div></td><td class="num">872</td><td class="num">19</td><td class="num">16</td><td class="num">58%</td><td class="num">37%</td><td class="num">$69.990</td><td class="num">18%</td></tr>
+          <tr><td class="prod">Sets de accesorios de baño</td><td><div class="bar"><i style="width:48%"></i><b>38.5</b></div></td><td class="num">94</td><td class="num">17</td><td class="num">12</td><td class="num">18%</td><td class="num">65%</td><td class="num">$32.990</td><td class="num">32%</td></tr>
+          <tr><td class="prod">Cortinas de baño y barras</td><td><div class="bar"><i style="width:47%"></i><b>37.5</b></div></td><td class="num">107</td><td class="num">14</td><td class="num">12</td><td class="num">36%</td><td class="num">43%</td><td class="num">$30.571</td><td class="num">13%</td></tr>
+          <tr><td class="prod">Kits de ducha, teléfonos y columnas</td><td><div class="bar"><i style="width:45%"></i><b>36.0</b></div></td><td class="num">395</td><td class="num">14</td><td class="num">13</td><td class="num">36%</td><td class="num">71%</td><td class="num">$15.782</td><td class="num">23%</td></tr>
+          <tr><td class="prod">Cestos de ropa sucia</td><td><div class="bar"><i style="width:42%"></i><b>33.6</b></div></td><td class="num">331</td><td class="num">12</td><td class="num">9</td><td class="num">67%</td><td class="num">58%</td><td class="num">$13.280</td><td class="num">16%</td></tr>
+          <tr><td class="prod">Ganchos y colgadores adhesivos</td><td><div class="bar"><i style="width:41%"></i><b>33.2</b></div></td><td class="num">909</td><td class="num">11</td><td class="num">10</td><td class="num">45%</td><td class="num">91%</td><td class="num">$6.990</td><td class="num">12%</td></tr>
+          <tr><td class="prod">Antideslizantes y alfombras</td><td><div class="bar"><i style="width:41%"></i><b>32.7</b></div></td><td class="num">197</td><td class="num">9</td><td class="num">8</td><td class="num">22%</td><td class="num">67%</td><td class="num">$10.377</td><td class="num">15%</td></tr>
+          <tr><td class="prod">Sifones, desagües y antiolor</td><td><div class="bar"><i style="width:39%"></i><b>31.4</b></div></td><td class="num">181</td><td class="num">8</td><td class="num">8</td><td class="num">25%</td><td class="num">75%</td><td class="num">$8.439</td><td class="num">21%</td></tr>
+          <tr><td class="prod">Organizadores, estantes y repisas</td><td><div class="bar"><i style="width:30%"></i><b>24.3</b></div></td><td class="num">662</td><td class="num">20</td><td class="num">18</td><td class="num">45%</td><td class="num">40%</td><td class="num">$13.157</td><td class="num">15%</td></tr>
+          <tr class="dim"><td class="prod">Sanitarios, lavamanos y receptáculos</td><td><div class="bar warn"><i style="width:26%"></i><b>21.2</b></div></td><td class="num">182</td><td class="num">17</td><td class="num">16</td><td class="num">18%</td><td class="num">41%</td><td class="num">$27.890</td><td class="num">10%</td></tr>
+          <tr class="dim"><td class="prod">Toallas y batas</td><td><div class="bar warn"><i style="width:21%"></i><b>17.2</b></div></td><td class="num">144</td><td class="num">29</td><td class="num">18</td><td class="num">76%</td><td class="num">66%</td><td class="num">$10.990</td><td class="num">37%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><p class="eyebrow">Recomendaciones</p><h2>Cinco apuestas concretas</h2></div>
+    <div class="picks">
+
+      <article class="pick">
+        <div class="pick-head"><span class="rank">01</span><h3>Accesibilidad: pack x2 barras de seguridad y silla de ducha</h3><span class="price">objetivo $24.990 y $39.990</span></div>
+        <div class="stats">
+          <div class="stat"><b>7</b><span>publicaciones</span></div>
+          <div class="stat"><b>1.729</b><span>uds/publicación</span></div>
+          <div class="stat"><b>29%</b><span>usa Full</span></div>
+          <div class="stat"><b>$10.374</b><span>costo máx. pack</span></div>
+          <div class="stat"><b>2,4×</b><span>múltiplo</span></div>
+        </div>
+        <dl>
+          <div><dt>Por qué</dt><dd>El mejor ratio demanda/competencia de la categoría: solo siete publicaciones en oferta, 4.8 estrellas y apenas 24% de descuento mediano, o sea que nadie está peleando precio. El alzabaño de $31.620 lleva más de 10.000 unidades y la silla de ducha de $39.148 lleva más de 1.000, ambas del mismo vendedor, que aún no tiene contrapeso.</dd></div>
+          <div><dt>Señal fuerte</dt><dd>Solo 29% del nicho usa Full. Entrar con Full es ventaja inmediata en posicionamiento y plazo de entrega.</dd></div>
+          <div><dt>Economía</dt><dd>Pack x2 barras a $24.990 (2 kg): comisión $4.248 · despacho $4.120 → quedan <b>$16.622</b>, con costo objetivo de $10.374. Silla de ducha a $39.990 (3,5 kg): quedan <b>$27.972</b>, costo objetivo $17.974.</dd></div>
+          <div><dt>Riesgo</dt><dd class="risk">Producto de uso clínico-doméstico: una barra que se suelta es un accidente, no una devolución. Exigir certificación de carga al proveedor y publicar la capacidad en kilos.</dd></div>
+        </dl>
+      </article>
+
+      <article class="pick">
+        <div class="pick-head"><span class="rank">02</span><h3>Ducha bidet árabe de acero inoxidable, kit completo</h3><span class="price">objetivo $14.990</span></div>
+        <div class="stats">
+          <div class="stat"><b>+10.000</b><span>uds del líder</span></div>
+          <div class="stat"><b>1.736</b><span>uds/publicación</span></div>
+          <div class="stat"><b>0,8 kg</b><span>peso</span></div>
+          <div class="stat"><b>$8.094</b><span>costo máximo</span></div>
+          <div class="stat"><b>79%</b><span>del precio queda</span></div>
+        </div>
+        <dl>
+          <div><dt>Por qué</dt><dd>Demanda característicamente chilena y masiva. La publicación líder de $8.714 acumula más de 10.000 unidades con 4.7 estrellas, y hay al menos cinco publicaciones más sobre las mil unidades.</dd></div>
+          <div><dt>La mejor logística de la muestra</dt><dd>0,8 kg y precio bajo el umbral de $19.990, así que el vendedor no absorbe despacho. A $14.990 quedan $11.842 —el 79% del precio— con costo objetivo de $8.094.</dd></div>
+          <div><dt>La jugada</dt><dd>El rango está partido entre el genérico de $6.600–$8.900 y el bidet de marca de $18.900–$28.500. Entrar en la mitad con kit completo —manguera trenzada, soporte y llave de paso— y armado sin gasfíter.</dd></div>
+          <div><dt>Riesgo</dt><dd class="risk">78% del nicho ya está en Full, así que la ventaja logística está tomada. La diferenciación tiene que venir del kit y de las fotos de instalación.</dd></div>
+        </dl>
+      </article>
+
+      <article class="pick">
+        <div class="pick-head"><span class="rank">03</span><h3>Grifería monomando para lavatorio, negro mate</h3><span class="price">objetivo $26.990</span></div>
+        <div class="stats">
+          <div class="stat"><b>22%</b><span>en catálogo</span></div>
+          <div class="stat"><b>1.067</b><span>uds/publicación</span></div>
+          <div class="stat"><b>33%</b><span>usa Full</span></div>
+          <div class="stat"><b>$11.534</b><span>costo máximo</span></div>
+          <div class="stat"><b>2,3×</b><span>múltiplo</span></div>
+        </div>
+        <dl>
+          <div><dt>Por qué</dt><dd>Es el nicho grande con menos catálogo de todos, lo que permite publicación propia con marca. El líder —un monomando de $10.640— lleva más de 10.000 unidades, y solo un tercio de los competidores usa Full.</dd></div>
+          <div><dt>La jugada</dt><dd>El tramo de $20.000 a $30.000 en acabado negro mate y cascada está poco cubierto: abajo hay cromo genérico y arriba marcas de tienda. Vender con flexibles incluidos.</dd></div>
+          <div><dt>Economía a $26.990</dt><dd>Comisión $4.588 · despacho $4.120 → quedan <b>$18.282</b>, con costo objetivo de $11.534.</dd></div>
+          <div><dt>Riesgo</dt><dd class="risk">17 competidores, el número más alto del top 5. Es el nicho donde más importa la ficha: fotos de instalación, medidas y garantía del cartucho.</dd></div>
+        </dl>
+      </article>
+
+      <article class="pick">
+        <div class="pick-head"><span class="rank">04</span><h3>Dispensadores e higiene institucional</h3><span class="price">objetivo $22.990</span></div>
+        <div class="stats">
+          <div class="stat"><b>1.085</b><span>uds/publicación</span></div>
+          <div class="stat"><b>12</b><span>publicaciones</span></div>
+          <div class="stat"><b>14%</b><span>descuento mediano</span></div>
+          <div class="stat"><b>$9.214</b><span>costo máximo</span></div>
+          <div class="stat"><b>2,5×</b><span>múltiplo</span></div>
+        </div>
+        <dl>
+          <div><dt>Por qué</dt><dd>Alta rotación con muy poca oferta y el segundo descuento mediano más bajo de la categoría. El comprador no es solo el hogar: oficinas, restaurantes y clínicas compran dispensador de papel jumbo, secador de manos y jabonera de pared. El secador de manos de $23.390 lleva más de 5.000 unidades.</dd></div>
+          <div><dt>La jugada</dt><dd>Venta B2B recurrente: quien compra el dispensador vuelve por el consumible. Conviene publicar ambos y ofrecer packs.</dd></div>
+          <div><dt>Economía a $22.990</dt><dd>Comisión $3.908 · despacho $4.120 → quedan <b>$14.962</b>, con costo objetivo de $9.214.</dd></div>
+          <div><dt>Riesgo</dt><dd class="risk">83% del nicho ya usa Full, y son productos voluminosos respecto a su peso: manda el peso volumétrico. Calcularlo antes de fijar precio.</dd></div>
+        </dl>
+      </article>
+
+      <article class="pick">
+        <div class="pick-head"><span class="rank">05</span><h3>Asiento y tapa de WC con cierre suave, reforzada</h3><span class="price">objetivo $17.990</span></div>
+        <div class="stats">
+          <div class="stat"><b>1.500</b><span>uds/publicación</span></div>
+          <div class="stat"><b>6</b><span>publicaciones</span></div>
+          <div class="stat"><b>80%</b><span>del precio queda</span></div>
+          <div class="stat"><b>$9.834</b><span>costo máximo</span></div>
+          <div class="stat"><b>83%</b><span>en catálogo</span></div>
+        </div>
+        <dl>
+          <div><dt>Por qué</dt><dd>Compra de reposición pura: la tapa se rompe y se reemplaza. El mercado está partido entre el plástico universal de $3.870, mal calificado con 3.9 estrellas, y el Bemis de madera de $40.704. El tramo intermedio de calidad está abierto.</dd></div>
+          <div><dt>Economía a $17.990</dt><dd>Queda bajo el umbral, así que no hay despacho a cargo del vendedor: comisión $3.058 · cargo fijo $600 → quedan <b>$14.332</b>, el 80% del precio, con costo objetivo de $9.834.</dd></div>
+          <div><dt>La jugada</dt><dd>Cierre suave, bisagra metálica y formato universal, atacando explícitamente la mala calificación del genérico barato.</dd></div>
+          <div><dt>Riesgo</dt><dd class="risk">83% del nicho es catálogo, el porcentaje más alto de la muestra. Hay que llegar con un modelo sin ficha creada o resignarse a pelear el buy box.</dd></div>
+        </dl>
+      </article>
+
+    </div>
+    <div class="callout">
+      <p class="eyebrow">Entrada de bajo capital</p>
+      <p>Ganchos y colgadores adhesivos: 909 unidades por publicación con ticket de $6.990. El margen absoluto por unidad es chico —$6.862 disponibles, costo objetivo $4.614— pero es el nicho más liviano de todos, con 0,4 kg, y sirve para levantar reputación rápido antes de subir de ticket.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><p class="eyebrow">Economía unitaria</p><h2>El escalón de los $19.990</h2></div>
+    <div class="callout">
+      <p class="eyebrow">Regla de precio</p>
+      <p>Cruzar de $19.490 a $19.990 cuesta <b>$3.105 de contribución por unidad</b> en un producto de 2 kg, y hay que llegar a ~$24.000 para recuperarla. El escalón es más suave que en México porque el ticket chileno es más alto en relación al despacho, pero define dos zonas de precio: <b>hasta $19.490</b> y <b>desde $24.000</b>.</p>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <caption class="prose">Producto de 2 kg, publicación premium, reputación verde. El despacho es estimado y debe confirmarse en el simulador de MercadoLibre.</caption>
+        <thead><tr><th class="num">Precio</th><th class="num">Cargo fijo</th><th class="num">Despacho que absorbe el vendedor</th><th>Queda tras comisión, cargo fijo y despacho</th></tr></thead>
+        <tbody>
+          <tr><td class="num">$14.990</td><td class="num">$600</td><td class="num">$0</td><td><div class="bar"><i style="width:51%"></i><b>$11.842</b></div></td></tr>
+          <tr><td class="num">$17.990</td><td class="num">$600</td><td class="num">$0</td><td><div class="bar"><i style="width:62%"></i><b>$14.332</b></div></td></tr>
+          <tr class="hl"><td class="num">$19.490</td><td class="num">$600</td><td class="num">$0</td><td><div class="bar"><i style="width:67%"></i><b>$15.577</b></div></td></tr>
+          <tr class="dim"><td class="num">$19.990</td><td class="num">$0</td><td class="num">$4.120</td><td><div class="bar warn"><i style="width:54%"></i><b>$12.472</b></div></td></tr>
+          <tr><td class="num">$22.990</td><td class="num">$0</td><td class="num">$4.120</td><td><div class="bar"><i style="width:64%"></i><b>$14.962</b></div></td></tr>
+          <tr><td class="num">$26.990</td><td class="num">$0</td><td class="num">$4.120</td><td><div class="bar"><i style="width:79%"></i><b>$18.282</b></div></td></tr>
+          <tr><td class="num">$32.990</td><td class="num">$0</td><td class="num">$4.120</td><td><div class="bar"><i style="width:100%"></i><b>$23.262</b></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <caption class="prose">Modelo de costos aplicado: MercadoLibre Chile, categoría Hogar y Muebles.</caption>
+        <thead><tr><th>Concepto</th><th>Valor usado</th></tr></thead>
+        <tbody>
+          <tr><td>Comisión por venta</td><td class="prod">14% clásica / 17% premium (rango referencial 14%–17% para Hogar)</td></tr>
+          <tr><td class="prod">Cargo fijo por unidad (precio bajo $19.990)</td><td class="num">~$600</td></tr>
+          <tr><td>Envío gratis</td><td class="prod">Obligatorio desde $19.990, con descuento por reputación de hasta 50%–60%</td></tr>
+          <tr><td class="prod">Costo de despacho de referencia</td><td class="prod">~$6.200 por 1 kg antes de descuento</td></tr>
+          <tr><td>IVA</td><td class="prod">Las comisiones se facturan con IVA: si eres contribuyente lo recuperas, si no, súmale 19% sobre la comisión</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><p class="eyebrow">Descartes</p><h2>Qué evitar</h2></div>
+    <ul class="plain">
+      <li><b>Sanitarios, lavamanos y receptáculos.</b> A 25 kg el despacho se come el 61% del precio mediano del nicho, con la peor rotación de la muestra. Solo funciona con retiro en tienda o tickets sobre $100.000.</li>
+      <li><b>Toallas y batas.</b> El nicho más poblado —29 publicaciones—, con 76% de catálogo y 37% de descuento mediano: el único con guerra de precios abierta, y la rotación por publicación es la más baja.</li>
+      <li><b>Organizadores y estantes.</b> Demanda decente pero 2,5 kg de puro volumen: el despacho se lleva 40% del precio mediano. Solo con diseño plegable o desarmable.</li>
+      <li><b>Precios entre $19.990 y $24.000.</b> La franja donde el escalón de despacho ya se activó pero el ticket todavía no lo absorbe.</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="sec-head"><p class="eyebrow">Siguiente paso</p><h2>Cómo validar antes de comprar inventario</h2></div>
+    <ul class="plain">
+      <li>Confirmar la comisión exacta de la subcategoría y el costo real de despacho con peso y medidas en el simulador de MercadoLibre. El modelo usa rangos públicos referenciales.</li>
+      <li>Calcular el peso volumétrico antes de fijar precio: en dispensadores, organizadores y cestos casi siempre manda el volumen.</li>
+      <li>Definir si vas a operar con o sin Full por nicho. En accesibilidad (29% Full) y grifería (33%) es palanca de posicionamiento; en ganchos (91%) ya es requisito.</li>
+      <li>Pedir muestra y probar el punto de falla del nicho: carga real de la barra de seguridad, cartucho del monomando, bisagra de la tapa de WC, sello del bidet.</li>
+      <li>Partir con 50 a 100 unidades por SKU, medir tres o cuatro semanas de venta orgánica y recién ahí decidir volumen.</li>
+      <li>Repetir esta captura en 30 días: la variación de unidades por publicación es la única forma de convertir el acumulado en tasa de venta real.</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="sec-head"><p class="eyebrow">Comparación</p><h2>Chile frente a México</h2></div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Indicador</th><th class="num">Chile</th><th class="num">México</th></tr></thead>
+        <tbody>
+          <tr><td>Publicaciones en Full</td><td class="num">49%</td><td class="num">92%</td></tr>
+          <tr><td>Publicaciones en catálogo</td><td class="num">38%</td><td class="num">65%</td></tr>
+          <tr><td class="prod">Descuento mediano por nicho</td><td class="num">10%–24%</td><td class="num">26%–50%</td></tr>
+          <tr><td class="prod">Umbral de envío gratis</td><td class="num">$19.990 CLP</td><td class="num">$299 MXN</td></tr>
+          <tr><td>Nicho estrella</td><td class="prod">Accesibilidad y ducha bidet</td><td class="prod">Barras de seguridad y coladeras</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="prose">El patrón común es la accesibilidad —barras de seguridad y apoyos de baño— que aparece arriba en ambos países. La diferencia es que en Chile el mercado todavía no está copado por Full ni por fichas de catálogo, así que hay más espacio para construir publicación propia.</p>
+  </section>
+
+  <section>
+    <div class="sec-head"><p class="eyebrow">Método</p><h2>De dónde salen los datos</h2></div>
+    <p class="prose">La API pública de MercadoLibre responde 403 sin token y las páginas de búsqueda redirigen a un muro de verificación. La superficie accesible es la de <b>ofertas por categoría</b>, que expone título, precio, precio de lista, descuento, vendedor, calificación, unidades vendidas acumuladas y tipo de envío. Se recorrieron 13 categorías —Baños y sus 10 subcategorías, más Mobiliario para Baños y Gasfitería—, se deduplicaron los resultados y se clasificaron en 17 nichos por reglas sobre el título. 45 de los 273 productos quedaron sin clasificar.</p>
+    <details>
+      <summary>Limitaciones que hay que tener presentes</summary>
+      <div class="inner">
+        <ul class="plain">
+          <li>La muestra es de <b>productos con oferta activa</b>, no del catálogo completo: mide bien qué se mueve, subestima la oferta total.</li>
+          <li><b>"Vendidos" es acumulado histórico en cubos</b> (+100, +1.000, +5.000, +10.000), no venta mensual.</li>
+          <li>Solo el 51% de las tarjetas muestra vendedor. El conteo de competidores suma los vendedores identificados más cada publicación sin vendedor visible: es una <b>cota superior</b>.</li>
+          <li>Los <b>costos de despacho del modelo son estimaciones</b> a partir de rangos públicos y del descuento por reputación verde.</li>
+        </ul>
+      </div>
+    </details>
+    <details>
+      <summary>Los 16 productos más vendidos de la muestra</summary>
+      <div class="inner">
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th class="num">Uds.</th><th class="num">Precio</th><th class="num">Desc.</th><th class="num">★</th><th>Vendedor</th><th>Producto</th></tr></thead>
+            <tbody>
+              <tr><td class="num">+10.000</td><td class="num">$8.714</td><td class="num">27%</td><td class="num">4.7</td><td>—</td><td class="prod">Ducha bidet árabe acero inoxidable para WC</td></tr>
+              <tr><td class="num">+10.000</td><td class="num">$10.640</td><td class="num">5%</td><td class="num">4.7</td><td>—</td><td class="prod">Grifería PMB monomando lavatorio Cincinnati cromo</td></tr>
+              <tr><td class="num">+10.000</td><td class="num">$31.620</td><td class="num">38%</td><td class="num">4.7</td><td>YAA</td><td class="prod">Asiento WC portátil plegable alzabaño</td></tr>
+              <tr><td class="num">+5.000</td><td class="num">$3.286</td><td class="num">7%</td><td class="num">4.5</td><td>—</td><td class="prod">Ganchos adhesivos colgador perchero acero inox</td></tr>
+              <tr><td class="num">+5.000</td><td class="num">$3.870</td><td class="num">29%</td><td class="num">3.9</td><td>—</td><td class="prod">Tapa de baño asiento WC universal redondo plástico</td></tr>
+              <tr><td class="num">+5.000</td><td class="num">$7.990</td><td class="num">20%</td><td class="num">4.8</td><td>BathLand</td><td class="prod">Pack x2 estante de baño organizador esquinero</td></tr>
+              <tr><td class="num">+5.000</td><td class="num">$9.479</td><td class="num">52%</td><td class="num">4.6</td><td>—</td><td class="prod">Grifo monomando mezcladora inoxidable negro</td></tr>
+              <tr><td class="num">+5.000</td><td class="num">$13.850</td><td class="num">13%</td><td class="num">4.4</td><td>—</td><td class="prod">Estante mueble organizador de baño 3 niveles</td></tr>
+              <tr><td class="num">+5.000</td><td class="num">$18.675</td><td class="num">25%</td><td class="num">4.9</td><td>BIOMED CHILE</td><td class="prod">Pack esponja jabonosa desechable Begobaño, 144 un</td></tr>
+              <tr><td class="num">+5.000</td><td class="num">$23.390</td><td class="num">13%</td><td class="num">4.6</td><td>Vaelora</td><td class="prod">Secador de mano eléctrico con sensor 1800 W</td></tr>
+              <tr><td class="num">+5.000</td><td class="num">$32.990</td><td class="num">17%</td><td class="num">4.5</td><td>GDPLUS</td><td class="prod">Bomba presurizadora para calefont</td></tr>
+              <tr><td class="num">+5.000</td><td class="num">$81.470</td><td class="num">18%</td><td class="num">4.8</td><td>Ferretería Mimbral</td><td class="prod">Bomba sumergible 17.000 L 630 W Einhell</td></tr>
+              <tr><td class="num">+1.000</td><td class="num">$3.141</td><td class="num">10%</td><td class="num">5.0</td><td>—</td><td class="prod">Brazo de ducha cromado Täumm con difusor</td></tr>
+              <tr><td class="num">+1.000</td><td class="num">$5.648</td><td class="num">36%</td><td class="num">4.8</td><td>—</td><td class="prod">30 ganchos montados en la pared</td></tr>
+              <tr><td class="num">+1.000</td><td class="num">$5.810</td><td class="num">35%</td><td class="num">4.7</td><td>Ravera</td><td class="prod">Restaurador de esmalte cerámico Ceys para tinas</td></tr>
+              <tr><td class="num">+1.000</td><td class="num">$5.890</td><td class="num">46%</td><td class="num">4.9</td><td>—</td><td class="prod">10 piezas ganchos perchero acero inox doble</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <footer>
+    <p>Fuentes de comisiones y costos:</p>
+    <ul>
+      <li><a href="https://www.wivoanalytics.com/blog/cuanto-cobra-mercado-libre-por-venta-en-2025-guia-completa-de-comisiones-envios-y-mas">Cuánto cobra Mercado Libre por venta en 2026 — Wivo Analytics</a></li>
+      <li><a href="https://blog.rapiboy.com/comisiones-sobre-ventas-en-la-plataforma-meli/">Guía 2026 de comisiones por venta en Mercado Libre — Rapiboy</a></li>
+      <li><a href="https://www.mercadolibre.cl/ayuda/Costos-de-envios_3667">Costos por ofrecer envíos gratis — Ayuda de Mercado Libre Chile</a></li>
+    </ul>
+    <p>Datos de producto capturados de la superficie de ofertas de MercadoLibre Chile el 10 de agosto de 2026. Documento independiente, sin relación con MercadoLibre.</p>
+  </footer>
+
+</div>

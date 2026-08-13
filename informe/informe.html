@@ -1,0 +1,354 @@
+<title>Oportunidades Hogar en MercadoLibre</title>
+<style>
+  :root{
+    --ground:#FBFAF7; --panel:#FFFFFF; --panel-2:#F4F1EA;
+    --ink:#1B2430; --ink-soft:#4C5563; --ink-mute:#7A828E;
+    --line:#E6E1D7; --line-strong:#D6CFC1;
+    --amber:#C67C0B; --amber-soft:#F3E4C4;
+    --teal:#0E7C6B; --teal-soft:#D6EBE5;
+    --red:#BB3B33; --red-soft:#F3D9D6;
+    --shadow:0 1px 2px rgba(27,36,48,.06),0 8px 24px rgba(27,36,48,.05);
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --ground:#14181E; --panel:#1C222B; --panel-2:#232B35;
+      --ink:#ECEAE3; --ink-soft:#B7BDC6; --ink-mute:#868D97;
+      --line:#2C333D; --line-strong:#3A424D;
+      --amber:#E6A63C; --amber-soft:#3A2E17;
+      --teal:#4FC7B2; --teal-soft:#123029;
+      --red:#E56b62; --red-soft:#3A1F1D;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 28px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#14181E; --panel:#1C222B; --panel-2:#232B35;
+    --ink:#ECEAE3; --ink-soft:#B7BDC6; --ink-mute:#868D97;
+    --line:#2C333D; --line-strong:#3A424D;
+    --amber:#E6A63C; --amber-soft:#3A2E17;
+    --teal:#4FC7B2; --teal-soft:#123029;
+    --red:#E56B62; --red-soft:#3A1F1D;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 28px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);
+    line-height:1.55;-webkit-font-smoothing:antialiased;font-size:16px}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px 96px}
+  a{color:var(--teal)}
+  h1,h2,h3{text-wrap:balance;line-height:1.15;margin:0}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--amber);font-weight:700}
+  .num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+  /* Header */
+  header{padding:56px 0 32px;border-bottom:1px solid var(--line)}
+  header .eyebrow{margin-bottom:14px}
+  h1{font-size:clamp(30px,5vw,46px);font-weight:800;letter-spacing:-.02em}
+  .lede{margin-top:16px;max-width:60ch;color:var(--ink-soft);font-size:17px}
+  .meta{margin-top:22px;display:flex;flex-wrap:wrap;gap:10px}
+  .chip{display:inline-flex;align-items:baseline;gap:7px;background:var(--panel);
+    border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:13px;
+    color:var(--ink-soft);box-shadow:var(--shadow)}
+  .chip b{font-family:var(--mono);color:var(--ink);font-size:14px}
+
+  section{margin-top:52px}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:22px}
+  .sec-head h2{font-size:22px;font-weight:800;letter-spacing:-.01em}
+  .sec-head .n{font-family:var(--mono);color:var(--amber);font-size:14px;font-weight:700}
+  .sub{color:var(--ink-mute);font-size:14px;margin:-8px 0 22px}
+
+  /* KPI row */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:18px 18px 16px;box-shadow:var(--shadow)}
+  .kpi .v{font-family:var(--mono);font-size:26px;font-weight:700;letter-spacing:-.02em}
+  .kpi .l{font-size:12.5px;color:var(--ink-mute);margin-top:4px}
+  .kpi.accent .v{color:var(--amber)}
+
+  /* Findings */
+  .finds{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .find{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:18px 20px;box-shadow:var(--shadow);display:flex;gap:14px}
+  .find .fn{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--amber);
+    flex:0 0 auto;padding-top:2px}
+  .find p{margin:0;font-size:14.5px;color:var(--ink-soft)}
+  .find b{color:var(--ink)}
+
+  /* Table */
+  .tablecard{background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    box-shadow:var(--shadow);overflow:hidden}
+  .scroll{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:640px}
+  thead th{background:var(--panel-2);color:var(--ink-soft);text-align:right;
+    padding:12px 14px;font-weight:600;font-size:11.5px;letter-spacing:.04em;
+    text-transform:uppercase;position:sticky;top:0;white-space:nowrap;
+    border-bottom:1px solid var(--line-strong)}
+  thead th:first-child,tbody td:first-child{text-align:left}
+  thead th.l{text-align:left}
+  tbody td{padding:11px 14px;text-align:right;border-bottom:1px solid var(--line);
+    font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+  tbody td.name{font-family:var(--sans);font-weight:600;white-space:normal;min-width:190px}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr.pick{background:linear-gradient(90deg,var(--amber-soft),transparent 60%)}
+  tbody tr.pick td:first-child{box-shadow:inset 3px 0 0 var(--amber)}
+  tbody tr.avoid td.name{color:var(--red)}
+  .rank{color:var(--ink-mute);font-size:12px}
+  .noisy td.name::after{content:" ◦";color:var(--ink-mute)}
+  /* score bar */
+  .scorebar{display:flex;align-items:center;gap:8px;justify-content:flex-end}
+  .scorebar .track{width:64px;height:7px;border-radius:4px;background:var(--panel-2);
+    overflow:hidden;border:1px solid var(--line)}
+  .scorebar .fill{height:100%;background:var(--amber);border-radius:4px}
+  .scorebar .val{width:38px;text-align:right}
+
+  /* Bets */
+  .bets{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .bet{background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:20px 22px;box-shadow:var(--shadow)}
+  .bet.wide{grid-column:1/-1}
+  .bet h3{font-size:17px;font-weight:800;display:flex;align-items:center;gap:9px}
+  .bet .tag{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--teal);
+    background:var(--teal-soft);border-radius:6px;padding:2px 7px}
+  .bet p{font-size:14px;color:var(--ink-soft);margin:12px 0 0}
+  .bet .econ{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}
+  .stat{background:var(--panel-2);border-radius:9px;padding:8px 11px;flex:1 1 auto;
+    min-width:96px}
+  .stat .sv{font-family:var(--mono);font-weight:700;font-size:15px}
+  .stat .sl{font-size:11px;color:var(--ink-mute);margin-top:1px}
+  .stat.good .sv{color:var(--teal)}
+  .risk{margin-top:12px;font-size:13px;color:var(--ink-soft);
+    border-left:3px solid var(--red);padding-left:12px}
+  .risk b{color:var(--red)}
+
+  /* Cliff chart */
+  .cliff{background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    box-shadow:var(--shadow);padding:24px}
+  .bars{display:grid;grid-template-columns:repeat(8,1fr);gap:10px;align-items:end;
+    height:230px;margin-top:8px}
+  .bar{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+    height:100%;gap:6px}
+  .bar .col{width:100%;max-width:60px;border-radius:6px 6px 0 0;background:var(--teal);
+    position:relative;transition:height .3s}
+  .bar.hi .col{background:var(--red)}
+  .bar .pct{font-family:var(--mono);font-size:12px;font-weight:700}
+  .bar .price{font-family:var(--mono);font-size:11px;color:var(--ink-mute);
+    writing-mode:horizontal-tb}
+  .bar.mark .price{color:var(--ink);font-weight:700}
+  .cliff-legend{display:flex;gap:18px;margin-top:18px;flex-wrap:wrap;font-size:13px;
+    color:var(--ink-soft)}
+  .cliff-legend .k{display:inline-flex;align-items:center;gap:7px}
+  .dot{width:11px;height:11px;border-radius:3px;display:inline-block}
+  .callout{margin-top:18px;background:var(--red-soft);border:1px solid var(--red);
+    border-radius:12px;padding:14px 16px;font-size:14px;color:var(--ink)}
+  .callout b{color:var(--red)}
+
+  /* Avoid list */
+  .avoidgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .av{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--red);
+    border-radius:12px;padding:14px 16px;box-shadow:var(--shadow)}
+  .av h4{margin:0;font-size:14.5px;font-weight:700}
+  .av p{margin:6px 0 0;font-size:13px;color:var(--ink-soft)}
+
+  .steps{counter-reset:s;list-style:none;padding:0;margin:0;display:grid;gap:10px}
+  .steps li{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:14px 16px 14px 52px;position:relative;font-size:14px;color:var(--ink-soft);
+    box-shadow:var(--shadow)}
+  .steps li::before{counter-increment:s;content:counter(s);position:absolute;left:16px;
+    top:13px;width:24px;height:24px;border-radius:7px;background:var(--amber-soft);
+    color:var(--amber);font-family:var(--mono);font-weight:700;font-size:13px;
+    display:grid;place-items:center}
+  .steps b{color:var(--ink)}
+
+  footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);
+    font-size:12.5px;color:var(--ink-mute)}
+  .disc{background:var(--panel-2);border-radius:12px;padding:16px 18px;font-size:12.5px;
+    color:var(--ink-soft)}
+  .disc b{color:var(--ink)}
+  @media(max-width:720px){
+    .kpis{grid-template-columns:repeat(2,1fr)}
+    .finds,.bets,.avoidgrid{grid-template-columns:1fr}
+    .bars{gap:5px}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Investigación de mercado · MercadoLibre Chile</div>
+    <h1>Qué vender en el nicho Hogar</h1>
+    <p class="lede">Ranking accionable de nichos con demanda comprobada, poca
+      competencia y margen que sobrevive a la comisión, el cargo fijo y el
+      despacho de MercadoLibre.</p>
+    <div class="meta">
+      <span class="chip">📅 <b>13 ago 2026</b></span>
+      <span class="chip">🛒 <b>mercadolibre.cl</b></span>
+      <span class="chip">📦 <b>988</b> publicaciones</span>
+      <span class="chip">🗂️ <b>52</b> nichos</span>
+      <span class="chip">💰 CLP</span>
+    </div>
+  </header>
+
+  <section>
+    <div class="kpis">
+      <div class="kpi"><div class="v">988</div><div class="l">Publicaciones únicas analizadas</div></div>
+      <div class="kpi"><div class="v">14</div><div class="l">Categorías hoja muestreadas</div></div>
+      <div class="kpi accent"><div class="v">$19.990</div><div class="l">Umbral de envío gratis — el "acantilado"</div></div>
+      <div class="kpi"><div class="v">96%</div><div class="l">De la oferta vive en fichas de catálogo compartidas</div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Hallazgos clave</h2></div>
+    <div class="finds">
+      <div class="find"><span class="fn">1</span><p>Los ganadores <b>no son los nichos más grandes.</b> Cámaras (78 ofertas) y baterías de cocina (53) están saturadas; los mejores por score son chicos y específicos.</p></div>
+      <div class="find"><span class="fn">2</span><p>Hay un <b>acantilado en $19.990.</b> Justo debajo te queda ~80% del precio; justo encima cae a ~62% porque aparece el costo de despacho.</p></div>
+      <div class="find"><span class="fn">3</span><p><b>96% del nicho es ficha de catálogo compartida:</b> compites por precio y reputación, no por marca. Las excepciones (alfombras de baño, limpieza, cortinas) permiten diferenciar.</p></div>
+      <div class="find"><span class="fn">4</span><p><b>Lo liviano y barato rinde más:</b> gramera, molinillo y cubrecolchón (&lt;1,5 kg, bajo el umbral) dejan 75-80%. El peso hunde el margen: sanitarios caen a 41%.</p></div>
+      <div class="find"><span class="fn">5</span><p><b>Consumibles de recompra escondidos:</b> rollos de sellado al vacío (+10.000), bolsas de basura (+10.000), paños de limpieza (+50.000).</p></div>
+      <div class="find"><span class="fn">6</span><p><b>Competencia débil concreta:</b> cubrecolchón (7 competidores para +10.000 ventas de un solo modelo), molinillos (9), gramera (8), selladoras (8).</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Ranking de oportunidad por nicho</h2></div>
+    <p class="sub">Score = log10(uds/pub + 10) × (1/√competidores) × (1 − 0,35·%catálogo) × %disponible × 100.
+      Filas ámbar = apuestas recomendadas · ◦ = muestra chica (≤5 ofertas), score ruidoso · rojo = evitar.</p>
+    <div class="tablecard"><div class="scroll">
+      <table>
+        <thead><tr>
+          <th class="l">Nicho</th><th>Ofertas</th><th>Comp.</th><th>Uds/pub</th>
+          <th>%cat</th><th>%Full</th><th>P. mediano</th><th>%disp</th><th>Score</th>
+        </tr></thead>
+        <tbody>
+          <tr class="noisy"><td class="name"><span class="rank">1 ·</span> Aromas / home spray</td><td>1</td><td>1</td><td>500</td><td>100</td><td>100</td><td>$19.990</td><td>69</td><td>121</td></tr>
+          <tr class="noisy"><td class="name"><span class="rank">2 ·</span> Toallero eléctrico</td><td>2</td><td>2</td><td>550</td><td>100</td><td>50</td><td>$53.492</td><td>73</td><td>93</td></tr>
+          <tr class="noisy"><td class="name"><span class="rank">4 ·</span> Secaplatos / escurridores</td><td>3</td><td>2</td><td>533</td><td>100</td><td>100</td><td>$24.990</td><td>66</td><td>84</td></tr>
+          <tr class="pick"><td class="name"><span class="rank">6 ·</span> Cubrecolchón / protectores</td><td>12</td><td>7</td><td>1.698</td><td>100</td><td>67</td><td>$10.797</td><td>77</td><td><div class="scorebar"><span class="track"><span class="fill" style="width:82%"></span></span><span class="val">61</span></div></td></tr>
+          <tr class="pick"><td class="name"><span class="rank">7 ·</span> Molinillos de café</td><td>10</td><td>9</td><td>3.180</td><td>100</td><td>100</td><td>$16.916</td><td>80</td><td><div class="scorebar"><span class="track"><span class="fill" style="width:80%"></span></span><span class="val">60</span></div></td></tr>
+          <tr class="pick"><td class="name"><span class="rank">8 ·</span> Selladoras al vacío</td><td>9</td><td>8</td><td>1.789</td><td>100</td><td>89</td><td>$19.980</td><td>80</td><td><div class="scorebar"><span class="track"><span class="fill" style="width:79%"></span></span><span class="val">60</span></div></td></tr>
+          <tr class="pick"><td class="name"><span class="rank">10 ·</span> Alfombras baño/cocina antidesl.</td><td>7</td><td>6</td><td>725</td><td>14</td><td>14</td><td>$8.174</td><td>76</td><td><div class="scorebar"><span class="track"><span class="fill" style="width:76%"></span></span><span class="val">58</span></div></td></tr>
+          <tr class="pick"><td class="name"><span class="rank">11 ·</span> Termos y mates</td><td>16</td><td>8</td><td>1.094</td><td>100</td><td>88</td><td>$16.142</td><td>79</td><td><div class="scorebar"><span class="track"><span class="fill" style="width:73%"></span></span><span class="val">55</span></div></td></tr>
+          <tr class="pick"><td class="name"><span class="rank">12 ·</span> Básculas / gramera de cocina</td><td>10</td><td>8</td><td>880</td><td>100</td><td>80</td><td>$8.146</td><td>76</td><td><div class="scorebar"><span class="track"><span class="fill" style="width:68%"></span></span><span class="val">51</span></div></td></tr>
+          <tr><td class="name"><span class="rank">13 ·</span> Accesorios de baño (sets)</td><td>9</td><td>8</td><td>667</td><td>100</td><td>100</td><td>$11.224</td><td>78</td><td><div class="scorebar"><span class="track"><span class="fill" style="width:67%"></span></span><span class="val">51</span></div></td></tr>
+          <tr><td class="name"><span class="rank">15 ·</span> Carritos / repisas cocina</td><td>14</td><td>10</td><td>691</td><td>93</td><td>86</td><td>$12.990</td><td>78</td><td><div class="scorebar"><span class="track"><span class="fill" style="width:63%"></span></span><span class="val">48</span></div></td></tr>
+          <tr><td class="name"><span class="rank">19 ·</span> Limpieza: traperos / mopas</td><td>20</td><td>18</td><td>4.115</td><td>100</td><td>20</td><td>$8.462</td><td>76</td><td><div class="scorebar"><span class="track"><span class="fill" style="width:56%"></span></span><span class="val">42</span></div></td></tr>
+          <tr class="avoid"><td class="name"><span class="rank">48 ·</span> Baterías de cocina / ollas</td><td>53</td><td>33</td><td>441</td><td>100</td><td>51</td><td>$42.492</td><td>71</td><td><div class="scorebar"><span class="track"><span class="fill" style="width:28%;background:var(--red)"></span></span><span class="val">21</span></div></td></tr>
+          <tr class="avoid"><td class="name"><span class="rank">49 ·</span> WC / sanitarios / mamparas</td><td>19</td><td>15</td><td>854</td><td>100</td><td>47</td><td>$28.759</td><td>41</td><td><div class="scorebar"><span class="track"><span class="fill" style="width:27%;background:var(--red)"></span></span><span class="val">20</span></div></td></tr>
+        </tbody>
+      </table>
+    </div></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Las apuestas concretas</h2></div>
+    <div class="bets">
+      <div class="bet">
+        <h3><span class="tag">#1</span> Cubrecolchón impermeable 2 plazas</h3>
+        <p>Un solo modelo (Okaeri, $8.607) acumula <b>+10.000 vendidos</b>, con clones de +5.000 y +1.000. Solo <b>12 ofertas / 7 competidores</b>: demanda probada, competencia baja. Liviano (~1,4 kg) y bajo el umbral.</p>
+        <div class="econ">
+          <div class="stat good"><div class="sv">$6.544</div><div class="sl">disponible · 76%</div></div>
+          <div class="stat"><div class="sv">$4.392</div><div class="sl">costo máx. (25%)</div></div>
+          <div class="stat"><div class="sv">~2×</div><div class="sl">múltiplo precio/costo</div></div>
+        </div>
+        <p class="risk"><b>Riesgo:</b> producto indiferenciado, se compite por precio dentro de la ficha. Necesitas buen precio de importación y reputación verde.</p>
+      </div>
+      <div class="bet">
+        <h3><span class="tag">#2</span> Molinillo de café eléctrico</h3>
+        <p><b>3.180 uds/publicación</b> — la demanda más alta entre los nichos sanos. Dos modelos con +10.000 vendidos ($10.990 y $6.291). Solo <b>10 ofertas / 9 competidores</b>, bajo el umbral.</p>
+        <div class="econ">
+          <div class="stat good"><div class="sv">$8.522</div><div class="sl">disponible · 78%</div></div>
+          <div class="stat"><div class="sv">$5.774</div><div class="sl">costo máx. (25%)</div></div>
+          <div class="stat"><div class="sv">14%</div><div class="sl">descuento mediano</div></div>
+        </div>
+        <p class="risk"><b>Riesgo:</b> electrodoméstico → postventa y garantía. Verifica certificación SEC y 220V.</p>
+      </div>
+      <div class="bet wide">
+        <h3><span class="tag">#3</span> Selladora al vacío + rollos (el consumible es el negocio)</h3>
+        <p>La máquina líder está a <b>$19.980 — un peso bajo el umbral</b> (pricing ya optimizado por el mercado). El negocio recurrente son los <b>rollos de sellado: +10.000 vendidos a $4.950</b>, recompra frecuente. 1.789 uds/pub, 9 ofertas / 8 competidores.</p>
+        <div class="econ">
+          <div class="stat good"><div class="sv">$15.983</div><div class="sl">disp. máquina · 80%</div></div>
+          <div class="stat"><div class="sv">$10.988</div><div class="sl">costo máx. máquina (25%)</div></div>
+          <div class="stat good"><div class="sv">$3.508</div><div class="sl">disp. rollos · 71%</div></div>
+          <div class="stat"><div class="sv">35%</div><div class="sl">descuento mediano (guerra de precio en la máquina)</div></div>
+        </div>
+        <p class="risk"><b>Riesgo:</b> subir la máquina $10 (a $19.990) te cuesta ~$3.100 de contribución. Compensa el bajo margen de la máquina con el del consumible.</p>
+      </div>
+      <div class="bet">
+        <h3><span class="tag">#4</span> Báscula / gramera de cocina</h3>
+        <p>880 uds/pub, líder a $7.990 (+5.000). <b>Liviana (0,5 kg) y barata</b> → 75% disponible y logística trivial. Solo 8 competidores y descuento mediano bajísimo (8%): poca guerra de precio.</p>
+        <div class="econ">
+          <div class="stat good"><div class="sv">$6.032</div><div class="sl">disponible · 75%</div></div>
+          <div class="stat"><div class="sv">$4.034</div><div class="sl">costo máx. (25%)</div></div>
+        </div>
+        <p class="risk"><b>Riesgo:</b> ticket bajo → necesitas volumen o venta en pack para que la operación rinda.</p>
+      </div>
+      <div class="bet">
+        <h3><span class="tag">#5</span> Alfombra de baño antideslizante</h3>
+        <p>El nicho con <b>menor % de catálogo (14%)</b> de toda la muestra → aquí SÍ se diferencia con marca y publicación propia. Líder a $2.702 con +5.000 vendidos.</p>
+        <div class="econ">
+          <div class="stat"><div class="sv">61%</div><div class="sl">disp. a $2.702</div></div>
+          <div class="stat good"><div class="sv">76%</div><div class="sl">disp. en set $7-8k</div></div>
+        </div>
+        <p class="risk"><b>Riesgo:</b> a $2.702 el cargo fijo de $600 se come 22% del ticket. Solo rinde en <b>pack/set</b> o con venta cruzada de accesorios de baño.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>El acantilado del envío gratis</h2></div>
+    <p class="sub">Contribución disponible para un producto de 2 kg, según precio de venta. En $19.990 aparece el costo de despacho y el margen se desploma.</p>
+    <div class="cliff">
+      <div class="bars">
+        <div class="bar"><span class="pct">79%</span><div class="col" style="height:79%"></div><span class="price">$15.990</span></div>
+        <div class="bar"><span class="pct">80%</span><div class="col" style="height:80%"></div><span class="price">$17.990</span></div>
+        <div class="bar"><span class="pct">80%</span><div class="col" style="height:80%"></div><span class="price">$18.990</span></div>
+        <div class="bar mark"><span class="pct">80%</span><div class="col" style="height:80%"></div><span class="price">$19.490</span></div>
+        <div class="bar hi mark"><span class="pct">62%</span><div class="col" style="height:62%"></div><span class="price">$19.990</span></div>
+        <div class="bar hi"><span class="pct">63%</span><div class="col" style="height:63%"></div><span class="price">$20.990</span></div>
+        <div class="bar hi"><span class="pct">65%</span><div class="col" style="height:65%"></div><span class="price">$22.990</span></div>
+        <div class="bar hi"><span class="pct">66%</span><div class="col" style="height:66%"></div><span class="price">$24.990</span></div>
+      </div>
+      <div class="cliff-legend">
+        <span class="k"><span class="dot" style="background:var(--teal)"></span> Bajo el umbral · solo cargo fijo $600</span>
+        <span class="k"><span class="dot" style="background:var(--red)"></span> Sobre el umbral · despacho ~$4.125</span>
+      </div>
+      <div class="callout">Cruzar de <b>$19.490 a $19.990</b> hace perder <b>~$3.100 de contribución</b> ($15.577 → $12.467), y no la recuperas hasta ~$23.500. <b>Nunca fijes el precio en $19.990 exacto:</b> quédate en $19.490-$19.890, o salta directo a $23.500+.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Qué evitar</h2></div>
+    <div class="avoidgrid">
+      <div class="av"><h4>WC, sanitarios, receptáculos y mamparas</h4><p>Peso ~22 kg: buena demanda (854 uds/pub) pero el despacho hunde el margen a <b>41% disponible</b>. Solo con logística propia o retiro en tienda.</p></div>
+      <div class="av"><h4>Baterías de cocina / ollas</h4><p>53 ofertas, 33 competidores, ~4,5 kg, ticket $42.492. Nicho maduro, saturado y pesado; guerra de marcas.</p></div>
+      <div class="av"><h4>Cámaras de seguridad WiFi</h4><p>78 ofertas, 32 competidores, 83% Full, 35% de descuento. Mucha demanda pero dominado por marcas (EZVIZ); difícil entrar sin capital.</p></div>
+      <div class="av"><h4>Alfombras decorativas de living</h4><p>Peso ~5 kg, 25 competidores. Pesadas y muy competidas: el envío se come la ventaja.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Cómo validar antes de comprar inventario</h2></div>
+    <ol class="steps">
+      <li>Confirma la <b>comisión exacta</b> de la subcategoría en tu cuenta (14-17%, según Clásica/Premium).</li>
+      <li>Simula el <b>despacho real</b> en el simulador oficial con peso y medidas reales (ojo con el peso volumétrico).</li>
+      <li>Pide <b>muestra física</b> antes de comprometer volumen: calidad y peso reales difieren del proveedor.</li>
+      <li>Arranca con <b>volumen chico</b> (10-20 unidades) para medir conversión y reputación antes de escalar.</li>
+      <li>Fija el precio <b>respetando el acantilado</b>: bajo $19.990, o arriba de ~$23.500.</li>
+      <li>Para consumibles, arma <b>packs</b> para diluir el envío y fomentar la recompra.</li>
+    </ol>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>Cómo se obtuvieron los datos y qué no cubren</h2></div>
+    <div class="disc">
+      <p style="margin-top:0"><b>Fuente:</b> superficie pública de <i>ofertas por categoría</i> de mercadolibre.cl (la API oficial exige token OAuth y las búsquedas redirigen a verificación).</p>
+      <p><b>(a)</b> La muestra son productos con <b>oferta activa</b>, no el catálogo completo. &nbsp; <b>(b)</b> "Vendidos" es <b>acumulado histórico en cubos</b> (+100, +1.000, +5.000…), no venta mensual. &nbsp; <b>(c)</b> El conteo de competidores es una <b>cota superior</b> (el vendedor solo aparece en ~55% de las tarjetas).</p>
+      <p style="margin-bottom:0"><b>(d)</b> Comisión, cargo fijo y despacho son <b>estimaciones</b> (comisión 14-17%, umbral $19.990, tabla de envío interpolada). <b>Confírmalas en el simulador oficial con peso y medidas reales antes de comprometer inventario.</b> &nbsp; <b>(e)</b> La clasificación en nichos y el peso por producto son heurísticos; 8,7% quedó sin clasificar.</p>
+    </div>
+  </section>
+
+  <footer>
+    Datos crudos y detalle completo de las 988 publicaciones y los 52 nichos en <span class="num">datos/</span> y en el Excel <span class="num">informe/oportunidades_hogar_mercadolibre_cl.xlsx</span>. Cifras de costos vigentes a agosto 2026 · estimaciones referenciales.
+  </footer>
+</div>

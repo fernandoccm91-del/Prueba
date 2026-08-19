@@ -1,0 +1,90 @@
+[
+ {
+  "precio": 17990,
+  "comision": 3058,
+  "fijo": 600,
+  "envio": 0,
+  "contrib": 14332,
+  "pct": 80
+ },
+ {
+  "precio": 18990,
+  "comision": 3228,
+  "fijo": 600,
+  "envio": 0,
+  "contrib": 15162,
+  "pct": 80
+ },
+ {
+  "precio": 19490,
+  "comision": 3313,
+  "fijo": 600,
+  "envio": 0,
+  "contrib": 15577,
+  "pct": 80
+ },
+ {
+  "precio": 19890,
+  "comision": 3381,
+  "fijo": 600,
+  "envio": 0,
+  "contrib": 15909,
+  "pct": 80
+ },
+ {
+  "precio": 19990,
+  "comision": 3398,
+  "fijo": 0,
+  "envio": 3410,
+  "contrib": 13182,
+  "pct": 66
+ },
+ {
+  "precio": 20990,
+  "comision": 3568,
+  "fijo": 0,
+  "envio": 3410,
+  "contrib": 14012,
+  "pct": 67
+ },
+ {
+  "precio": 22990,
+  "comision": 3908,
+  "fijo": 0,
+  "envio": 3410,
+  "contrib": 15672,
+  "pct": 68
+ },
+ {
+  "precio": 24990,
+  "comision": 4248,
+  "fijo": 0,
+  "envio": 3410,
+  "contrib": 17332,
+  "pct": 69
+ },
+ {
+  "precio": 27990,
+  "comision": 4758,
+  "fijo": 0,
+  "envio": 3410,
+  "contrib": 19822,
+  "pct": 71
+ },
+ {
+  "precio": 29990,
+  "comision": 5098,
+  "fijo": 0,
+  "envio": 3410,
+  "contrib": 21482,
+  "pct": 72
+ },
+ {
+  "precio": 32990,
+  "comision": 5608,
+  "fijo": 0,
+  "envio": 3410,
+  "contrib": 23972,
+  "pct": 73
+ }
+]

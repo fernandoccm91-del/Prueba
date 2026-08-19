@@ -1,0 +1,336 @@
+<title>Veinte Apuestas Chicas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#F4F7F5; --surface:#FFFFFF; --sunk:#EBF0ED;
+  --ink:#141E1C; --body:#31403C; --muted:#68776F;
+  --line:#D6DEDA; --hair:#E5EBE7;
+  --accent:#14574F; --accent-soft:#DCEBE6;
+  --warn:#A55D06; --warn-soft:#F6E8D2;
+  --good:#33704A; --bad:#9C3B2E;
+  --shadow:0 1px 2px rgba(20,30,28,.05), 0 8px 24px -16px rgba(20,30,28,.18);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0D1514; --surface:#151F1D; --sunk:#111A18;
+    --ink:#E9F0EC; --body:#BAC8C2; --muted:#869890;
+    --line:#26332F; --hair:#1E2A27;
+    --accent:#5FBCAC; --accent-soft:#16302C;
+    --warn:#D99A3C; --warn-soft:#2E2415;
+    --good:#63AE7C; --bad:#D47563;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0D1514; --surface:#151F1D; --sunk:#111A18;
+  --ink:#E9F0EC; --body:#BAC8C2; --muted:#869890;
+  --line:#26332F; --hair:#1E2A27;
+  --accent:#5FBCAC; --accent-soft:#16302C;
+  --warn:#D99A3C; --warn-soft:#2E2415;
+  --good:#63AE7C; --bad:#D47563;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--body);
+  font-family:"Source Serif 4",Georgia,serif; font-size:17px; line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1120px; margin:0 auto; padding:0 24px 96px}
+h1,h2,h3,h4{font-family:"Bricolage Grotesque",system-ui,sans-serif; color:var(--ink); text-wrap:balance; margin:0}
+.mono,.num,.eyebrow,th,.tag,.rank,.econ span,.risk span{font-family:"IBM Plex Mono",ui-monospace,monospace}
+.num{font-variant-numeric:tabular-nums}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:3px}
+
+/* ---------- encabezado ---------- */
+header.top{border-bottom:1px solid var(--line); padding:64px 0 40px; margin-bottom:56px}
+.eyebrow{font-size:11.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--accent); font-weight:600}
+h1{font-size:clamp(38px,6.4vw,68px); line-height:1.02; font-weight:800; letter-spacing:-.025em; margin:18px 0 0; max-width:16ch}
+.lede{font-size:20px; max-width:62ch; margin:22px 0 0; color:var(--body)}
+.scope{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1px;
+  background:var(--line); border:1px solid var(--line); border-radius:10px; overflow:hidden; margin-top:40px}
+.scope div{background:var(--surface); padding:16px 18px}
+.scope b{font-family:"IBM Plex Mono",monospace; font-size:26px; font-weight:600; color:var(--ink); display:block; font-variant-numeric:tabular-nums; line-height:1.2}
+.scope span{font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted)}
+
+/* ---------- secciones ---------- */
+section{margin:0 0 72px}
+h2{font-size:clamp(25px,3.4vw,34px); font-weight:700; letter-spacing:-.02em; margin-bottom:6px}
+.sub{color:var(--muted); font-size:15.5px; max-width:70ch; margin:0 0 26px}
+h3{font-size:20px; font-weight:700; letter-spacing:-.01em}
+p{max-width:70ch}
+
+/* ---------- hallazgos ---------- */
+ol.finds{list-style:none; counter-reset:f; padding:0; margin:0; display:grid; gap:2px;
+  background:var(--line); border:1px solid var(--line); border-radius:10px; overflow:hidden}
+ol.finds li{counter-increment:f; background:var(--surface); padding:20px 24px 20px 62px; position:relative}
+ol.finds li::before{content:counter(f,decimal-leading-zero); position:absolute; left:22px; top:21px;
+  font-family:"IBM Plex Mono",monospace; font-size:12px; font-weight:600; color:var(--accent)}
+ol.finds strong{color:var(--ink); font-weight:600}
+
+/* ---------- tablas ---------- */
+.scroll{overflow-x:auto; border:1px solid var(--line); border-radius:10px; background:var(--surface); box-shadow:var(--shadow)}
+table{width:100%; border-collapse:collapse; font-size:14px}
+th{font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; font-weight:600; color:var(--muted);
+  text-align:right; padding:13px 12px; border-bottom:1px solid var(--line); white-space:nowrap; background:var(--sunk)}
+th:first-child,th.l{text-align:left}
+td{padding:12px; border-bottom:1px solid var(--hair); vertical-align:middle}
+td.num{text-align:right; white-space:nowrap; font-family:"IBM Plex Mono",monospace; font-size:13px}
+tr:last-child td{border-bottom:0}
+td.n{color:var(--muted); font-family:"IBM Plex Mono",monospace; font-size:12px; width:34px; text-align:right}
+.prod strong{color:var(--ink); font-weight:600; font-family:"Bricolage Grotesque",sans-serif; display:block; font-size:14.5px}
+.ref{display:block; font-family:"IBM Plex Mono",monospace; font-size:11px; color:var(--muted); margin-top:3px; line-height:1.45}
+.pct{color:var(--good); font-weight:500} .pct.bad{color:var(--bad)}
+.bar{display:block; height:3px; border-radius:2px; background:var(--hair); margin-top:5px; min-width:52px}
+.bar>span{display:block; height:100%; border-radius:2px; background:var(--accent)}
+.bar.sm>span{background:var(--muted); opacity:.55}
+td.score{font-weight:600; color:var(--ink)}
+tbody tr:hover td{background:var(--sunk)}
+.two{display:grid; grid-template-columns:1fr 1fr; gap:24px}
+@media(max-width:760px){.two{grid-template-columns:1fr}}
+
+/* ---------- apuestas ---------- */
+.bets{display:grid; gap:20px}
+.bet{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:26px 28px; box-shadow:var(--shadow)}
+.bet header{display:flex; gap:16px; align-items:flex-start; margin-bottom:14px}
+.rank{flex:none; width:34px; height:34px; border-radius:8px; background:var(--accent-soft); color:var(--accent);
+  display:grid; place-items:center; font-size:13px; font-weight:600}
+.bet .ref{margin-top:5px}
+.why{margin:0 0 18px}
+.econ{display:grid; grid-template-columns:repeat(auto-fit,minmax(146px,1fr)); gap:1px; background:var(--line);
+  border:1px solid var(--line); border-radius:8px; overflow:hidden; margin-bottom:16px}
+.econ>div{background:var(--surface); padding:11px 14px}
+.econ span{display:block; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-bottom:3px}
+.econ b{font-family:"IBM Plex Mono",monospace; font-size:16px; font-weight:600; color:var(--ink); font-variant-numeric:tabular-nums}
+.econ b.neg{color:var(--bad); font-weight:500}
+.econ .hl{background:var(--accent-soft)} .econ .hl b{color:var(--accent)}
+.risk{margin:0; font-size:15px; color:var(--body); background:var(--warn-soft); border-radius:8px; padding:12px 16px; max-width:none}
+.risk span{display:block; font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--warn); font-weight:600; margin-bottom:3px}
+
+/* ---------- acantilado ---------- */
+tr.peak td{background:var(--accent-soft)} tr.peak td b{color:var(--accent)}
+tr.drop td{background:var(--warn-soft)} tr.drop td b{color:var(--warn)}
+.callout{border-left:3px solid var(--warn); background:var(--warn-soft); border-radius:0 10px 10px 0;
+  padding:20px 24px; margin:24px 0 0}
+.callout p{margin:0; max-width:72ch}
+.callout strong{color:var(--ink)}
+
+/* ---------- método / validar ---------- */
+.notes{background:var(--sunk); border:1px solid var(--line); border-radius:12px; padding:26px 30px}
+.notes ul{margin:0; padding-left:20px; display:grid; gap:9px}
+.notes li{max-width:76ch}
+.notes strong{color:var(--ink); font-weight:600}
+ol.steps{list-style:none; counter-reset:s; padding:0; margin:0; display:grid; gap:14px}
+ol.steps li{counter-increment:s; padding-left:44px; position:relative; max-width:74ch}
+ol.steps li::before{content:counter(s); position:absolute; left:0; top:1px; width:26px; height:26px; border-radius:50%;
+  background:var(--accent); color:var(--paper); display:grid; place-items:center;
+  font-family:"IBM Plex Mono",monospace; font-size:12px; font-weight:600}
+footer{border-top:1px solid var(--line); padding-top:26px; color:var(--muted); font-size:13.5px}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div class="eyebrow">Estudio de mercado · MercadoLibre Chile · Agosto 2026</div>
+  <h1>Veinte apuestas chicas</h1>
+  <p class="lede">Productos pequeños y de demanda constante en hogar, baño, cocina y fitness — rankeados por demanda comprobada, competencia real y el margen que sobrevive después de que MercadoLibre cobra lo suyo.</p>
+  <div class="scope">
+    <div><b>1.117</b><span>publicaciones</span></div>
+    <div><b>17</b><span>categorías hoja</span></div>
+    <div><b>60</b><span>nichos</span></div>
+    <div><b>20</b><span>apuestas ≤1,5 kg</span></div>
+    <div><b>CLP</b><span>moneda</span></div>
+  </div>
+</header>
+
+<section>
+  <h2>Lo que dicen los datos</h2>
+  <p class="sub">Seis hallazgos con cifras de la muestra, no generalidades.</p>
+  <ol class="finds">
+    <li>El <strong>cargo fijo de $600</strong> bajo el umbral de envío gratis es lo que decide si un producto barato sirve o no. En traperos húmedos ($1.690, la demanda más alta de todo el estudio con 15.250 uds/publicación) se lleva el 35% del precio y deja solo un 47% disponible. En los 20 seleccionados deja entre 61% y 80%.</li>
+    <li>Cruzar los <strong>$19.990</strong> te hace ganar menos vendiendo más caro. A $19.890 quedan $15.909; a $19.990 quedan $13.182 — <strong>$2.727 menos por unidad</strong>. Hay que llegar a $23.280 solo para volver al mismo punto.</li>
+    <li>El nicho menos disputado es <strong>cuerdas de saltar</strong>: 2 vendedores en toda la muestra, 1.275 uds/publicación y 0,3 kg. El más disputado de la lista es bandas elásticas, con 14.</li>
+    <li>Los <strong>consumibles ganan por recompra</strong>: bolsas de sellado al vacío lideran con 3.333 uds/publicación, seguidas de guantes desechables, esponjas y paños de microfibra. Son los únicos productos de la lista donde el mismo cliente vuelve.</li>
+    <li><strong>El peso manda sobre el precio.</strong> Mancuernas venden bien (636 uds/publicación) pero 12 kg de despacho dejan solo el 41% disponible; los 20 seleccionados pesan entre 0,2 y 1,2 kg y ninguno paga despacho.</li>
+    <li>El <strong>uso de Full es desparejo</strong> y ahí hay una grieta: paños de microfibra y guantes desechables tienen 0% de publicaciones con Full pese a demanda alta. Es visibilidad que se gana solo despachando mejor.</li>
+  </ol>
+</section>
+
+<section>
+  <h2>Los 20 productos</h2>
+  <p class="sub">Filtro aplicado: peso estimado ≤ 1,5 kg, mínimo 4 publicaciones en la muestra y al menos 200 unidades vendidas por publicación. Ordenados por score de oportunidad.</p>
+  <div class="scroll"><table>
+    <thead><tr><th></th><th class="l">Nicho y referencia de la muestra</th><th>Kg</th><th>Precio med.</th>
+    <th>Compet.</th><th>Uds/pub.</th><th>Disponible</th><th>%</th><th>Costo máx.</th><th>Score</th></tr></thead>
+    <tbody><tr><td class="n">1</td><td class="prod"><strong>Cuerdas de saltar</strong><span class="ref">Cuerda Saltar De Velocidad Aluminio Fitnics Cardio Crossfit</span></td><td class="num">0.3</td><td class="num">$5.972</td><td class="num">2</td><td class="num">1.275<span class="bar sm"><span style="width:38%"></span></span></td><td class="num">$4.357</td><td class="num pct">73%</td><td class="num">$2.864</td><td class="num score">104<span class="bar"><span style="width:100%"></span></span></td></tr><tr><td class="n">2</td><td class="prod"><strong>Bidet ducha para WC</strong><span class="ref">Ducha Bidet Arabe Acero Inoxidable Wc Inodoro Alta Calidad</span></td><td class="num">0.6</td><td class="num">$17.990</td><td class="num">4</td><td class="num">2.008<span class="bar sm"><span style="width:60%"></span></span></td><td class="num">$14.332</td><td class="num pct">80%</td><td class="num">$9.834</td><td class="num score">93<span class="bar"><span style="width:89%"></span></span></td></tr><tr><td class="n">3</td><td class="prod"><strong>Cestos de ropa sucia</strong><span class="ref">Canasto Cesto Ropa Sucia Pleglable Look Bambu Grande Tapa Im Beige</span></td><td class="num">1.2</td><td class="num">$13.529</td><td class="num">4</td><td class="num">1.275<span class="bar sm"><span style="width:38%"></span></span></td><td class="num">$10.629</td><td class="num pct">79%</td><td class="num">$7.247</td><td class="num score">90<span class="bar"><span style="width:86%"></span></span></td></tr><tr><td class="n">4</td><td class="prod"><strong>Bolsas para sellado al vacío</strong><span class="ref">Rollo Bolsas Sellado Al Vacío Sellar Alimentos 28cmx10mts Transparente</span></td><td class="num">0.6</td><td class="num">$6.872</td><td class="num">5</td><td class="num">3.333<span class="bar sm"><span style="width:100%"></span></span></td><td class="num">$5.104</td><td class="num pct">74%</td><td class="num">$3.386</td><td class="num score">83<span class="bar"><span style="width:80%"></span></span></td></tr><tr><td class="n">5</td><td class="prod"><strong>Hand grip / agarre</strong><span class="ref">Hand Grip Ejercitador de Manos Fitnics Ajustable 5 a 60 Kg Color Negro</span></td><td class="num">0.3</td><td class="num">$12.790</td><td class="num">4</td><td class="num">1.512<span class="bar sm"><span style="width:45%"></span></span></td><td class="num">$10.016</td><td class="num pct">78%</td><td class="num">$6.818</td><td class="num score">81<span class="bar"><span style="width:78%"></span></span></td></tr><tr><td class="n">6</td><td class="prod"><strong>Antideslizantes y alfombras baño</strong><span class="ref">Tapete Goma Antideslizante Piso De Ducha Baño 36×69cm Gris</span></td><td class="num">0.9</td><td class="num">$6.758</td><td class="num">3</td><td class="num">525<span class="bar sm"><span style="width:16%"></span></span></td><td class="num">$5.009</td><td class="num pct">74%</td><td class="num">$3.320</td><td class="num score">76<span class="bar"><span style="width:73%"></span></span></td></tr><tr><td class="n">7</td><td class="prod"><strong>Barras seguridad y movilidad</strong><span class="ref">X3 Manillas Seguridad Ducha Para Baño Barra De Seguridad Plateado</span></td><td class="num">1.2</td><td class="num">$14.662</td><td class="num">5</td><td class="num">542<span class="bar sm"><span style="width:16%"></span></span></td><td class="num">$11.569</td><td class="num pct">79%</td><td class="num">$7.904</td><td class="num score">68<span class="bar"><span style="width:66%"></span></span></td></tr><tr><td class="n">8</td><td class="prod"><strong>Guantes desechables</strong><span class="ref">Guantes De Vinilo Caja 100 Unidades Desechables Fs - Mred Talla L</span></td><td class="num">0.8</td><td class="num">$8.680</td><td class="num">5</td><td class="num">850<span class="bar sm"><span style="width:26%"></span></span></td><td class="num">$6.604</td><td class="num pct">76%</td><td class="num">$4.434</td><td class="num score">65<span class="bar"><span style="width:62%"></span></span></td></tr><tr><td class="n">9</td><td class="prod"><strong>Quita pelusas y pelo mascota</strong><span class="ref">Rodillo De Pelusa Extra Adhesivo Para Pelo De Mascotas. Ropa</span></td><td class="num">0.4</td><td class="num">$6.459</td><td class="num">5</td><td class="num">425<span class="bar sm"><span style="width:13%"></span></span></td><td class="num">$4.761</td><td class="num pct">74%</td><td class="num">$3.146</td><td class="num score">63<span class="bar"><span style="width:60%"></span></span></td></tr><tr><td class="n">10</td><td class="prod"><strong>Organizadores de maquillaje</strong><span class="ref">Cosmetiquero Organizador Maquillaje Con Espejo Led Estuche USB Recarga</span></td><td class="num">0.7</td><td class="num">$6.831</td><td class="num">6</td><td class="num">743<span class="bar sm"><span style="width:22%"></span></span></td><td class="num">$5.070</td><td class="num pct">74%</td><td class="num">$3.362</td><td class="num score">57<span class="bar"><span style="width:54%"></span></span></td></tr><tr><td class="n">11</td><td class="prod"><strong>Esponjas y estropajos</strong><span class="ref">Pack Esponja Jabonosa Desechable Begobaño 6 Paquetes. 144 Un Blanco Y </span></td><td class="num">0.4</td><td class="num">$9.447</td><td class="num">8</td><td class="num">644<span class="bar sm"><span style="width:19%"></span></span></td><td class="num">$7.241</td><td class="num pct">77%</td><td class="num">$4.879</td><td class="num score">50<span class="bar"><span style="width:48%"></span></span></td></tr><tr><td class="n">12</td><td class="prod"><strong>Cajas y bolsas organizadoras</strong><span class="ref">Set De Separadores De Cajones Organizador Closet Hogar  Blanco</span></td><td class="num">1.0</td><td class="num">$5.318</td><td class="num">6</td><td class="num">383<span class="bar sm"><span style="width:11%"></span></span></td><td class="num">$3.814</td><td class="num pct">72%</td><td class="num">$2.484</td><td class="num score">49<span class="bar"><span style="width:47%"></span></span></td></tr><tr><td class="n">13</td><td class="prod"><strong>Paños de microfibra</strong><span class="ref">Paño Microfibra Limpieza Hogar 20 Piezas 25x25 Cm Multi-colored</span></td><td class="num">0.5</td><td class="num">$6.362</td><td class="num">8</td><td class="num">788<span class="bar sm"><span style="width:24%"></span></span></td><td class="num">$4.680</td><td class="num pct">74%</td><td class="num">$3.090</td><td class="num score">49<span class="bar"><span style="width:47%"></span></span></td></tr><tr><td class="n">14</td><td class="prod"><strong>Cortinas de baño</strong><span class="ref">Cortina Baño Ducha Casatua Con Iman Y Forro Gris</span></td><td class="num">0.8</td><td class="num">$10.440</td><td class="num">6</td><td class="num">218<span class="bar sm"><span style="width:7%"></span></span></td><td class="num">$8.065</td><td class="num pct">77%</td><td class="num">$5.455</td><td class="num score">48<span class="bar"><span style="width:46%"></span></span></td></tr><tr><td class="n">15</td><td class="prod"><strong>Termómetros de cocina</strong><span class="ref">Termómetro Digital de Cocina Carnes aceites comidas y reposteria Insta</span></td><td class="num">0.2</td><td class="num">$2.694</td><td class="num">4</td><td class="num">256<span class="bar sm"><span style="width:8%"></span></span></td><td class="num">$1.636</td><td class="num pct">61%</td><td class="num">$963</td><td class="num score">48<span class="bar"><span style="width:46%"></span></span></td></tr><tr><td class="n">16</td><td class="prod"><strong>Cabezales y kits de ducha</strong><span class="ref">Teléfono Cabezal De Ducha Turbo Con Masajeador 4 En 1 Gris Oscuro Mate</span></td><td class="num">0.7</td><td class="num">$12.883</td><td class="num">10</td><td class="num">731<span class="bar sm"><span style="width:22%"></span></span></td><td class="num">$10.093</td><td class="num pct">78%</td><td class="num">$6.872</td><td class="num score">46<span class="bar"><span style="width:44%"></span></span></td></tr><tr><td class="n">17</td><td class="prod"><strong>Balanzas y grameras</strong><span class="ref">Gramera Digital Pesa Gramera Cocina Pesa Alimentos 5kg/1g Balanzas Dig</span></td><td class="num">0.5</td><td class="num">$7.490</td><td class="num">10</td><td class="num">938<span class="bar sm"><span style="width:28%"></span></span></td><td class="num">$5.617</td><td class="num pct">75%</td><td class="num">$3.744</td><td class="num score">46<span class="bar"><span style="width:44%"></span></span></td></tr><tr><td class="n">18</td><td class="prod"><strong>Accesorios crossfit textiles</strong><span class="ref">Par Muñequera Boer Crossfit Fitness Levantamiento Elasticada Negro/gri</span></td><td class="num">0.3</td><td class="num">$6.016</td><td class="num">8</td><td class="num">334<span class="bar sm"><span style="width:10%"></span></span></td><td class="num">$4.393</td><td class="num pct">73%</td><td class="num">$2.889</td><td class="num score">43<span class="bar"><span style="width:41%"></span></span></td></tr><tr><td class="n">19</td><td class="prod"><strong>Bandas elásticas resistencia</strong><span class="ref">Kit 6 Power Bands Banda Elástica De Resistencia Pull Up Gym Juego De 6</span></td><td class="num">0.5</td><td class="num">$12.980</td><td class="num">14</td><td class="num">525<span class="bar sm"><span style="width:16%"></span></span></td><td class="num">$10.173</td><td class="num pct">78%</td><td class="num">$6.928</td><td class="num score">40<span class="bar"><span style="width:38%"></span></span></td></tr><tr><td class="n">20</td><td class="prod"><strong>Cortadores y mandolinas</strong><span class="ref">Rebanadora Segura Mandolina De Verduras Comidas Picadora Sli Color</span></td><td class="num">0.8</td><td class="num">$9.636</td><td class="num">13</td><td class="num">692<span class="bar sm"><span style="width:21%"></span></span></td><td class="num">$7.398</td><td class="num pct">77%</td><td class="num">$4.989</td><td class="num score">39<span class="bar"><span style="width:38%"></span></span></td></tr></tbody>
+  </table></div>
+  <p class="sub" style="margin-top:14px"><strong>Costo máx.</strong> = lo máximo que puedes pagar por el producto puesto en bodega y aún dejar 25% de margen neto sobre el precio de venta.</p>
+</section>
+
+<section>
+  <h2>Las seis primeras, en detalle</h2>
+  <p class="sub">Por qué cada una, qué queda de cada venta y qué puede salir mal.</p>
+  <div class="bets"><article class="bet">
+ <header><span class="rank">01</span><div><h3>Cuerdas de saltar</h3>
+ <p class="ref">Referencia en la muestra: Cuerda Saltar De Velocidad Aluminio Fitnics Cardio Crossfit — 5.000 vendidos a $9.480</p></div></header>
+ <p class="why">Solo 2 vendedores en toda la muestra y la referencia acumula +5.000 unidades. Es el nicho menos disputado de los 20.</p>
+ <div class="econ">
+  <div><span>Precio mediano</span><b>$5.972</b></div>
+  <div><span>Comisión 17%</span><b class="neg">−$1.015</b></div>
+  <div><span>Cargo fijo</span><b class="neg">−$600</b></div>
+  <div><span>Despacho</span><b class="neg">−$0</b></div>
+  <div class="hl"><span>Queda disponible</span><b>$4.357</b></div>
+  <div class="hl"><span>Costo máx. de compra</span><b>$2.864</b></div>
+ </div>
+ <p class="risk"><span>Riesgo</span>Producto commodity: si entran 3 vendedores más, la única palanca es el precio. Diferénciate con el rodamiento y el cable de acero recubierto.</p>
+</article><article class="bet">
+ <header><span class="rank">02</span><div><h3>Bidet ducha para WC</h3>
+ <p class="ref">Referencia en la muestra: Ducha Bidet Arabe Acero Inoxidable Wc Inodoro Alta Calidad — 10.000 vendidos a $8.762</p></div></header>
+ <p class="why">2.008 unidades por publicación con 4 competidores. La referencia lleva +10.000 ventas a $8.762 y hay espacio hasta $17.990.</p>
+ <div class="econ">
+  <div><span>Precio mediano</span><b>$17.990</b></div>
+  <div><span>Comisión 17%</span><b class="neg">−$3.058</b></div>
+  <div><span>Cargo fijo</span><b class="neg">−$600</b></div>
+  <div><span>Despacho</span><b class="neg">−$0</b></div>
+  <div class="hl"><span>Queda disponible</span><b>$14.332</b></div>
+  <div class="hl"><span>Costo máx. de compra</span><b>$9.834</b></div>
+ </div>
+ <p class="risk"><span>Riesgo</span>Producto de instalación: una fuga genera reclamo y daña reputación. Exige muestra y prueba de presión antes de comprar volumen.</p>
+</article><article class="bet">
+ <header><span class="rank">03</span><div><h3>Cestos de ropa sucia</h3>
+ <p class="ref">Referencia en la muestra: Canasto Cesto Ropa Sucia Pleglable Look Bambu Grande Tapa Im Beige — 5.000 vendidos a $11.390</p></div></header>
+ <p class="why">Demanda pareja todo el año, 4 competidores y 79% del precio disponible tras costos.</p>
+ <div class="econ">
+  <div><span>Precio mediano</span><b>$13.529</b></div>
+  <div><span>Comisión 17%</span><b class="neg">−$2.300</b></div>
+  <div><span>Cargo fijo</span><b class="neg">−$600</b></div>
+  <div><span>Despacho</span><b class="neg">−$0</b></div>
+  <div class="hl"><span>Queda disponible</span><b>$10.629</b></div>
+  <div class="hl"><span>Costo máx. de compra</span><b>$7.247</b></div>
+ </div>
+ <p class="risk"><span>Riesgo</span>Es voluminoso aunque liviano: el peso volumétrico puede encarecer el despacho más de lo que dice la tabla por kilo. Confírmalo plegado y sin plegar.</p>
+</article><article class="bet">
+ <header><span class="rank">04</span><div><h3>Bolsas para sellado al vacío</h3>
+ <p class="ref">Referencia en la muestra: Rollo Bolsas Sellado Al Vacío Sellar Alimentos 28cmx10mts Transparente — 10.000 vendidos a $4.950</p></div></header>
+ <p class="why">El mayor ratio de la muestra: 3.333 unidades por publicación. Es consumible — el cliente vuelve a comprar.</p>
+ <div class="econ">
+  <div><span>Precio mediano</span><b>$6.872</b></div>
+  <div><span>Comisión 17%</span><b class="neg">−$1.168</b></div>
+  <div><span>Cargo fijo</span><b class="neg">−$600</b></div>
+  <div><span>Despacho</span><b class="neg">−$0</b></div>
+  <div class="hl"><span>Queda disponible</span><b>$5.104</b></div>
+  <div class="hl"><span>Costo máx. de compra</span><b>$3.386</b></div>
+ </div>
+ <p class="risk"><span>Riesgo</span>Margen por unidad bajo ($5.104). Solo funciona con rotación alta y compra por volumen; no sirve para vender de a una.</p>
+</article><article class="bet">
+ <header><span class="rank">05</span><div><h3>Hand grip / agarre</h3>
+ <p class="ref">Referencia en la muestra: Hand Grip Ejercitador de Manos Fitnics Ajustable 5 a 60 Kg Color Negro — 5.000 vendidos a $6.490</p></div></header>
+ <p class="why">1.512 uds/publicación con 4 competidores y solo 0,3 kg. Envío casi gratis para ti.</p>
+ <div class="econ">
+  <div><span>Precio mediano</span><b>$12.790</b></div>
+  <div><span>Comisión 17%</span><b class="neg">−$2.174</b></div>
+  <div><span>Cargo fijo</span><b class="neg">−$600</b></div>
+  <div><span>Despacho</span><b class="neg">−$0</b></div>
+  <div class="hl"><span>Queda disponible</span><b>$10.016</b></div>
+  <div class="hl"><span>Costo máx. de compra</span><b>$6.818</b></div>
+ </div>
+ <p class="risk"><span>Riesgo</span>Ticket bajo y producto muy copiable. Sube el ticket vendiéndolo en kit (grip + banda + cuerda) en vez de suelto.</p>
+</article><article class="bet">
+ <header><span class="rank">06</span><div><h3>Antideslizantes y alfombras baño</h3>
+ <p class="ref">Referencia en la muestra: Tapete Goma Antideslizante Piso De Ducha Baño 36×69cm Gris — 1.000 vendidos a $7.188</p></div></header>
+ <p class="why">3 competidores, 75% del precio disponible y demanda que no depende de la estación.</p>
+ <div class="econ">
+  <div><span>Precio mediano</span><b>$6.758</b></div>
+  <div><span>Comisión 17%</span><b class="neg">−$1.149</b></div>
+  <div><span>Cargo fijo</span><b class="neg">−$600</b></div>
+  <div><span>Despacho</span><b class="neg">−$0</b></div>
+  <div class="hl"><span>Queda disponible</span><b>$5.009</b></div>
+  <div class="hl"><span>Costo máx. de compra</span><b>$3.320</b></div>
+ </div>
+ <p class="risk"><span>Riesgo</span>Muestra chica (4 publicaciones): confirma la demanda en el buscador antes de comprometer inventario.</p>
+</article></div>
+</section>
+
+<section>
+  <h2>El acantilado de los $19.990</h2>
+  <p class="sub">Bajo el umbral pagas un cargo fijo de $600. Sobre el umbral el envío corre por tu cuenta: $3.410 para un producto de 0,7 kg con reputación verde. El salto es discontinuo.</p>
+  <div class="scroll"><table>
+    <thead><tr><th class="l">Precio de venta</th><th>Comisión 17%</th><th>Cargo fijo</th><th>Despacho</th><th>Contribución</th><th>%</th></tr></thead>
+    <tbody><tr class=""><td class="num">$17.990</td><td class="num">−$3.058</td><td class="num">−$600</td><td class="num">—</td><td class="num"><b>$14.332</b><span class="bar"><span style="width:60%"></span></span></td><td class="num pct">80%</td></tr><tr class=""><td class="num">$18.990</td><td class="num">−$3.228</td><td class="num">−$600</td><td class="num">—</td><td class="num"><b>$15.162</b><span class="bar"><span style="width:63%"></span></span></td><td class="num pct">80%</td></tr><tr class=""><td class="num">$19.490</td><td class="num">−$3.313</td><td class="num">−$600</td><td class="num">—</td><td class="num"><b>$15.577</b><span class="bar"><span style="width:65%"></span></span></td><td class="num pct">80%</td></tr><tr class="peak"><td class="num">$19.890</td><td class="num">−$3.381</td><td class="num">−$600</td><td class="num">—</td><td class="num"><b>$15.909</b><span class="bar"><span style="width:66%"></span></span></td><td class="num pct">80%</td></tr><tr class="drop"><td class="num">$19.990</td><td class="num">−$3.398</td><td class="num">—</td><td class="num">−$3.410</td><td class="num"><b>$13.182</b><span class="bar"><span style="width:55%"></span></span></td><td class="num pct">66%</td></tr><tr class=""><td class="num">$20.990</td><td class="num">−$3.568</td><td class="num">—</td><td class="num">−$3.410</td><td class="num"><b>$14.012</b><span class="bar"><span style="width:58%"></span></span></td><td class="num pct">67%</td></tr><tr class=""><td class="num">$22.990</td><td class="num">−$3.908</td><td class="num">—</td><td class="num">−$3.410</td><td class="num"><b>$15.672</b><span class="bar"><span style="width:65%"></span></span></td><td class="num pct">68%</td></tr><tr class=""><td class="num">$24.990</td><td class="num">−$4.248</td><td class="num">—</td><td class="num">−$3.410</td><td class="num"><b>$17.332</b><span class="bar"><span style="width:72%"></span></span></td><td class="num pct">69%</td></tr><tr class=""><td class="num">$27.990</td><td class="num">−$4.758</td><td class="num">—</td><td class="num">−$3.410</td><td class="num"><b>$19.822</b><span class="bar"><span style="width:83%"></span></span></td><td class="num pct">71%</td></tr><tr class=""><td class="num">$29.990</td><td class="num">−$5.098</td><td class="num">—</td><td class="num">−$3.410</td><td class="num"><b>$21.482</b><span class="bar"><span style="width:90%"></span></span></td><td class="num pct">72%</td></tr><tr class=""><td class="num">$32.990</td><td class="num">−$5.608</td><td class="num">—</td><td class="num">−$3.410</td><td class="num"><b>$23.972</b><span class="bar"><span style="width:100%"></span></span></td><td class="num pct">73%</td></tr></tbody>
+  </table></div>
+  <div class="callout"><p><strong>Dónde no poner el precio:</strong> la franja entre $19.990 y $23.280 es tierra quemada — cobras más que a $19.890 y te llevas menos a casa. Si el producto no puede sostener $24.000 o más, déjalo en $19.890.</p></div>
+</section>
+
+<section>
+  <h2>Qué evitar</h2>
+  <p class="sub">Nichos que se ven bien en demanda y no sobreviven la economía unitaria.</p>
+  <div class="scroll"><table>
+    <thead><tr><th class="l">Nicho</th><th>Kg</th><th>Precio med.</th><th>Compet.</th><th>Disponible</th><th class="l">Por qué</th></tr></thead>
+    <tbody><tr><td><strong>Paños y traperos húmedos</strong></td><td class="num">0.6</td><td class="num">$1.690</td><td class="num">5</td><td class="num pct bad">47%</td><td>15.250 uds/publicación — la demanda más alta de todo el estudio. Pero a $1.690 el cargo fijo de $600 se lleva un tercio del precio: solo queda el 47%.</td></tr><tr><td><strong>Pesas y mancuernas</strong></td><td class="num">12.0</td><td class="num">$28.601</td><td class="num">20</td><td class="num pct bad">41%</td><td>12 kg de despacho contra un precio mediano de $28.601: el envío deja apenas el 41% disponible.</td></tr><tr><td><strong>Sartenes, ollas y baterías</strong></td><td class="num">6.0</td><td class="num">$29.990</td><td class="num">42</td><td class="num pct bad">59%</td><td>42 competidores, 98% en ficha de catálogo compartida y 6 kg de peso. Guerra de precio sin diferenciación posible.</td></tr><tr><td><strong>Suplementos deportivos</strong></td><td class="num">0.6</td><td class="num">$23.149</td><td class="num">77</td><td class="num pct ">68%</td><td>El mayor volumen absoluto del estudio, pero 77 competidores y requiere registro sanitario del ISP para importar y vender.</td></tr><tr><td><strong>Máquinas de gimnasio</strong></td><td class="num">35.0</td><td class="num">$127.485</td><td class="num">12</td><td class="num pct ">67%</td><td>35 kg: el despacho es prohibitivo salvo con logística propia. Descuento mediano del 49% indica márgenes ya destruidos.</td></tr><tr><td><strong>Termómetros de cocina</strong></td><td class="num">0.2</td><td class="num">$2.694</td><td class="num">4</td><td class="num pct ">61%</td><td>Aparece en los 20 por su demanda, pero a $2.694 solo queda el 61%. Súbelo de precio o véndelo en kit.</td></tr></tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>Antes de comprar inventario</h2>
+  <p class="sub">Los números de arriba sirven para elegir entre nichos. No sirven para comprometer plata sin verificar.</p>
+  <ol class="steps">
+    <li><strong>Confirma la comisión real de tu subcategoría</strong> en el simulador de costos de MercadoLibre. El 17% que usé es el techo referencial de Hogar y Muebles; tu categoría puede estar en 14%.</li>
+    <li><strong>Mide el peso volumétrico</strong>, no solo el peso real. Un cesto de ropa plegable pesa 1,2 kg pero ocupa como 4 — y MercadoLibre cobra por el que salga más caro.</li>
+    <li><strong>Verifica la demanda en el buscador</strong>, no solo en ofertas. Esta muestra solo ve productos con descuento activo; busca el término y mira cuántas publicaciones reales hay.</li>
+    <li><strong>Pide muestra física</strong> antes de comprar volumen, sobre todo en bidet, barras de seguridad y balanzas — los tres tienen modos de falla que generan reclamo.</li>
+    <li><strong>Arranca con 30 a 50 unidades</strong> de dos o tres productos, no con uno solo a fondo. El objetivo de la primera compra es medir conversión real, no ganar plata.</li>
+  </ol>
+</section>
+
+<section>
+  <h2>Cómo se obtuvieron estos datos</h2>
+  <p class="sub">Y, más importante, qué no cubren.</p>
+  <div class="notes"><ul>
+    <li><strong>La fuente es la superficie de ofertas por categoría</strong> de mercadolibre.cl, 35 páginas de 17 categorías hoja. Muestra productos con oferta o descuento activo — no el catálogo completo. Subestima la oferta total de cada nicho.</li>
+    <li><strong>"Vendidos" es acumulado histórico en cubos</strong> (+100, +1.000, +5.000, +10.000), no venta mensual. Sirve para comparar nichos entre sí y ordenar por popularidad; no para proyectar facturación.</li>
+    <li><strong>El conteo de competidores es una cota superior.</strong> Solo el 48% de las tarjetas muestra vendedor; cada publicación sin vendedor visible se contó como un competidor propio.</li>
+    <li><strong>El 97% de la muestra vive en fichas de catálogo compartidas</strong> (<code>/p/MLC…</code>). Eso es un sesgo de esta superficie —las ofertas se enganchan al catálogo—, no una medición del porcentaje real de cada nicho. Por eso ese factor casi no diferencia entre nichos en el score.</li>
+    <li><strong>Los costos de envío son estimaciones</strong> interpoladas de ejemplos públicos, con 55% de descuento por reputación verde. Ninguna fuente publica la tabla oficial completa por peso. Confírmalos en el simulador antes de fijar precios.</li>
+    <li><strong>Los pesos son estimaciones por criterio</strong> sobre el tipo de objeto, no medidas reales del producto que vayas a comprar.</li>
+    <li><strong>El score</strong> combina log₁₀(uds/publicación) × 1/√competidores × (1 − 0,35 × %catálogo) × %disponible. Rankea, no predice: un score alto con 4 publicaciones de muestra es una pista, no una certeza.</li>
+  </ul></div>
+</section>
+
+<section>
+  <h2>Mapa de las categorías</h2>
+  <p class="sub">Ofertas activas por subcategoría al momento de la descarga. Define de dónde salió la muestra.</p>
+  <div class="two">
+    <div class="scroll"><table>
+      <thead><tr><th class="l">Hogar, Muebles y Jardín</th><th>ID</th><th>Ofertas</th></tr></thead>
+      <tbody><tr><td>Cocina y Menaje</td><td class="mono muted">MLC1592</td><td class="num">583<span class="bar"><span style="width:100%"></span></span></td></tr><tr><td>Muebles para el Hogar</td><td class="mono muted">MLC436380</td><td class="num">370<span class="bar"><span style="width:63%"></span></span></td></tr><tr><td>Textiles de Hogar y Decoración</td><td class="mono muted">MLC436246</td><td class="num">323<span class="bar"><span style="width:55%"></span></span></td></tr><tr><td>Adornos y Decoración</td><td class="mono muted">MLC1631</td><td class="num">284<span class="bar"><span style="width:49%"></span></span></td></tr><tr><td>Cuidado del Hogar y Lavandería</td><td class="mono muted">MLC174455</td><td class="num">262<span class="bar"><span style="width:45%"></span></span></td></tr><tr><td>Iluminación</td><td class="mono muted">MLC1582</td><td class="num">235<span class="bar"><span style="width:40%"></span></span></td></tr><tr><td>Jardín y Aire Libre</td><td class="mono muted">MLC1621</td><td class="num">225<span class="bar"><span style="width:39%"></span></span></td></tr><tr><td>Camas y Colchones</td><td class="mono muted">MLC433403</td><td class="num">222<span class="bar"><span style="width:38%"></span></span></td></tr><tr><td>Seguridad para el Hogar</td><td class="mono muted">MLC177170</td><td class="num">219<span class="bar"><span style="width:38%"></span></span></td></tr><tr><td>Baños</td><td class="mono muted">MLC1613</td><td class="num">175<span class="bar"><span style="width:30%"></span></span></td></tr><tr><td>Organización para el Hogar</td><td class="mono muted">MLC436414</td><td class="num">174<span class="bar"><span style="width:30%"></span></span></td></tr></tbody></table></div>
+    <div class="scroll"><table>
+      <thead><tr><th class="l">Deportes y Fitness</th><th>ID</th><th>Ofertas</th></tr></thead>
+      <tbody><tr><td>Suplementos y Shakers</td><td class="mono muted">MLC438178</td><td class="num">378<span class="bar"><span style="width:65%"></span></span></td></tr><tr><td>Zapatillas</td><td class="mono muted">MLC3724</td><td class="num">315<span class="bar"><span style="width:54%"></span></span></td></tr><tr><td>Camping, Caza y Pesca</td><td class="mono muted">MLC1362</td><td class="num">177<span class="bar"><span style="width:30%"></span></span></td></tr><tr><td>Fitness y Musculación</td><td class="mono muted">MLC1338</td><td class="num">175<span class="bar"><span style="width:30%"></span></span></td></tr><tr><td>Ropa Deportiva</td><td class="mono muted">MLC1339</td><td class="num">156<span class="bar"><span style="width:27%"></span></span></td></tr><tr><td>Ciclismo</td><td class="mono muted">MLC1292</td><td class="num">93<span class="bar"><span style="width:16%"></span></span></td></tr><tr><td>Pilates y Yoga</td><td class="mono muted">MLC440636</td><td class="num">20<span class="bar"><span style="width:3%"></span></span></td></tr></tbody></table></div>
+  </div>
+</section>
+
+<section>
+  <h2>Ranking completo de nichos</h2>
+  <p class="sub">Los 60 nichos con al menos 3 publicaciones en la muestra, incluidos los pesados y los saturados.</p>
+  <div class="scroll"><table>
+    <thead><tr><th></th><th class="l">Nicho</th><th>Ofertas</th><th>Compet.</th><th>Uds/pub.</th>
+    <th>% Full</th><th>Dto. med.</th><th>Precio med.</th><th>Kg</th><th>Disp.</th><th>Score</th></tr></thead>
+    <tbody><tr><td class="n">1</td><td>Cuerdas de saltar</td><td class="num">4</td><td class="num">2</td><td class="num">1.275</td><td class="num">25%</td><td class="num">44%</td><td class="num">$5.972</td><td class="num">0.3</td><td class="num pct">73%</td><td class="num score">104<span class="bar"><span style="width:100%"></span></span></td></tr><tr><td class="n">2</td><td>Bidet ducha para WC</td><td class="num">6</td><td class="num">4</td><td class="num">2.008</td><td class="num">83%</td><td class="num">26%</td><td class="num">$17.990</td><td class="num">0.6</td><td class="num pct">80%</td><td class="num score">93<span class="bar"><span style="width:89%"></span></span></td></tr><tr><td class="n">3</td><td>Cestos de ropa sucia</td><td class="num">4</td><td class="num">4</td><td class="num">1.275</td><td class="num">75%</td><td class="num">13%</td><td class="num">$13.529</td><td class="num">1.2</td><td class="num pct">79%</td><td class="num score">90<span class="bar"><span style="width:86%"></span></span></td></tr><tr><td class="n">4</td><td>Productos de limpieza líquidos</td><td class="num">3</td><td class="num">3</td><td class="num">833</td><td class="num">33%</td><td class="num">17%</td><td class="num">$19.780</td><td class="num">1.2</td><td class="num pct">80%</td><td class="num score">88<span class="bar"><span style="width:84%"></span></span></td></tr><tr><td class="n">5</td><td>Bolsas para sellado al vacío</td><td class="num">6</td><td class="num">5</td><td class="num">3.333</td><td class="num">67%</td><td class="num">28%</td><td class="num">$6.872</td><td class="num">0.6</td><td class="num pct">74%</td><td class="num score">83<span class="bar"><span style="width:80%"></span></span></td></tr><tr><td class="n">6</td><td>Hand grip / agarre</td><td class="num">4</td><td class="num">4</td><td class="num">1.512</td><td class="num">75%</td><td class="num">11%</td><td class="num">$12.790</td><td class="num">0.3</td><td class="num pct">78%</td><td class="num score">81<span class="bar"><span style="width:78%"></span></span></td></tr><tr><td class="n">7</td><td>Antideslizantes y alfombras baño</td><td class="num">4</td><td class="num">3</td><td class="num">525</td><td class="num">75%</td><td class="num">20%</td><td class="num">$6.758</td><td class="num">0.9</td><td class="num pct">74%</td><td class="num score">76<span class="bar"><span style="width:73%"></span></span></td></tr><tr><td class="n">8</td><td>Escobillas y limpieza WC</td><td class="num">3</td><td class="num">3</td><td class="num">367</td><td class="num">67%</td><td class="num">11%</td><td class="num">$8.549</td><td class="num">0.8</td><td class="num pct">76%</td><td class="num score">74<span class="bar"><span style="width:71%"></span></span></td></tr><tr><td class="n">9</td><td>Carritos organizadores</td><td class="num">9</td><td class="num">5</td><td class="num">1.622</td><td class="num">89%</td><td class="num">35%</td><td class="num">$12.990</td><td class="num">4.5</td><td class="num pct">78%</td><td class="num score">73<span class="bar"><span style="width:70%"></span></span></td></tr><tr><td class="n">10</td><td>Barras seguridad y movilidad</td><td class="num">6</td><td class="num">5</td><td class="num">542</td><td class="num">67%</td><td class="num">32%</td><td class="num">$14.662</td><td class="num">1.2</td><td class="num pct">79%</td><td class="num score">68<span class="bar"><span style="width:66%"></span></span></td></tr><tr><td class="n">11</td><td>Trampolines fitness</td><td class="num">3</td><td class="num">3</td><td class="num">333</td><td class="num">100%</td><td class="num">35%</td><td class="num">$58.180</td><td class="num">8.0</td><td class="num pct">71%</td><td class="num score">67<span class="bar"><span style="width:65%"></span></span></td></tr><tr><td class="n">12</td><td>Asientos y tapas de WC</td><td class="num">5</td><td class="num">5</td><td class="num">2.800</td><td class="num">80%</td><td class="num">30%</td><td class="num">$31.620</td><td class="num">2.5</td><td class="num pct">66%</td><td class="num score">67<span class="bar"><span style="width:64%"></span></span></td></tr><tr><td class="n">13</td><td>Guantes desechables</td><td class="num">6</td><td class="num">5</td><td class="num">850</td><td class="num">0%</td><td class="num">25%</td><td class="num">$8.680</td><td class="num">0.8</td><td class="num pct">76%</td><td class="num score">65<span class="bar"><span style="width:62%"></span></span></td></tr><tr><td class="n">14</td><td>Quita pelusas y pelo mascota</td><td class="num">5</td><td class="num">5</td><td class="num">425</td><td class="num">60%</td><td class="num">31%</td><td class="num">$6.459</td><td class="num">0.4</td><td class="num pct">74%</td><td class="num score">63<span class="bar"><span style="width:60%"></span></span></td></tr><tr><td class="n">15</td><td>Calistenia y barras</td><td class="num">3</td><td class="num">3</td><td class="num">200</td><td class="num">67%</td><td class="num">30%</td><td class="num">$61.740</td><td class="num">6.0</td><td class="num pct">71%</td><td class="num score">62<span class="bar"><span style="width:60%"></span></span></td></tr><tr><td class="n">16</td><td>Paños y traperos húmedos</td><td class="num">8</td><td class="num">5</td><td class="num">15.250</td><td class="num">0%</td><td class="num">37%</td><td class="num">$1.690</td><td class="num">0.6</td><td class="num pct">47%</td><td class="num score">58<span class="bar"><span style="width:55%"></span></span></td></tr><tr><td class="n">17</td><td>Organizadores de maquillaje</td><td class="num">7</td><td class="num">6</td><td class="num">743</td><td class="num">71%</td><td class="num">20%</td><td class="num">$6.831</td><td class="num">0.7</td><td class="num pct">74%</td><td class="num score">57<span class="bar"><span style="width:54%"></span></span></td></tr><tr><td class="n">18</td><td>Bolsas de basura y plásticas</td><td class="num">13</td><td class="num">9</td><td class="num">2.638</td><td class="num">0%</td><td class="num">32%</td><td class="num">$4.394</td><td class="num">1.6</td><td class="num pct">69%</td><td class="num score">51<span class="bar"><span style="width:49%"></span></span></td></tr><tr><td class="n">19</td><td>Mopas y trapeadores</td><td class="num">8</td><td class="num">8</td><td class="num">731</td><td class="num">38%</td><td class="num">24%</td><td class="num">$9.965</td><td class="num">2.0</td><td class="num pct">77%</td><td class="num score">51<span class="bar"><span style="width:49%"></span></span></td></tr><tr><td class="n">20</td><td>Mat yoga y colchonetas</td><td class="num">9</td><td class="num">7</td><td class="num">364</td><td class="num">44%</td><td class="num">22%</td><td class="num">$15.716</td><td class="num">1.8</td><td class="num pct">79%</td><td class="num score">50<span class="bar"><span style="width:48%"></span></span></td></tr><tr><td class="n">21</td><td>Esponjas y estropajos</td><td class="num">8</td><td class="num">8</td><td class="num">644</td><td class="num">12%</td><td class="num">20%</td><td class="num">$9.447</td><td class="num">0.4</td><td class="num pct">77%</td><td class="num score">50<span class="bar"><span style="width:48%"></span></span></td></tr><tr><td class="n">22</td><td>Cajas y bolsas organizadoras</td><td class="num">6</td><td class="num">6</td><td class="num">383</td><td class="num">100%</td><td class="num">21%</td><td class="num">$5.318</td><td class="num">1.0</td><td class="num pct">72%</td><td class="num score">49<span class="bar"><span style="width:47%"></span></span></td></tr><tr><td class="n">23</td><td>Paños de microfibra</td><td class="num">8</td><td class="num">8</td><td class="num">788</td><td class="num">0%</td><td class="num">12%</td><td class="num">$6.362</td><td class="num">0.5</td><td class="num pct">74%</td><td class="num score">49<span class="bar"><span style="width:47%"></span></span></td></tr><tr><td class="n">24</td><td>Cortinas de baño</td><td class="num">7</td><td class="num">6</td><td class="num">218</td><td class="num">43%</td><td class="num">8%</td><td class="num">$10.440</td><td class="num">0.8</td><td class="num pct">77%</td><td class="num score">48<span class="bar"><span style="width:46%"></span></span></td></tr><tr><td class="n">25</td><td>Termómetros de cocina</td><td class="num">4</td><td class="num">4</td><td class="num">256</td><td class="num">25%</td><td class="num">16%</td><td class="num">$2.694</td><td class="num">0.2</td><td class="num pct">61%</td><td class="num score">48<span class="bar"><span style="width:46%"></span></span></td></tr><tr><td class="n">26</td><td>Cabezales y kits de ducha</td><td class="num">12</td><td class="num">10</td><td class="num">731</td><td class="num">83%</td><td class="num">14%</td><td class="num">$12.883</td><td class="num">0.7</td><td class="num pct">78%</td><td class="num score">46<span class="bar"><span style="width:44%"></span></span></td></tr><tr><td class="n">27</td><td>Balanzas y grameras</td><td class="num">12</td><td class="num">10</td><td class="num">938</td><td class="num">83%</td><td class="num">12%</td><td class="num">$7.490</td><td class="num">0.5</td><td class="num pct">75%</td><td class="num score">46<span class="bar"><span style="width:44%"></span></span></td></tr><tr><td class="n">28</td><td>Grifería y monomandos</td><td class="num">13</td><td class="num">12</td><td class="num">1.050</td><td class="num">54%</td><td class="num">20%</td><td class="num">$13.450</td><td class="num">1.4</td><td class="num pct">79%</td><td class="num score">45<span class="bar"><span style="width:43%"></span></span></td></tr><tr><td class="n">29</td><td>Basureros</td><td class="num">8</td><td class="num">7</td><td class="num">169</td><td class="num">50%</td><td class="num">17%</td><td class="num">$18.759</td><td class="num">3.0</td><td class="num pct">80%</td><td class="num score">44<span class="bar"><span style="width:42%"></span></span></td></tr><tr><td class="n">30</td><td>Accesorios crossfit textiles</td><td class="num">8</td><td class="num">8</td><td class="num">334</td><td class="num">50%</td><td class="num">20%</td><td class="num">$6.016</td><td class="num">0.3</td><td class="num pct">73%</td><td class="num score">43<span class="bar"><span style="width:41%"></span></span></td></tr><tr><td class="n">31</td><td>Rejillas y desagües</td><td class="num">4</td><td class="num">4</td><td class="num">50</td><td class="num">50%</td><td class="num">22%</td><td class="num">$28.495</td><td class="num">0.7</td><td class="num pct">71%</td><td class="num score">41<span class="bar"><span style="width:39%"></span></span></td></tr><tr><td class="n">32</td><td>Gadgets eléctricos de cocina</td><td class="num">5</td><td class="num">5</td><td class="num">50</td><td class="num">60%</td><td class="num">20%</td><td class="num">$14.627</td><td class="num">1.5</td><td class="num pct">79%</td><td class="num score">41<span class="bar"><span style="width:39%"></span></span></td></tr><tr><td class="n">33</td><td>Percheros y ganchos pared</td><td class="num">7</td><td class="num">7</td><td class="num">93</td><td class="num">57%</td><td class="num">42%</td><td class="num">$9.550</td><td class="num">1.5</td><td class="num pct">77%</td><td class="num score">41<span class="bar"><span style="width:39%"></span></span></td></tr><tr><td class="n">34</td><td>Bandas elásticas resistencia</td><td class="num">15</td><td class="num">14</td><td class="num">525</td><td class="num">60%</td><td class="num">32%</td><td class="num">$12.980</td><td class="num">0.5</td><td class="num pct">78%</td><td class="num score">40<span class="bar"><span style="width:38%"></span></span></td></tr><tr><td class="n">35</td><td>Cortadores y mandolinas</td><td class="num">13</td><td class="num">13</td><td class="num">692</td><td class="num">38%</td><td class="num">19%</td><td class="num">$9.636</td><td class="num">0.8</td><td class="num pct">77%</td><td class="num score">39<span class="bar"><span style="width:38%"></span></span></td></tr><tr><td class="n">36</td><td>Colgadores y perchas de ropa</td><td class="num">21</td><td class="num">17</td><td class="num">1.799</td><td class="num">43%</td><td class="num">22%</td><td class="num">$7.990</td><td class="num">1.2</td><td class="num pct">75%</td><td class="num score">39<span class="bar"><span style="width:37%"></span></span></td></tr><tr><td class="n">37</td><td>Toalleros y ganchos baño</td><td class="num">10</td><td class="num">8</td><td class="num">85</td><td class="num">20%</td><td class="num">20%</td><td class="num">$9.310</td><td class="num">0.6</td><td class="num pct">77%</td><td class="num score">37<span class="bar"><span style="width:35%"></span></span></td></tr><tr><td class="n">38</td><td>Tendederos y planchado</td><td class="num">17</td><td class="num">15</td><td class="num">675</td><td class="num">71%</td><td class="num">21%</td><td class="num">$34.590</td><td class="num">4.0</td><td class="num pct">68%</td><td class="num score">33<span class="bar"><span style="width:32%"></span></span></td></tr><tr><td class="n">39</td><td>Termos y botellas térmicas</td><td class="num">42</td><td class="num">20</td><td class="num">653</td><td class="num">83%</td><td class="num">20%</td><td class="num">$17.490</td><td class="num">0.6</td><td class="num pct">80%</td><td class="num score">33<span class="bar"><span style="width:31%"></span></span></td></tr><tr><td class="n">40</td><td>Dispensadores baño</td><td class="num">22</td><td class="num">20</td><td class="num">628</td><td class="num">55%</td><td class="num">20%</td><td class="num">$12.727</td><td class="num">1.2</td><td class="num pct">78%</td><td class="num score">32<span class="bar"><span style="width:31%"></span></span></td></tr><tr><td class="n">41</td><td>Máquinas de gimnasio</td><td class="num">44</td><td class="num">12</td><td class="num">324</td><td class="num">39%</td><td class="num">49%</td><td class="num">$127.485</td><td class="num">35.0</td><td class="num pct">67%</td><td class="num score">32<span class="bar"><span style="width:30%"></span></span></td></tr><tr><td class="n">42</td><td>Escurridores y secaplatos</td><td class="num">23</td><td class="num">20</td><td class="num">545</td><td class="num">65%</td><td class="num">20%</td><td class="num">$10.990</td><td class="num">1.8</td><td class="num pct">78%</td><td class="num score">31<span class="bar"><span style="width:30%"></span></span></td></tr><tr><td class="n">43</td><td>Balones y balance</td><td class="num">6</td><td class="num">6</td><td class="num">21</td><td class="num">0%</td><td class="num">24%</td><td class="num">$7.490</td><td class="num">1.2</td><td class="num pct">75%</td><td class="num score">30<span class="bar"><span style="width:28%"></span></span></td></tr><tr><td class="n">44</td><td>Organizadores de zapatos</td><td class="num">13</td><td class="num">13</td><td class="num">144</td><td class="num">46%</td><td class="num">19%</td><td class="num">$37.040</td><td class="num">1.5</td><td class="num pct">72%</td><td class="num score">28<span class="bar"><span style="width:27%"></span></span></td></tr><tr><td class="n">45</td><td>Organizadores de ducha</td><td class="num">25</td><td class="num">24</td><td class="num">461</td><td class="num">40%</td><td class="num">20%</td><td class="num">$7.990</td><td class="num">0.9</td><td class="num pct">75%</td><td class="num score">28<span class="bar"><span style="width:27%"></span></span></td></tr><tr><td class="n">46</td><td>Selladoras al vacío</td><td class="num">17</td><td class="num">17</td><td class="num">397</td><td class="num">88%</td><td class="num">31%</td><td class="num">$21.866</td><td class="num">2.0</td><td class="num pct">64%</td><td class="num score">27<span class="bar"><span style="width:26%"></span></span></td></tr><tr><td class="n">47</td><td>Estantes y racks de cocina</td><td class="num">29</td><td class="num">28</td><td class="num">556</td><td class="num">52%</td><td class="num">17%</td><td class="num">$14.240</td><td class="num">2.2</td><td class="num pct">79%</td><td class="num score">27<span class="bar"><span style="width:26%"></span></span></td></tr><tr><td class="n">48</td><td>Mate y accesorios</td><td class="num">15</td><td class="num">14</td><td class="num">132</td><td class="num">33%</td><td class="num">15%</td><td class="num">$23.691</td><td class="num">0.7</td><td class="num pct">69%</td><td class="num score">26<span class="bar"><span style="width:25%"></span></span></td></tr><tr><td class="n">49</td><td>Café: molinillos y prensas</td><td class="num">35</td><td class="num">30</td><td class="num">1.251</td><td class="num">26%</td><td class="num">20%</td><td class="num">$22.990</td><td class="num">1.6</td><td class="num pct">65%</td><td class="num score">24<span class="bar"><span style="width:23%"></span></span></td></tr><tr><td class="n">50</td><td>Contenedores herméticos</td><td class="num">24</td><td class="num">24</td><td class="num">182</td><td class="num">38%</td><td class="num">20%</td><td class="num">$11.106</td><td class="num">0.9</td><td class="num pct">78%</td><td class="num score">24<span class="bar"><span style="width:23%"></span></span></td></tr><tr><td class="n">51</td><td>Cuchillos y tablas</td><td class="num">30</td><td class="num">29</td><td class="num">218</td><td class="num">83%</td><td class="num">30%</td><td class="num">$17.047</td><td class="num">1.4</td><td class="num pct">79%</td><td class="num score">24<span class="bar"><span style="width:23%"></span></span></td></tr><tr><td class="n">52</td><td>Bolsas de lavado</td><td class="num">5</td><td class="num">5</td><td class="num">0</td><td class="num">20%</td><td class="num">20%</td><td class="num">$5.947</td><td class="num">0.3</td><td class="num pct">73%</td><td class="num score">24<span class="bar"><span style="width:23%"></span></span></td></tr><tr><td class="n">53</td><td>Repostería: moldes y papel</td><td class="num">31</td><td class="num">28</td><td class="num">232</td><td class="num">45%</td><td class="num">18%</td><td class="num">$5.587</td><td class="num">0.5</td><td class="num pct">72%</td><td class="num score">21<span class="bar"><span style="width:20%"></span></span></td></tr><tr><td class="n">54</td><td>Accesorios varios de baño</td><td class="num">6</td><td class="num">6</td><td class="num">0</td><td class="num">17%</td><td class="num">20%</td><td class="num">$5.920</td><td class="num">0.8</td><td class="num pct">73%</td><td class="num score">21<span class="bar"><span style="width:20%"></span></span></td></tr><tr><td class="n">55</td><td>Tazas. mugs y vasos</td><td class="num">49</td><td class="num">44</td><td class="num">521</td><td class="num">49%</td><td class="num">15%</td><td class="num">$12.384</td><td class="num">1.2</td><td class="num pct">78%</td><td class="num score">21<span class="bar"><span style="width:20%"></span></span></td></tr><tr><td class="n">56</td><td>Suplementos deportivos</td><td class="num">146</td><td class="num">77</td><td class="num">4.516</td><td class="num">3%</td><td class="num">21%</td><td class="num">$23.149</td><td class="num">0.6</td><td class="num pct">68%</td><td class="num score">18<span class="bar"><span style="width:18%"></span></span></td></tr><tr><td class="n">57</td><td>Pesas y mancuernas</td><td class="num">35</td><td class="num">20</td><td class="num">636</td><td class="num">46%</td><td class="num">22%</td><td class="num">$28.601</td><td class="num">12.0</td><td class="num pct">41%</td><td class="num score">17<span class="bar"><span style="width:16%"></span></span></td></tr><tr><td class="n">58</td><td>Utensilios y bowls</td><td class="num">38</td><td class="num">37</td><td class="num">95</td><td class="num">29%</td><td class="num">12%</td><td class="num">$11.311</td><td class="num">1.0</td><td class="num pct">78%</td><td class="num score">17<span class="bar"><span style="width:16%"></span></span></td></tr><tr><td class="n">59</td><td>Sartenes. ollas y baterías</td><td class="num">52</td><td class="num">42</td><td class="num">395</td><td class="num">56%</td><td class="num">20%</td><td class="num">$29.990</td><td class="num">6.0</td><td class="num pct">59%</td><td class="num score">16<span class="bar"><span style="width:15%"></span></span></td></tr><tr><td class="n">60</td><td>Muebles</td><td class="num">13</td><td class="num">11</td><td class="num">60</td><td class="num">15%</td><td class="num">25%</td><td class="num">$45.980</td><td class="num">30.0</td><td class="num pct">38%</td><td class="num score">14<span class="bar"><span style="width:13%"></span></span></td></tr></tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>Los 15 más vendidos de toda la muestra</h2>
+  <p class="sub">Sin filtrar por peso ni por nicho — para dimensionar qué mueve realmente la categoría.</p>
+  <div class="scroll"><table>
+    <thead><tr><th class="l">Producto</th><th>Precio</th><th>Vendidos</th><th>Calif.</th><th>Vendedor</th><th>Dto.</th></tr></thead>
+    <tbody><tr><td class="prod"><a href="https://www.mercadolibre.cl/creatine-100-pure-monohydrate-1kg-foodtech-sin-sabor/p/MLC28720010" target="_blank" rel="noopener">Creatine 100% pure monohydrate 1kg Foodtech sin sabor</a><span class="ref">Suplementos deportivos</span></td><td class="num">$29.990</td><td class="num">+100.000</td><td class="num">4.9</td><td class="num">Supletech</td><td class="num">50% OFF</td></tr><tr><td class="prod"><a href="https://www.mercadolibre.cl/omega-up-ultrapure-150-capsulas/p/MLC19671692" target="_blank" rel="noopener">Omega UP UltraPure (150 Cápsulas)</a><span class="ref">Suplementos deportivos</span></td><td class="num">$33.821</td><td class="num">+100.000</td><td class="num">4.9</td><td class="num">All Nutrition</td><td class="num">15% OFF</td></tr><tr><td class="prod"><a href="https://www.mercadolibre.cl/pano-de-limpieza-aileda-trapero-humedo-pano-lavanda-12-u-traperos-pisos/p/MLC23653931" target="_blank" rel="noopener">Paño de limpieza Aileda Trapero Humedo paño lavanda 12 u Traperos Pisos</a><span class="ref">Paños y traperos húmedos</span></td><td class="num">$1.392</td><td class="num">+50.000</td><td class="num">4.9</td><td class="num">no visible</td><td class="num">34% OFF</td></tr><tr><td class="prod"><a href="https://www.mercadolibre.cl/pano-de-limpieza-virginia-trapero-humedo-lavanda-10u/p/MLC22777197" target="_blank" rel="noopener">Paño de limpieza Virginia Trapero Humedo lavanda 10 u</a><span class="ref">Paños y traperos húmedos</span></td><td class="num">$1.690</td><td class="num">+50.000</td><td class="num">4.9</td><td class="num">Virginia</td><td class="num">41% OFF</td></tr><tr><td class="prod"><a href="https://www.mercadolibre.cl/stevia-80grs-natfood-premium-endulzante-cero-diabetes/p/MLC20914760" target="_blank" rel="noopener">Stevia 80grs. Natfood Premium Endulzante Cero Diabetes</a><span class="ref">Suplementos deportivos</span></td><td class="num">$9.579</td><td class="num">+50.000</td><td class="num">4.9</td><td class="num">Un Antojito</td><td class="num">6% OFF</td></tr><tr><td class="prod"><a href="https://www.mercadolibre.cl/aileda-bolsa-de-basura-con-cordon-70x90-cms-cierre-facil/p/MLC29458676" target="_blank" rel="noopener">Aileda Bolsa De Basura Con Cordón 70x90 Cms - Cierre Fácil</a><span class="ref">Bolsas de basura y plásticas</span></td><td class="num">$1.183</td><td class="num">+10.000</td><td class="num">4.9</td><td class="num">no visible</td><td class="num">42% OFF</td></tr><tr><td class="prod"><a href="https://www.mercadolibre.cl/bolsa-de-basura-grande-80x110-cms-ultra-resistente-10-unidad/up/MLCU116645502" target="_blank" rel="noopener">Bolsa De Basura Grande 80x110 Cms Ultra Resistente 10 Unidad</a><span class="ref">Bolsas de basura y plásticas</span></td><td class="num">$1.190</td><td class="num">+10.000</td><td class="num">4.8</td><td class="num">no visible</td><td class="num">20% OFF</td></tr><tr><td class="prod"><a href="https://www.mercadolibre.cl/trapero-humedo-multiuso-aileda-eco-aroma-limon-12-pzaspqt-traperos-pisos/p/MLC62407919" target="_blank" rel="noopener">Trapero Humedo Multiuso Aileda Eco Aroma Limón - 12 Pzas/pqt Traperos Pisos</a><span class="ref">Paños y traperos húmedos</span></td><td class="num">$1.392</td><td class="num">+10.000</td><td class="num">4.9</td><td class="num">no visible</td><td class="num">34% OFF</td></tr><tr><td class="prod"><a href="https://www.mercadolibre.cl/bolsas-plasticas-tipo-camiseta-blancas-40x50-100-unidades/p/MLC46520775" target="_blank" rel="noopener">Bolsas Plásticas Tipo Camiseta Blancas 40x50 - 100 Unidades</a><span class="ref">Bolsas de basura y plásticas</span></td><td class="num">$1.510</td><td class="num">+10.000</td><td class="num">4.8</td><td class="num">DISTRIBUIDORA F X</td><td class="num">5% OFF</td></tr><tr><td class="prod"><a href="https://www.mercadolibre.cl/virginia-traperos-pisos-manzana-verde-10u/p/MLC24605498" target="_blank" rel="noopener">Virginia Traperos Pisos Manzana Verde 10u</a><span class="ref">Paños y traperos húmedos</span></td><td class="num">$1.690</td><td class="num">+10.000</td><td class="num">4.9</td><td class="num">Virginia</td><td class="num">41% OFF</td></tr><tr><td class="prod"><a href="https://www.mercadolibre.cl/rollo-bolsas-sellado-al-vacio-sellar-alimentos-28cmx10mts/up/MLCU61844374" target="_blank" rel="noopener">Rollo Bolsas Sellado Al Vacío Sellar Alimentos 28cmx10mts Transparente</a><span class="ref">Bolsas para sellado al vacío</span></td><td class="num">$4.950</td><td class="num">+10.000</td><td class="num">4.8</td><td class="num">Mohits</td><td class="num">41% OFF</td></tr><tr><td class="prod"><a href="https://www.mercadolibre.cl/dispensador-de-lavalozas-jabon-y-porta-esponja-organizador-color-plateado/p/MLC28932440" target="_blank" rel="noopener">Dispensador De Lavalozas Jabón Y Porta Esponja Organizador Color Plateado</a><span class="ref">Dispensadores baño</span></td><td class="num">$5.631</td><td class="num">+10.000</td><td class="num">4.7</td><td class="num">Organiza2</td><td class="num">5% OFF</td></tr><tr><td class="prod"><a href="https://www.mercadolibre.cl/creatina-monohidratada-ostrovit-300-grs-sin-sabor/p/MLC23705639" target="_blank" rel="noopener">Creatina Monohidratada Ostrovit 300 grs sin sabor</a><span class="ref">Suplementos deportivos</span></td><td class="num">$7.400</td><td class="num">+10.000</td><td class="num">4.8</td><td class="num">Comercial Dada</td><td class="num">24% OFF</td></tr><tr><td class="prod"><a href="https://www.mercadolibre.cl/your-goal-barra-proteica-protein-bite-caramel-peanuts-20g-proteina/p/MLC22733743" target="_blank" rel="noopener">Your Goal Barra Proteica Protein Bite Caramel Peanuts 20g Proteína</a><span class="ref">Suplementos deportivos</span></td><td class="num">$7.490</td><td class="num">+10.000</td><td class="num">4.9</td><td class="num">Bazaro</td><td class="num">23% OFF</td></tr><tr><td class="prod"><a href="https://www.mercadolibre.cl/marley-mug-negro--marley-coffee/up/MLCU73207349" target="_blank" rel="noopener">Marley Mug Negro · Marley Coffee</a><span class="ref">Tazas. mugs y vasos</span></td><td class="num">$7.642</td><td class="num">+10.000</td><td class="num">4.9</td><td class="num">Marley Coffee</td><td class="num">14% OFF</td></tr></tbody>
+  </table></div>
+</section>
+
+<footer>
+  <p>Datos descargados de la superficie pública de ofertas de mercadolibre.cl el 19 de agosto de 2026. Modelo de costos: comisión 17%, cargo fijo $600 bajo $19.990, descuento de envío 55% por reputación verde. Todas las cifras en pesos chilenos.</p>
+</footer>
+</div>

@@ -47,5 +47,6 @@ Ambos son privados hasta que los compartas desde el menú de cada página.
 | `08-plan-lanzamiento-60-dias.md` | Cronograma semana a semana y objetivos |
 | `09-instalacion-tema.md` | Cómo montar las secciones sobre Dawn |
 | `10-anuncios-y-landing-pages.md` | Creativos de Meta, teardowns de landings, la ventana chilena y los 12 anuncios |
+| `11-dispensador-automatico.md` | Evaluación del dispensador automático de acero: mercado real, costos de origen, márgenes y riesgos |
 | `datos/` | Datos crudos de MercadoLibre (.xlsx y .json), el script de costeo y la plantilla para la Biblioteca de Anuncios |
 | `informes/` | El swipe file publicado (HTML) |

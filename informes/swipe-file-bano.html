@@ -1,0 +1,878 @@
+<title>Swipe File Baño</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   SWIPE FILE BAÑO
+   Rampa secuencial teal validada: monotónica en luminosidad y
+   todos los pasos >= 3:1 contra su superficie en ambos temas.
+   ============================================================ */
+
+:root {
+  color-scheme: light;
+  --ground:   #FBFBFC;
+  --surface:  #FFFFFF;
+  --surface2: #F3F4F7;
+  --ink:      #16181D;
+  --ink2:     #565D6B;
+  --ink3:     #838A97;
+  --line:     #E3E6EC;
+  --line2:    #D2D7E0;
+  --accent:   #0C4E57;
+  --accent-w: #E8F2F3;
+  --signal:   #8A5A06;
+  --signal-w: #FBF1DE;
+
+  --s1: #4A9BA3;
+  --s2: #3A8E98;
+  --s3: #1F7078;
+  --s4: #0C4E57;
+
+  --display: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  --body:    'Newsreader', Georgia, 'Times New Roman', serif;
+  --mono:    'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --col: 70ch;
+  --wide: 1080px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --ground:   #101216;
+    --surface:  #181B21;
+    --surface2: #1F232B;
+    --ink:      #E9EBF0;
+    --ink2:     #9BA2B0;
+    --ink3:     #767E8C;
+    --line:     #272C35;
+    --line2:    #333944;
+    --accent:   #7ED0D6;
+    --accent-w: #16292D;
+    --signal:   #E0A040;
+    --signal-w: #2A2113;
+
+    --s1: #3A8189;
+    --s2: #4C9BA3;
+    --s3: #62B6BD;
+    --s4: #7ED0D6;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ground:   #101216;
+  --surface:  #181B21;
+  --surface2: #1F232B;
+  --ink:      #E9EBF0;
+  --ink2:     #9BA2B0;
+  --ink3:     #767E8C;
+  --line:     #272C35;
+  --line2:    #333944;
+  --accent:   #7ED0D6;
+  --accent-w: #16292D;
+  --signal:   #E0A040;
+  --signal-w: #2A2113;
+
+  --s1: #3A8189;
+  --s2: #4C9BA3;
+  --s3: #62B6BD;
+  --s4: #7ED0D6;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* ---------- Estructura ---------- */
+.envoltorio { max-width: var(--wide); margin-inline: auto; padding: 0 28px 96px; }
+.col { max-width: var(--col); }
+section { padding-block: 56px; border-top: 1px solid var(--line); }
+section:first-of-type { border-top: 0; }
+
+/* ---------- Barra superior ---------- */
+.barra {
+  position: sticky; top: 0; z-index: 20;
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.barra__int {
+  max-width: var(--wide); margin-inline: auto; padding: 11px 28px;
+  display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+}
+.barra__marca {
+  font-family: var(--display); font-weight: 700; font-size: 13px;
+  letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink);
+  white-space: nowrap;
+}
+.barra__nav { display: flex; gap: 4px; flex-wrap: wrap; margin-left: auto; }
+.barra__nav a {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.02em;
+  color: var(--ink2); text-decoration: none; padding: 5px 9px; border-radius: 3px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.barra__nav a:hover { background: var(--surface2); color: var(--ink); }
+
+/* ---------- Tipografía ---------- */
+.eyebrow {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--ink3); margin: 0 0 14px;
+}
+h1 {
+  font-family: var(--display); font-weight: 700;
+  font-size: clamp(2.3rem, 5.5vw, 3.9rem); line-height: 1.02;
+  letter-spacing: -0.032em; margin: 0; text-wrap: balance;
+}
+h2 {
+  font-family: var(--display); font-weight: 600;
+  font-size: clamp(1.5rem, 3vw, 2.05rem); line-height: 1.12;
+  letter-spacing: -0.022em; margin: 0 0 8px; text-wrap: balance;
+}
+h3 {
+  font-family: var(--display); font-weight: 600; font-size: 1.13rem;
+  line-height: 1.25; letter-spacing: -0.012em; margin: 0;
+}
+h4 {
+  font-family: var(--mono); font-weight: 500; font-size: 11px;
+  letter-spacing: 0.13em; text-transform: uppercase; color: var(--ink3);
+  margin: 0 0 12px;
+}
+p { margin: 0 0 18px; }
+p:last-child { margin-bottom: 0; }
+.dek { font-size: 1.15rem; color: var(--ink2); margin: 22px 0 34px; }
+strong { font-weight: 600; color: var(--ink); }
+em { font-style: italic; }
+a { color: var(--accent); text-underline-offset: 3px; }
+
+.mono { font-family: var(--mono); font-size: 0.86em; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* ---------- Portada ---------- */
+.portada { padding-block: 72px 48px; }
+.portada__meta {
+  display: flex; gap: 8px 26px; flex-wrap: wrap; margin-top: 30px;
+  font-family: var(--mono); font-size: 11.5px; color: var(--ink3);
+  padding-top: 18px; border-top: 1px solid var(--line);
+}
+.portada__meta b { color: var(--ink2); font-weight: 500; }
+
+/* ---------- Aviso ---------- */
+.aviso {
+  background: var(--signal-w); border-left: 3px solid var(--signal);
+  border-radius: 0 3px 3px 0; padding: 20px 24px; margin-bottom: 34px;
+}
+.aviso h4 { color: var(--signal); margin-bottom: 8px; }
+.aviso p { font-size: 0.96rem; color: var(--ink); }
+
+/* ---------- Tablas ---------- */
+.tabla-cont { overflow-x: auto; margin: 26px 0; }
+table { border-collapse: collapse; width: 100%; min-width: 540px; font-size: 0.93rem; }
+th {
+  font-family: var(--mono); font-weight: 500; font-size: 10.5px;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink3);
+  text-align: left; padding: 0 14px 9px 0; border-bottom: 1px solid var(--line2);
+  vertical-align: bottom;
+}
+td { padding: 11px 14px 11px 0; border-bottom: 1px solid var(--line); vertical-align: top; color: var(--ink2); }
+td:first-child, th:first-child { padding-left: 0; }
+td strong { color: var(--ink); }
+.der { text-align: right; }
+
+/* ---------- Gráfico ---------- */
+.gr {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: 4px; padding: 26px 28px 20px; margin: 26px 0;
+}
+.gr__t { font-family: var(--display); font-weight: 600; font-size: 1rem; margin: 0 0 4px; }
+.gr__st { font-family: var(--mono); font-size: 11px; color: var(--ink3); margin: 0 0 24px; }
+.gr__filas { display: flex; flex-direction: column; gap: 2px; }
+.gr__fila {
+  display: grid; grid-template-columns: 116px 1fr; align-items: center; gap: 16px;
+  padding: 5px 0; border: 0; background: transparent; width: 100%;
+  cursor: default; font: inherit; text-align: left; position: relative;
+  border-radius: 3px;
+}
+.gr__fila:hover, .gr__fila:focus-visible { background: var(--surface2); }
+.gr__marca {
+  font-family: var(--display); font-weight: 600; font-size: 13px; color: var(--ink);
+}
+.gr__pista { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.gr__track { flex: 1 1 auto; min-width: 0; }
+.gr__barra {
+  display: block; height: 22px; border-radius: 0 4px 4px 0;
+  transition: filter 0.15s ease;
+}
+.gr__fila:hover .gr__barra { filter: brightness(1.08); }
+.gr__val {
+  font-family: var(--mono); font-size: 12.5px; font-weight: 500;
+  color: var(--ink); font-variant-numeric: tabular-nums; flex: none;
+}
+.gr__sec { font-family: var(--mono); font-size: 11px; color: var(--ink3); flex: none; }
+.gr__eje {
+  margin-top: 16px; padding-top: 10px; border-top: 1px solid var(--line);
+  font-family: var(--mono); font-size: 10.5px; color: var(--ink3);
+}
+.gr__tip {
+  position: absolute; left: 132px; top: calc(100% + 4px); z-index: 5;
+  background: var(--ink); color: var(--ground);
+  border-radius: 3px; padding: 9px 12px; min-width: 200px;
+  font-family: var(--mono); font-size: 11px; line-height: 1.55;
+  pointer-events: none; opacity: 0; transition: opacity 0.14s ease;
+  box-shadow: 0 6px 20px -6px rgba(0,0,0,0.4);
+}
+.gr__fila:hover .gr__tip, .gr__fila:focus-visible .gr__tip { opacity: 1; }
+.gr__tip b { color: var(--ground); font-weight: 500; }
+
+/* ---------- Citas de hooks ---------- */
+.hooks { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 26px 0; }
+.hook {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: 4px; padding: 20px 22px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.hook__marca {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--accent);
+}
+.hook__lista { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 9px; }
+.hook__lista li {
+  font-family: var(--mono); font-size: 12.5px; line-height: 1.5; color: var(--ink);
+  padding-left: 14px; position: relative;
+}
+.hook__lista li::before {
+  content: '›'; position: absolute; left: 0; color: var(--ink3);
+}
+.hook__nota { font-size: 0.88rem; color: var(--ink2); margin: 0; }
+
+/* ---------- Teardowns ---------- */
+.td { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin: 26px 0; }
+.td__item {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: 4px; padding: 24px; display: flex; flex-direction: column; gap: 14px;
+}
+.td__cab { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.td__etq {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.09em;
+  text-transform: uppercase; color: var(--ink3); white-space: nowrap;
+}
+.td__item p { font-size: 0.93rem; color: var(--ink2); margin: 0; }
+.td__cifras { display: flex; flex-wrap: wrap; gap: 8px; }
+.pastilla {
+  font-family: var(--mono); font-size: 11px; padding: 4px 9px;
+  background: var(--accent-w); color: var(--accent); border-radius: 3px;
+  font-variant-numeric: tabular-nums;
+}
+.td__roba {
+  border-top: 1px solid var(--line); padding-top: 13px; margin-top: auto;
+  font-size: 0.9rem; color: var(--ink);
+}
+.td__roba b {
+  display: block; font-family: var(--mono); font-size: 10px; letter-spacing: 0.11em;
+  text-transform: uppercase; color: var(--signal); margin-bottom: 5px; font-weight: 500;
+}
+
+/* ---------- Anuncios ---------- */
+.concepto { margin: 34px 0 0; }
+.concepto__cab {
+  display: flex; align-items: baseline; gap: 14px; margin-bottom: 16px;
+  padding-bottom: 10px; border-bottom: 1px solid var(--line2);
+}
+.concepto__letra {
+  font-family: var(--display); font-weight: 700; font-size: 1.5rem;
+  color: var(--accent); line-height: 1;
+}
+.concepto__fmt { font-family: var(--mono); font-size: 11px; color: var(--ink3); margin-left: auto; }
+.anuncios { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.anuncio {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: 4px; padding: 20px; display: flex; flex-direction: column; gap: 12px;
+}
+.anuncio__cab { display: flex; align-items: baseline; gap: 9px; }
+.anuncio__id {
+  font-family: var(--mono); font-size: 11px; font-weight: 500;
+  color: var(--ground); background: var(--ink);
+  padding: 2px 7px; border-radius: 3px;
+}
+.anuncio__meta { font-family: var(--mono); font-size: 10.5px; color: var(--ink3); margin-left: auto; }
+.anuncio h3 { font-size: 0.98rem; }
+.anuncio__desc { font-size: 0.88rem; color: var(--ink2); margin: 0; }
+.guion {
+  background: var(--surface2); border-radius: 3px; padding: 13px 15px;
+  font-family: var(--mono); font-size: 11.5px; line-height: 1.65;
+  color: var(--ink); white-space: pre-wrap; margin: 0;
+  overflow-x: auto;
+}
+
+/* ---------- Lista de acciones ---------- */
+.acciones { counter-reset: acc; list-style: none; margin: 26px 0 0; padding: 0; }
+.acciones li {
+  counter-increment: acc; position: relative; padding: 15px 0 15px 46px;
+  border-bottom: 1px solid var(--line); font-size: 0.97rem; color: var(--ink2);
+}
+.acciones li::before {
+  content: counter(acc, decimal-leading-zero);
+  position: absolute; left: 0; top: 17px;
+  font-family: var(--mono); font-size: 11px; color: var(--accent);
+}
+.acciones li b { color: var(--ink); font-weight: 600; }
+
+/* ---------- Protocolo ---------- */
+.reglas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 26px 0; }
+.regla {
+  background: var(--surface); border: 1px solid var(--line);
+  border-top: 3px solid var(--signal); border-radius: 0 0 4px 4px; padding: 20px;
+}
+.regla__n {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--signal); margin: 0 0 9px;
+}
+.regla h3 { font-size: 1rem; margin-bottom: 8px; }
+.regla p { font-size: 0.88rem; color: var(--ink2); }
+
+.enlaces { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; margin: 26px 0; }
+.enlaces__g h4 { margin-bottom: 10px; }
+.enlaces__g ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 7px; }
+.enlaces__g a {
+  font-family: var(--mono); font-size: 11.5px; text-decoration: none;
+  color: var(--ink2); background: var(--surface); border: 1px solid var(--line2);
+  padding: 5px 10px; border-radius: 3px; display: inline-block;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.enlaces__g a:hover { border-color: var(--accent); color: var(--accent); }
+
+.cierre {
+  background: var(--surface); border: 1px solid var(--line2);
+  border-radius: 4px; padding: 26px 28px; margin-top: 34px;
+}
+.cierre h3 { margin-bottom: 10px; }
+.cierre p { font-size: 0.97rem; color: var(--ink2); }
+
+.fuentes { font-size: 0.85rem; color: var(--ink3); }
+.fuentes p { margin-bottom: 9px; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .anuncios, .reglas { grid-template-columns: 1fr; }
+  .hooks, .td, .enlaces { grid-template-columns: 1fr; }
+  .gr__fila { grid-template-columns: 92px 1fr; gap: 10px; }
+  .gr__tip { left: 0; min-width: 0; width: 100%; }
+  .envoltorio { padding-inline: 20px; }
+  .barra__int { padding-inline: 20px; }
+  .barra__nav { display: none; }
+}
+</style>
+
+<div class="barra">
+  <div class="barra__int">
+    <span class="barra__marca">Swipe File Baño</span>
+    <nav class="barra__nav">
+      <a href="#volumen">Volumen</a>
+      <a href="#hooks">Hooks</a>
+      <a href="#formatos">Formatos</a>
+      <a href="#teardowns">Landings</a>
+      <a href="#chile">Chile</a>
+      <a href="#anuncios">Tus 12 anuncios</a>
+      <a href="#protocolo">Protocolo</a>
+    </nav>
+  </div>
+</div>
+
+<div class="envoltorio">
+
+  <header class="portada col">
+    <p class="eyebrow">Investigación de creativos y páginas de venta</p>
+    <h1>Lo que hacen los que venden baño, y lo que Chile todavía no hace.</h1>
+    <p class="dek">Desglose de las cuentas de Meta de cuatro marcas del rubro, teardown de cuatro páginas de venta de Estados Unidos, y el hueco concreto que dejan abierto los competidores chilenos.</p>
+    <div class="portada__meta">
+      <span><b>Agosto 2026</b></span>
+      <span>4 cuentas de Meta · <b>826 anuncios activos</b></span>
+      <span>4 landings · 2 tiendas chilenas</span>
+    </div>
+  </header>
+
+  <section>
+    <div class="col">
+      <div class="aviso">
+        <h4>Lo que no pude investigar</h4>
+        <p><strong>No pude entrar a la Biblioteca de Anuncios de Meta.</strong> Facebook devuelve 403 a todo cliente automatizado y el navegador de esta sesión no tiene salida de red. Todo lo que sigue viene de desgloses de creativos publicados, de las páginas de venta leídas directamente, y de prensa de negocio. Ningún anuncio de este informe es inventado. La última sección es el protocolo para que hagas esa parte tú, con los links ya armados: son unos 40 minutos.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="volumen">
+    <div class="col">
+      <p class="eyebrow">01 · El hallazgo</p>
+      <h2>El creativo ganador no existe. Existe el volumen.</h2>
+      <p>Ninguna de estas marcas tiene «tres buenos anuncios». Tienen entre 89 y 535 activos al mismo tiempo, y suben entre 16 y 29 nuevos <em>por semana</em>. Jolie, que llegó a USD 4,2 millones en su primer año, corre más de cien variaciones de ángulo y estilo.</p>
+      <p>No es que hayan encontrado el creativo mágico: producen tanto que los ganadores aparecen. Si tu plan es «hacer unos anuncios» antes de lanzar, el plan está mal formulado. Lo que necesitas es una rutina de producción semanal.</p>
+    </div>
+
+    <div class="gr">
+      <p class="gr__t">Anuncios activos en Meta, por marca</p>
+      <p class="gr__st">Agosto 2026 · en gris, creativos nuevos por semana</p>
+      <div class="gr__filas" id="grafico"></div>
+      <p class="gr__eje">0 ————————————————————— 535 anuncios activos</p>
+    </div>
+
+    <div class="tabla-cont">
+      <table>
+        <caption class="mono" style="text-align:left;color:var(--ink3);padding-bottom:10px;font-size:11px;letter-spacing:.1em;text-transform:uppercase">Mezcla de formatos por marca</caption>
+        <thead>
+          <tr><th>Marca</th><th>Rubro</th><th class="der">Activos</th><th class="der">Nuevos/sem</th><th>Formatos dominantes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Our Place</strong></td><td>Menaje</td><td class="der num">535</td><td class="der num">~26</td><td>Demo 20% · Headline 11% · Feature Benefit 8%</td></tr>
+          <tr><td><strong>Brooklinen</strong></td><td>Ropa de cama y baño</td><td class="der num">111</td><td class="der num">~29</td><td><strong>Headline 31%</strong> · Slideshow 18% · Montage 9%</td></tr>
+          <tr><td><strong>TUSHY</strong></td><td>Bidés</td><td class="der num">91</td><td class="der num">~26</td><td><strong>Demo 22%</strong> · Yapper 9% · Testimonial 9%</td></tr>
+          <tr><td><strong>KOHLER</strong></td><td>Sanitarios</td><td class="der num">89</td><td class="der num">~16</td><td>Demo 15% · Celebrity 13% · B-Roll 13%</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col">
+      <p><strong>Demo domina donde hay algo que mostrar funcionando.</strong> Es el formato número uno en tres de las cuatro. En baño eso es literal: el agua desapareciendo en la alfombra, el adhesivo aguantando peso, el dispensador rellenándose. Es video, no foto.</p>
+      <p><strong>Brooklinen enseña la excepción.</strong> En textiles, donde el producto no <em>hace</em> nada, el formato dominante es Headline con 31%: una frase potente sobre una imagen. Tu catálogo tiene los dos casos — la alfombra y el organizador son Demo; el set coordinado y el toallero son Headline.</p>
+      <p><strong>Y un detalle que sorprende:</strong> la mayoría de estos anuncios no lleva llamado a la acción dentro del creativo. Confían en el botón nativo de Meta. El «Compra ahora» va en la plataforma, no gritado en el video.</p>
+    </div>
+  </section>
+
+  <section id="hooks">
+    <div class="col">
+      <p class="eyebrow">02 · Los ganchos</p>
+      <h2>Nombrar el dolor antes que el producto</h2>
+      <p>Estos son los hooks que están corriendo ahora mismo. Fíjate en el patrón: casi ninguno empieza por el objeto.</p>
+    </div>
+    <div class="hooks">
+      <div class="hook">
+        <span class="hook__marca">TUSHY · el problema sin eufemismos</span>
+        <ul class="hook__lista">
+          <li>Poop isn't meant to be a workout</li>
+          <li>Sh*tting should feel easy</li>
+          <li>+3M Happy Butts</li>
+          <li>over 2.5 million clean butts agree</li>
+        </ul>
+        <p class="hook__nota">Y en el cuerpo: «Easy 10-minute install», «no plumber or electricity needed», «pays for itself in months». El tiempo exacto vence la objeción mejor que «fácil de instalar».</p>
+      </div>
+      <div class="hook">
+        <span class="hook__marca">Our Place · el problema doméstico, nombrado</span>
+        <ul class="hook__lista">
+          <li>No More Cabinet Chaos</li>
+          <li>Detox Your Kitchen</li>
+          <li>The first thing I did when I found out I was pregnant was buy non-toxic pans</li>
+        </ul>
+        <p class="hook__nota">El último tiene 124 caracteres y no menciona el producto hasta el final. Es el patrón que gana en tráfico frío.</p>
+      </div>
+      <div class="hook">
+        <span class="hook__marca">Brooklinen · cuando no hay nada que demostrar</span>
+        <ul class="hook__lista">
+          <li>Hotel Quality Without the Bill</li>
+          <li>Best In Bed</li>
+          <li>Don't Stoop to the Dupe</li>
+          <li>Sleep Mode ON</li>
+        </ul>
+        <p class="hook__nota">Sin demo posible, el anuncio <em>es</em> la frase. Cuatro palabras haciendo el trabajo de un video.</p>
+      </div>
+      <div class="hook">
+        <span class="hook__marca">KOHLER · el que no debes copiar</span>
+        <ul class="hook__lista">
+          <li>Save up to 15% at select stores</li>
+          <li>Now through May 28</li>
+          <li>Martha Stewart Favorites</li>
+        </ul>
+        <p class="hook__nota">Pura comunicación de descuento apoyada en celebridades. Es lo que hace una marca con distribución en retail y presupuesto. No es tu modelo.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="formatos">
+    <div class="col">
+      <p class="eyebrow">03 · Formatos</p>
+      <h2>Seis formatos, no ciento trece</h2>
+      <p>De los 113 formatos catalogados, estos seis son los que aplican a productos de baño. Los otros 107 no son para ti.</p>
+    </div>
+    <div class="tabla-cont">
+      <table>
+        <thead><tr><th>Formato</th><th>Qué es</th><th>Etapa</th><th>Medio</th><th>Tu producto</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Demo</strong></td><td>El producto haciendo su trabajo, cámara fija en el momento de prueba</td><td>Medio-bajo</td><td>Solo video</td><td>Alfombra · organizador · dispensador</td></tr>
+          <tr><td><strong>Antes y después</strong></td><td>El problema como se ve hoy, y lo mismo después. La transformación tiene que ser <em>visible</em>, no afirmada</td><td>Medio-bajo</td><td>Video o foto</td><td>Lavamanos desordenado → ordenado</td></tr>
+          <tr><td><strong>Split screen</strong></td><td>Pantalla partida: video de un lado, comparación del otro</td><td>Todo</td><td>Ambos</td><td>Alfombra de género vs. diatomea</td></tr>
+          <tr><td><strong>Testimonial</strong></td><td>Cliente a cámara</td><td>Medio</td><td>Video</td><td>Después de tus primeras 20 ventas</td></tr>
+          <tr><td><strong>Headline</strong></td><td>Una frase potente sobre imagen</td><td>Alto-medio</td><td>Foto</td><td>Set coordinado · toallero</td></tr>
+          <tr><td><strong>Oferta</strong></td><td>La promoción como protagonista</td><td>Bajo</td><td>Foto</td><td>Solo retargeting y CyberDay</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col">
+      <h3 style="margin-bottom:12px">Cómo se hace bien un antes y después</h3>
+      <p>Es el formato más desaprovechado del nicho y el que mejor te calza. Cuatro reglas de ejecución:</p>
+      <ol class="acciones" style="margin-top:8px">
+        <li><b>Aísla la variable.</b> Misma cámara, misma luz, mismo encuadre. Si mueves el trípode entre las dos tomas, la prueba se cae. El 90% lo hace mal justo acá.</li>
+        <li><b>Pantalla partida o secuencia.</b> La mitad tratada y la mitad sin tratar al mismo tiempo, o aplicar y revelar progresivamente.</li>
+        <li><b>Validación externa.</b> Que otra persona entre y evalúe la transformación. Vale más que tu propia voz.</li>
+        <li><b>Sin restricciones en hogar.</b> Meta limita este formato en salud y skincare. En baño no hay problema.</li>
+      </ol>
+      <p style="margin-top:22px">Dato de referencia 2026: los creativos estilo UGC superan al contenido de marca pulido en <strong>27% de CTR y 19% de conversión</strong>. Para tráfico frío, video de <strong>9 a 15 segundos</strong> con gancho de problema.</p>
+    </div>
+  </section>
+
+  <section id="teardowns">
+    <div class="col">
+      <p class="eyebrow">04 · Páginas de venta</p>
+      <h2>Cuatro landings, leídas línea por línea</h2>
+    </div>
+    <div class="td">
+      <article class="td__item">
+        <div class="td__cab"><h3>TUSHY</h3><span class="td__etq">hellotushy.com</span></div>
+        <p><strong>H1: «3 million+ butts love TUSHY».</strong> Prueba social <em>como titular</em>, no como sección enterrada abajo.</p>
+        <p>Sus bloques de valor no son sustantivos, son verbos: «Stop wiping, start saving» (con «Save an average of $471 per year»), «Get cleaner», «Poop easier», «Sniff sweeter», «Toilet smarter», «Dry softer». Cada verbo es una categoría de producto disfrazada de beneficio.</p>
+        <div class="td__cifras"><span class="pastilla">$129 – $1.599</span><span class="pastilla">grueso en $139–199</span><span class="pastilla">instala en &lt;10 min</span></div>
+        <div class="td__roba"><b>Para robar</b>Un quiz como llamado secundario: «TAKE OUR BIDET QUIZ». Cuando el catálogo confunde, un quiz convierte mejor que una grilla.</div>
+      </article>
+
+      <article class="td__item">
+        <div class="td__cab"><h3>Dorai Home</h3><span class="td__etq">la referencia más cercana</span></div>
+        <p>Ficha de la Bath Stone Mat, USD 90. Escalera de bundles completa: 2-pack con 10%, «Clean Home Starter Set» de $203 a $172 con 15%, y «Build Your Own Set» también con 15%.</p>
+        <p>Titulares de beneficio en la voz del cliente: <span class="mono">«Never step on a soggy bath mat»</span>. Y el material tiene marca registrada: <span class="mono">Diomat™</span>.</p>
+        <div class="td__cifras"><span class="pastilla">3.356 reseñas</span><span class="pastilla">82% de 5 estrellas</span><span class="pastilla">despacho 1–2 días</span></div>
+        <div class="td__roba"><b>Para robar</b>Ponerle marca al material convierte una piedra genérica de Alibaba en tecnología propietaria. Cuesta cero. Y dejan el color agotado <em>visible</em>: escasez real, la única que no destruye la marca.</div>
+      </article>
+
+      <article class="td__item">
+        <div class="td__cab"><h3>Parachute</h3><span class="td__etq">la aritmética del bundle</span></div>
+        <p>Banner permanente: <span class="mono">«Free Shipping on Every Order | 60 days return»</span>. Su escalera de volumen usa descuentos <strong>chicos</strong>: set 2+2 con 5%, set 4+4 con 10%.</p>
+        <p>No necesitan 30% porque el bundle no se vende por precio, se vende por conveniencia. Organizan por material con dos adjetivos: «Thick. Cozy.» / «Quick-Drying. Modern.»</p>
+        <div class="td__cifras"><span class="pastilla">toallas $14–89</span><span class="pastilla">batas $129–159</span><span class="pastilla">60 días de devolución</span></div>
+        <div class="td__roba"><b>Lo que hacen mal</b>Cero reseñas en la página de colección. Tú sí pon la nota promedio en cada tarjeta de la grilla.</div>
+      </article>
+
+      <article class="td__item">
+        <div class="td__cab"><h3>Jolie</h3><span class="td__etq">el claim verificable</span></div>
+        <p>Su copy no dice «tu pelo se verá mejor». Dice: <span class="mono">«the only clinically proven shower filter, backed by 6 independent third-party studies»</span>, reducción de caída del cabello del 46%, y 70% de los participantes con menos picazón.</p>
+        <p>Gastan cerca de <strong>USD 100.000 al mes</strong> en marketing, no millones, porque el motor es seeding de creadores. En su etapa inicial, 7 de cada 10 creadores a los que mandaban producto publicaban.</p>
+        <div class="td__cifras"><span class="pastilla">175.000 clientes en &lt;24 meses</span><span class="pastilla">USD 4,2M el año 1</span><span class="pastilla">churn 3%</span></div>
+        <div class="td__roba"><b>Para robar</b>Mandar producto a 30 cuentas chilenas de deco cuesta menos que dos semanas de Meta Ads.</div>
+      </article>
+    </div>
+  </section>
+
+  <section id="chile">
+    <div class="col">
+      <p class="eyebrow">05 · Competencia local</p>
+      <h2>La ventana chilena</h2>
+      <p><strong>Casaideas</strong> es el competidor más peligroso: es el único chileno que ya compite en curaduría y no solo en precio. Navega por ambiente igual que Dorai Home, y ya tiene el ángulo de renovación con su sección «Renueva tu baño». Su punto débil es que la home mezcla liquidación con contenido aspiracional y la promesa se diluye.</p>
+      <p><strong>La Batea</strong> juega en gama media-alta con tienda en Chicureo y Vitacura. Pone «hasta 3 cuotas sin interés» arriba de todo — la palanca chilena por excelencia — y da 45 días para cambios, más que tus 30. Su punto débil: el catálogo es tan ancho que el baño queda como nota al pie.</p>
+      <p>Ninguno de los dos declara umbral de envío gratis. Y en MercadoLibre, el 100% de las publicaciones de baño está en ficha de catálogo compartida en 29 de 31 nichos: ahí no hay marca, solo precio.</p>
+    </div>
+    <div class="tabla-cont">
+      <table>
+        <thead><tr><th>El hueco</th><th>Por qué importa</th><th>Qué haces tú</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Nadie usa antes y después</strong></td><td>Es el formato con mayor prueba visual del rubro, y el nicho lo permite perfectamente</td><td>Es tu creativo número uno desde el día uno</td></tr>
+          <tr><td><strong>Nadie declara envío gratis</strong></td><td>Ni Casaideas ni La Batea. Es la objeción n°1 de abandono en Chile</td><td>«Envío gratis sobre $45.000» en la barra superior</td></tr>
+          <tr><td><strong>Nadie prueba nada</strong></td><td>Jolie construyó una marca sobre seis estudios. En Chile ninguna marca de baño sostiene un solo claim</td><td>«Probado 6 meses en una ducha de uso diario»: verdad chica, verificable, tuya</td></tr>
+          <tr><td><strong>Todos venden objetos</strong></td><td>Los hooks que ganan nombran el dolor antes que el producto</td><td>«El piso del baño siempre mojado» antes que «alfombra de diatomea»</td></tr>
+          <tr><td><strong>Nadie hace seeding</strong></td><td>Jolie: 7 de cada 10 creadores publicaban</td><td>30 cuentas chilenas de deco cuestan menos que 2 semanas de ads</td></tr>
+          <tr><td>Cuotas sin interés <em>sí</em> lo hacen</td><td>La Batea lo pone arriba de todo. Un ticket de $89.990 se vende mucho mejor en tres cuotas</td><td>Esta cópiala tal cual</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="anuncios">
+    <div class="col">
+      <p class="eyebrow">06 · Producción</p>
+      <h2>Tus primeros doce anuncios</h2>
+      <p>Cuatro conceptos por tres variaciones, para producir en las primeras dos semanas. Todo grabable con celular. La numeración agrupa por concepto, no por prioridad: los doce salen juntos.</p>
+    </div>
+
+    <div class="concepto">
+      <div class="concepto__cab"><span class="concepto__letra">A</span><h3>La alfombra</h3><span class="concepto__fmt">Demo · Split screen</span></div>
+      <div class="anuncios">
+        <article class="anuncio">
+          <div class="anuncio__cab"><span class="anuncio__id">A1</span><span class="anuncio__meta">Demo · 9 s</span></div>
+          <h3>Demo puro</h3>
+          <p class="anuncio__desc">Plano cenital fijo. Un vaso de agua cayendo sobre la alfombra. El agua desaparece.</p>
+          <pre class="guion">0–2 s  El piso del baño
+       siempre mojado
+3–6 s  [el agua desapareciendo]
+7–9 s  Piedra de diatomea.
+       Seca en 60 segundos.</pre>
+        </article>
+        <article class="anuncio">
+          <div class="anuncio__cab"><span class="anuncio__id">A2</span><span class="anuncio__meta">Split screen · 12 s</span></div>
+          <h3>Género vs. piedra</h3>
+          <p class="anuncio__desc">Izquierda: alfombra de género, se moja, queda la mancha oscura. Derecha: la tuya, seca. Misma cámara, misma luz.</p>
+          <pre class="guion">Tu alfombra de baño lleva
+tres días mojada.
+
+Esta se seca sola.</pre>
+        </article>
+        <article class="anuncio">
+          <div class="anuncio__cab"><span class="anuncio__id">A3</span><span class="anuncio__meta">Yapper · 15 s</span></div>
+          <h3>A cámara, sin producción</h3>
+          <p class="anuncio__desc">Tú o alguien hablando directo, sin guion aparente. El formato que TUSHY corre en el 9% de su cuenta.</p>
+          <pre class="guion">«Nunca entendí por qué
+aceptamos que la alfombra
+del baño esté siempre húmeda
+y con olor. Esta es de piedra.
+La pisas mojado y en un minuto
+está seca. Eso es todo
+el video.»</pre>
+        </article>
+      </div>
+    </div>
+
+    <div class="concepto">
+      <div class="concepto__cab"><span class="concepto__letra">B</span><h3>El baño coordinado</h3><span class="concepto__fmt">Antes y después · Headline</span></div>
+      <div class="anuncios">
+        <article class="anuncio">
+          <div class="anuncio__cab"><span class="anuncio__id">B1</span><span class="anuncio__meta">Antes/después · 8 s</span></div>
+          <h3>El sábado de diferencia</h3>
+          <p class="anuncio__desc">Lavamanos real con envases de supermercado y un vaso de la cocina. Corte. El mismo lavamanos con tu set. <strong>Trípode fijo</strong>.</p>
+          <pre class="guion">El mismo baño.
+Un sábado de diferencia.
+
+Sin obra, sin pintar,
+sin taladro.</pre>
+        </article>
+        <article class="anuncio">
+          <div class="anuncio__cab"><span class="anuncio__id">B2</span><span class="anuncio__meta">Headline · estático</span></div>
+          <h3>La frase sola</h3>
+          <p class="anuncio__desc">Foto del lavamanos ordenado. Formato Brooklinen: sin demo, el anuncio es la frase.</p>
+          <pre class="guion">Tu baño,
+por fin ordenado.</pre>
+        </article>
+        <article class="anuncio">
+          <div class="anuncio__cab"><span class="anuncio__id">B3</span><span class="anuncio__meta">Antes/después · 10 s</span></div>
+          <h3>Validación externa</h3>
+          <p class="anuncio__desc">Alguien más entrando al baño y reaccionando. La evaluación de un tercero es lo que vuelve creíble la transformación.</p>
+          <pre class="guion">[reacción real,
+sin guion]
+
+Nueve piezas.
+Un solo pedido.</pre>
+        </article>
+      </div>
+    </div>
+
+    <div class="concepto">
+      <div class="concepto__cab"><span class="concepto__letra">C</span><h3>Sin taladro</h3><span class="concepto__fmt">Demo de objeción</span></div>
+      <div class="anuncios">
+        <article class="anuncio">
+          <div class="anuncio__cab"><span class="anuncio__id">C1</span><span class="anuncio__meta">Demo · 10 s</span></div>
+          <h3>Prueba de resistencia</h3>
+          <p class="anuncio__desc">Colgando peso real del organizador pegado a la muralla. La prueba tiene que verse, no afirmarse.</p>
+          <pre class="guion">Vivo de arriendo
+y no puedo taladrar.
+
+Aguanta 5 kilos.
+Sale sin dañar la pintura.</pre>
+        </article>
+        <article class="anuncio">
+          <div class="anuncio__cab"><span class="anuncio__id">C2</span><span class="anuncio__meta">Demo · 12 s</span></div>
+          <h3>Instalación cronometrada</h3>
+          <p class="anuncio__desc">Limpiar, pegar, presionar, listo. Cronómetro en pantalla. Copia el «Easy 10-minute install» de TUSHY.</p>
+          <pre class="guion">00:00  limpiar y secar
+00:12  pegar
+00:20  presionar 30 s
+00:52  listo
+
+Sin gásfiter. Sin hoyos.</pre>
+        </article>
+        <article class="anuncio">
+          <div class="anuncio__cab"><span class="anuncio__id">C3</span><span class="anuncio__meta">Listicle · estático</span></div>
+          <h3>Las cinco cosas</h3>
+          <p class="anuncio__desc">Formato lista sobre una foto de ambiente. Barato de producir y fácil de variar.</p>
+          <pre class="guion">5 cosas que puedes ordenar
+en tu baño sin hacer
+un solo hoyo</pre>
+        </article>
+      </div>
+    </div>
+
+    <div class="concepto">
+      <div class="concepto__cab"><span class="concepto__letra">D</span><h3>El set completo</h3><span class="concepto__fmt">Headline · Testimonial</span></div>
+      <div class="anuncios">
+        <article class="anuncio">
+          <div class="anuncio__cab"><span class="anuncio__id">D1</span><span class="anuncio__meta">Headline · estático</span></div>
+          <h3>Cero decisiones</h3>
+          <p class="anuncio__desc">Foto del set completo. El beneficio real del bundle no es el precio, es no tener que elegir.</p>
+          <pre class="guion">Nueve piezas.
+Un solo pedido.
+Cero decisiones.</pre>
+        </article>
+        <article class="anuncio">
+          <div class="anuncio__cab"><span class="anuncio__id">D2</span><span class="anuncio__meta">Comparación · estático</span></div>
+          <h3>La aritmética</h3>
+          <p class="anuncio__desc">El ahorro en pesos, no en porcentaje. Es la lección de Parachute aplicada a tus precios.</p>
+          <pre class="guion">Pieza por pieza:  $110.960
+El set completo:   $89.990</pre>
+        </article>
+        <article class="anuncio">
+          <div class="anuncio__cab"><span class="anuncio__id">D3</span><span class="anuncio__meta">Testimonial · 15 s</span></div>
+          <h3>La reseña número 20</h3>
+          <p class="anuncio__desc">No lo produzcas todavía. Este anuncio existe recién cuando tengas veinte reseñas reales con foto.</p>
+          <pre class="guion">[cliente real, a cámara,
+con el producto en su
+propio baño]</pre>
+        </article>
+      </div>
+    </div>
+
+    <div class="col">
+      <h3 style="margin:34px 0 12px">Cómo correrlos</h3>
+      <ol class="acciones" style="margin-top:0">
+        <li><b>Semana 1.</b> Los doce en una sola campaña, un conjunto de anuncios, público amplio 25–45 en Región Metropolitana, $25.000 al día. No segmentes por intereses: Meta encuentra el público mejor que tú.</li>
+        <li><b>Semana 2.</b> Matas todo lo que esté bajo 1% de CTR. Produces tres variaciones de lo que sobrevivió.</li>
+        <li><b>De ahí en adelante.</b> Entre cuatro y seis creativos nuevos por semana, para siempre. TUSHY sube veintiséis; con cuatro ya estás en el juego.</li>
+      </ol>
+      <p style="margin-top:22px;font-size:1.05rem"><strong>La regla que resume todo:</strong> el creativo es la segmentación. En 2026 no ganas afinando públicos, ganas produciendo más ángulos.</p>
+    </div>
+  </section>
+
+  <section id="protocolo">
+    <div class="col">
+      <p class="eyebrow">07 · Lo que te toca a ti</p>
+      <h2>La Biblioteca de Anuncios, a mano</h2>
+      <p>Esto es lo único de este informe que quedó pendiente, y son unos 40 minutos. No necesitas cuenta ni herramienta pagada. Los links de abajo ya llevan los filtros puestos.</p>
+    </div>
+
+    <div class="reglas">
+      <div class="regla">
+        <p class="regla__n">Regla 1</p>
+        <h3>Más de 60 días = ganador</h3>
+        <p>Nadie deja plata quemándose dos meses. La fecha de inicio te dice qué funciona sin que veas una sola métrica.</p>
+      </div>
+      <div class="regla">
+        <p class="regla__n">Regla 2</p>
+        <h3>Muchas versiones = lo están escalando</h3>
+        <p>Meta muestra «se están usando N anuncios con este contenido creativo». Un concepto con quince versiones vale más que quince conceptos con una.</p>
+      </div>
+      <div class="regla">
+        <p class="regla__n">Regla 3</p>
+        <h3>El delta es el informe</h3>
+        <p>Lo que corre en Estados Unidos y no existe en Chile es, literalmente, tu lista de tareas.</p>
+      </div>
+    </div>
+
+    <div class="enlaces">
+      <div class="enlaces__g">
+        <h4>Chile · por término</h4>
+        <ul id="links-cl"></ul>
+      </div>
+      <div class="enlaces__g">
+        <h4>Estados Unidos · por término</h4>
+        <ul id="links-us"></ul>
+      </div>
+      <div class="enlaces__g">
+        <h4>Chile · por anunciante</h4>
+        <ul id="marcas-cl"></ul>
+      </div>
+      <div class="enlaces__g">
+        <h4>Estados Unidos · por anunciante</h4>
+        <ul id="marcas-us"></ul>
+      </div>
+    </div>
+
+    <div class="col">
+      <p style="margin-top:26px">De cada anuncio registra: anunciante, <strong>fecha de inicio</strong>, número de versiones activas, formato, el hook literal de los primeros tres segundos, el texto en pantalla, el texto principal, el llamado a la acción, a dónde manda y qué oferta trae. La planilla del repositorio ya trae las columnas, las listas desplegables y estos mismos links.</p>
+    </div>
+
+    <div class="cierre col">
+      <h3>Si tienes quince minutos y no cuarenta</h3>
+      <p>Entra solo a <strong>Dorai Home</strong> y <strong>TUSHY</strong> en la Biblioteca de Estados Unidos, ordena mentalmente sus anuncios por antigüedad y copia la estructura de los tres más viejos. Los tres anuncios más viejos de una cuenta que gasta bien son, literalmente, la respuesta.</p>
+    </div>
+  </section>
+
+  <section class="fuentes col">
+    <h4>Fuentes</h4>
+    <p>Desgloses de creativos: Motion Creative Strategy Library (perfiles de TUSHY, KOHLER, Our Place y Brooklinen; formatos Demo, Antes y después, Split Screen).</p>
+    <p>Páginas leídas directamente: hellotushy.com · doraihome.com · parachutehome.com · casaideas.cl · labatea.cl</p>
+    <p>Cifras de Jolie: Modern Retail, Business of Fashion y Stord. Datos de MercadoLibre Chile: investigación propia sobre 179 publicaciones, agosto 2026.</p>
+  </section>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- Gráfico: barras horizontales, rampa secuencial de un solo tono ----------
+     Serie única, así que no lleva leyenda: el título la nombra. Cada barra va
+     con etiqueta directa, y la tabla de arriba cumple de vista tabular. */
+  var MARCAS = [
+    { m: 'Our Place',  activos: 535, sem: 26, fmt: 'Demo 20% · Headline 11%', rubro: 'Menaje' },
+    { m: 'Brooklinen', activos: 111, sem: 29, fmt: 'Headline 31% · Slideshow 18%', rubro: 'Cama y baño' },
+    { m: 'TUSHY',      activos: 91,  sem: 26, fmt: 'Demo 22% · Yapper 9%', rubro: 'Bidés' },
+    { m: 'KOHLER',     activos: 89,  sem: 16, fmt: 'Demo 15% · Celebrity 13%', rubro: 'Sanitarios' }
+  ];
+  var MAX = 535;
+  var PASOS = ['var(--s4)', 'var(--s3)', 'var(--s2)', 'var(--s1)']; // más = más oscuro
+
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+
+  document.getElementById('grafico').innerHTML = MARCAS.map(function (d, i) {
+    var pct = Math.max(d.activos / MAX * 100, 1.5);
+    return '<div class="gr__fila" tabindex="0" role="img" aria-label="' +
+        esc(d.m) + ': ' + d.activos + ' anuncios activos, ' + d.sem + ' nuevos por semana">' +
+      '<span class="gr__marca">' + esc(d.m) + '</span>' +
+      '<span class="gr__pista">' +
+        '<span class="gr__track"><span class="gr__barra" style="width:' + pct.toFixed(1) + '%; background:' + PASOS[i] + '"></span></span>' +
+        '<span class="gr__val">' + d.activos + '</span>' +
+        '<span class="gr__sec">+' + d.sem + '/sem</span>' +
+      '</span>' +
+      '<span class="gr__tip"><b>' + esc(d.m) + '</b> · ' + esc(d.rubro) + '<br>' +
+        d.activos + ' anuncios activos<br>' + d.sem + ' creativos nuevos/semana<br>' +
+        esc(d.fmt) + '</span>' +
+    '</div>';
+  }).join('');
+
+  /* ---------- Links de la Biblioteca de Anuncios ---------- */
+  var BASE = 'https://www.facebook.com/ads/library/?active_status=active&ad_type=all' +
+             '&country={pais}&q={q}&search_type=keyword_unordered&media_type=all';
+
+  var SETS = [
+    ['links-cl', 'CL', ['accesorios de baño', 'organizador de baño', 'alfombra de baño',
+                        'dispensador de jabón', 'set de baño', 'decoración baño',
+                        'toallero', 'organizador de ducha', 'baño minimalista']],
+    ['links-us', 'US', ['bath mat', 'shower organizer', 'bathroom organization',
+                        'soap dispenser', 'diatomite mat', 'bathroom storage',
+                        'bath accessories']],
+    ['marcas-cl', 'CL', ['Casaideas', 'Sodimac', 'Easy Chile', 'La Batea deco',
+                         'Milk', 'BazarED', 'Decorazzia', 'Dekora Chile']],
+    ['marcas-us', 'US', ['Dorai Home', 'TUSHY', 'Jolie', 'Open Spaces',
+                         'Brooklinen', 'Parachute Home', 'Canopy', 'Simple Modern']]
+  ];
+
+  SETS.forEach(function (s) {
+    var cont = document.getElementById(s[0]);
+    if (!cont) return;
+    cont.innerHTML = s[2].map(function (t) {
+      var url = BASE.replace('{pais}', s[1]).replace('{q}', encodeURIComponent(t));
+      return '<li><a href="' + url + '" target="_blank" rel="noopener noreferrer">' + esc(t) + '</a></li>';
+    }).join('');
+  });
+})();
+</script>

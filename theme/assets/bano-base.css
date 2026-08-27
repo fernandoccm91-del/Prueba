@@ -1,0 +1,154 @@
+/* ==========================================================================
+   Sistema de diseño — tienda de baño minimalista
+   Subir a Shopify: Tema → Editar código → Assets → Añadir un recurso nuevo
+   Cargar en theme.liquid dentro de <head>:
+     {{ 'bano-base.css' | asset_url | stylesheet_tag }}
+   ========================================================================== */
+
+:root {
+  --arena-clara: #F5F1EC;
+  --arena:       #E8E0D6;
+  --tinta:       #1C1917;
+  --tinta-suave: #57534E;
+  --piedra:      #A8A29E;
+  --acento:      #8A7F6D;
+  --blanco:      #FFFFFF;
+
+  --fuente-titulo: 'Fraunces', 'Instrument Serif', Georgia, serif;
+  --fuente-cuerpo: 'Inter', 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --radio: 2px;
+  --seccion-y: 96px;
+  --seccion-y-movil: 64px;
+  --ancho-max: 1280px;
+}
+
+/* --- Contenedores ------------------------------------------------------- */
+.bn-seccion { padding: var(--seccion-y) 24px; }
+.bn-contenedor { max-width: var(--ancho-max); margin-inline: auto; }
+.bn-seccion--arena { background: var(--arena-clara); }
+.bn-seccion--arena-media { background: var(--arena); }
+
+@media (max-width: 749px) {
+  .bn-seccion { padding: var(--seccion-y-movil) 20px; }
+}
+
+/* --- Tipografía --------------------------------------------------------- */
+.bn-titulo {
+  font-family: var(--fuente-titulo);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  color: var(--tinta);
+  margin: 0;
+}
+.bn-titulo--xl { font-size: clamp(2.25rem, 5vw, 3.75rem); }
+.bn-titulo--l  { font-size: clamp(1.75rem, 3.5vw, 2.5rem); }
+.bn-titulo--m  { font-size: clamp(1.25rem, 2vw, 1.5rem); }
+
+.bn-texto {
+  font-family: var(--fuente-cuerpo);
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--tinta-suave);
+  margin: 0;
+}
+.bn-texto--grande { font-size: 1.125rem; }
+.bn-eyebrow {
+  font-family: var(--fuente-cuerpo);
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--piedra);
+  margin: 0 0 12px;
+}
+
+/* --- Botones ------------------------------------------------------------ */
+.bn-boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--fuente-cuerpo);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  padding: 15px 32px;
+  border-radius: var(--radio);
+  border: 1px solid var(--tinta);
+  background: var(--tinta);
+  color: var(--arena-clara);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+.bn-boton:hover { background: transparent; color: var(--tinta); }
+.bn-boton--fantasma { background: transparent; color: var(--tinta); }
+.bn-boton--fantasma:hover { background: var(--tinta); color: var(--arena-clara); }
+.bn-boton--ancho { width: 100%; }
+.bn-boton:focus-visible { outline: 2px solid var(--acento); outline-offset: 3px; }
+
+.bn-enlace {
+  font-family: var(--fuente-cuerpo);
+  font-size: 0.9375rem;
+  color: var(--tinta);
+  text-decoration: none;
+  border-bottom: 1px solid var(--piedra);
+  padding-bottom: 2px;
+}
+.bn-enlace:hover { border-color: var(--tinta); }
+
+/* --- Grillas ------------------------------------------------------------ */
+.bn-grilla { display: grid; gap: 24px; }
+.bn-grilla--2 { grid-template-columns: repeat(2, 1fr); }
+.bn-grilla--3 { grid-template-columns: repeat(3, 1fr); }
+.bn-grilla--4 { grid-template-columns: repeat(4, 1fr); }
+
+@media (max-width: 989px) {
+  .bn-grilla--3, .bn-grilla--4 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 749px) {
+  .bn-grilla--2, .bn-grilla--3, .bn-grilla--4 { grid-template-columns: 1fr; }
+  .bn-grilla--movil-2 { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+}
+
+/* --- Tarjeta de producto ------------------------------------------------ */
+.bn-tarjeta { background: var(--blanco); border-radius: var(--radio); overflow: hidden; }
+.bn-tarjeta__media {
+  aspect-ratio: 4 / 5;
+  background: var(--arena);
+  overflow: hidden;
+}
+.bn-tarjeta__media img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: transform 0.5s ease;
+}
+.bn-tarjeta:hover .bn-tarjeta__media img { transform: scale(1.03); }
+.bn-tarjeta__cuerpo { padding: 20px; }
+.bn-tarjeta__titulo {
+  font-family: var(--fuente-cuerpo);
+  font-size: 0.9375rem; font-weight: 500; color: var(--tinta);
+  margin: 0 0 6px; text-decoration: none; display: block;
+}
+.bn-tarjeta__precio { font-family: var(--fuente-cuerpo); font-size: 0.9375rem; color: var(--tinta); }
+.bn-tarjeta__precio del { color: var(--piedra); margin-right: 8px; }
+.bn-tarjeta__precio ins { color: var(--acento); text-decoration: none; }
+
+/* --- Insignia ----------------------------------------------------------- */
+.bn-insignia {
+  display: inline-block;
+  font-family: var(--fuente-cuerpo);
+  font-size: 0.6875rem; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 5px 10px; border: 1px solid var(--piedra); border-radius: var(--radio);
+  color: var(--tinta-suave); background: var(--blanco);
+}
+.bn-insignia--ahorro { background: var(--tinta); color: var(--arena-clara); border-color: var(--tinta); }
+
+/* --- Utilidades --------------------------------------------------------- */
+.bn-centro { text-align: center; }
+.bn-cabecera-seccion { max-width: 620px; margin: 0 auto 48px; }
+.bn-cabecera-seccion.bn-centro > * + * { margin-top: 12px; }
+.bn-vsr {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}

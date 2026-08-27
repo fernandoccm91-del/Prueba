@@ -1,0 +1,115 @@
+{%- comment -%}
+  Prueba social — reseñas con foto del cliente.
+  Las reseñas con imagen convierten muchísimo más que las de solo texto.
+{%- endcomment -%}
+
+<section class="bn-seccion bn-seccion--arena bn-resenas">
+  <div class="bn-contenedor">
+    <div class="bn-cabecera-seccion bn-centro">
+      <h2 class="bn-titulo bn-titulo--l">{{ section.settings.titulo }}</h2>
+      {%- if section.settings.resumen != blank -%}
+        <p class="bn-texto">{{ section.settings.resumen }}</p>
+      {%- endif -%}
+    </div>
+
+    <div class="bn-grilla bn-grilla--3">
+      {%- for bloque in section.blocks -%}
+        <figure class="bn-resena" {{ bloque.shopify_attributes }}>
+          {%- if bloque.settings.imagen != blank -%}
+            <div class="bn-resena__media">
+              <img src="{{ bloque.settings.imagen | image_url: width: 700 }}"
+                   alt="Foto enviada por {{ bloque.settings.autor | escape }}" loading="lazy"
+                   width="700" height="{{ 700 | times: bloque.settings.imagen.aspect_ratio | round }}">
+            </div>
+          {%- endif -%}
+
+          <div class="bn-resena__cuerpo">
+            <div class="bn-resena__estrellas" role="img"
+                 aria-label="{{ bloque.settings.estrellas }} de 5 estrellas">
+              {%- for i in (1..5) -%}
+                <svg viewBox="0 0 20 20" aria-hidden="true"
+                     class="{% if i <= bloque.settings.estrellas %}llena{% endif %}">
+                  <path d="M10 1.5l2.6 5.3 5.9.9-4.2 4.1 1 5.8-5.3-2.8-5.3 2.8 1-5.8L1.5 7.7l5.9-.9z"/>
+                </svg>
+              {%- endfor -%}
+            </div>
+
+            <blockquote class="bn-resena__texto">{{ bloque.settings.texto }}</blockquote>
+
+            <figcaption class="bn-resena__autor">
+              {{ bloque.settings.autor }}
+              {%- if bloque.settings.comuna != blank %}, {{ bloque.settings.comuna }}{% endif -%}
+              {%- if bloque.settings.verificada %}
+                <span class="bn-resena__verificada">· Compra verificada</span>
+              {%- endif -%}
+            </figcaption>
+          </div>
+        </figure>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+<style>
+  #shopify-section-{{ section.id }} .bn-resena {
+    margin: 0; background: var(--blanco); border-radius: var(--radio); overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  #shopify-section-{{ section.id }} .bn-resena__media { aspect-ratio: 4 / 3; background: var(--arena); }
+  #shopify-section-{{ section.id }} .bn-resena__media img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+  }
+  #shopify-section-{{ section.id }} .bn-resena__cuerpo {
+    padding: 24px; display: flex; flex-direction: column; gap: 12px; flex: 1;
+  }
+  #shopify-section-{{ section.id }} .bn-resena__estrellas { display: flex; gap: 2px; }
+  #shopify-section-{{ section.id }} .bn-resena__estrellas svg {
+    width: 15px; height: 15px; fill: none; stroke: var(--piedra); stroke-width: 1.2;
+  }
+  #shopify-section-{{ section.id }} .bn-resena__estrellas svg.llena { fill: var(--acento); stroke: var(--acento); }
+  #shopify-section-{{ section.id }} .bn-resena__texto {
+    margin: 0; font-family: var(--fuente-cuerpo); font-size: 0.9375rem;
+    line-height: 1.6; color: var(--tinta); flex: 1;
+  }
+  #shopify-section-{{ section.id }} .bn-resena__autor {
+    font-family: var(--fuente-cuerpo); font-size: 0.8125rem; color: var(--tinta-suave);
+  }
+  #shopify-section-{{ section.id }} .bn-resena__verificada { color: var(--piedra); }
+</style>
+
+{% schema %}
+{
+  "name": "Reseñas con foto",
+  "tag": "section",
+  "max_blocks": 6,
+  "settings": [
+    { "type": "text", "id": "titulo", "label": "Título", "default": "Lo que dicen quienes ya lo hicieron" },
+    { "type": "text", "id": "resumen", "label": "Resumen", "default": "4,8 de 5 · 127 reseñas verificadas" }
+  ],
+  "blocks": [
+    {
+      "type": "resena",
+      "name": "Reseña",
+      "settings": [
+        { "type": "image_picker", "id": "imagen", "label": "Foto del cliente",
+          "info": "Foto real enviada por el cliente. No uses stock: se nota." },
+        { "type": "range", "id": "estrellas", "min": 1, "max": 5, "step": 1, "label": "Estrellas", "default": 5 },
+        { "type": "textarea", "id": "texto", "label": "Reseña" },
+        { "type": "text", "id": "autor", "label": "Nombre", "default": "Camila R." },
+        { "type": "text", "id": "comuna", "label": "Comuna", "default": "Ñuñoa" },
+        { "type": "checkbox", "id": "verificada", "label": "Compra verificada", "default": true }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Reseñas con foto",
+      "blocks": [
+        { "type": "resena", "settings": { "texto": "Compré el set del lavamanos y cambió el baño entero. La cerámica se siente mucho mejor de lo que esperaba por el precio." } },
+        { "type": "resena", "settings": { "texto": "Vivo de arriendo y no podía taladrar nada. El organizador de ducha lleva cuatro meses pegado sin moverse.", "autor": "Matías P.", "comuna": "Providencia" } },
+        { "type": "resena", "settings": { "texto": "La alfombra de diatomea es de otro planeta. No vuelvo a comprar una de género nunca más.", "autor": "Fernanda L.", "comuna": "La Reina" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,111 @@
+{%- comment -%}
+  Antes / después — deslizador de comparación.
+  El argumento más potente del nicho y casi nadie lo usa. JS mínimo, sin dependencias.
+{%- endcomment -%}
+
+<section class="bn-seccion bn-ad">
+  <div class="bn-contenedor">
+    <div class="bn-cabecera-seccion bn-centro">
+      <h2 class="bn-titulo bn-titulo--l">{{ section.settings.titulo }}</h2>
+      {%- if section.settings.bajada != blank -%}
+        <p class="bn-texto">{{ section.settings.bajada }}</p>
+      {%- endif -%}
+    </div>
+
+    <div class="bn-ad__marco" data-bn-antes-despues>
+      <img class="bn-ad__img bn-ad__img--despues"
+           src="{{ section.settings.imagen_despues | image_url: width: 1600 }}"
+           alt="{{ section.settings.alt_despues | escape }}" loading="lazy"
+           width="1600" height="{{ 1600 | times: section.settings.imagen_despues.aspect_ratio | round | default: 1000 }}">
+
+      <div class="bn-ad__capa" data-bn-capa>
+        <img class="bn-ad__img bn-ad__img--antes"
+             src="{{ section.settings.imagen_antes | image_url: width: 1600 }}"
+             alt="{{ section.settings.alt_antes | escape }}" loading="lazy"
+             width="1600" height="{{ 1600 | times: section.settings.imagen_antes.aspect_ratio | round | default: 1000 }}">
+      </div>
+
+      <span class="bn-ad__etiqueta bn-ad__etiqueta--izq" aria-hidden="true">{{ section.settings.rotulo_antes }}</span>
+      <span class="bn-ad__etiqueta bn-ad__etiqueta--der" aria-hidden="true">{{ section.settings.rotulo_despues }}</span>
+
+      <input class="bn-ad__control" type="range" min="0" max="100" value="50" step="0.1"
+             data-bn-control aria-label="Deslizar para comparar antes y después">
+      <span class="bn-ad__manija" data-bn-manija aria-hidden="true"></span>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function () {
+    var marco = document.querySelector('#shopify-section-{{ section.id }} [data-bn-antes-despues]');
+    if (!marco) return;
+    var capa    = marco.querySelector('[data-bn-capa]');
+    var control = marco.querySelector('[data-bn-control]');
+    var manija  = marco.querySelector('[data-bn-manija]');
+    function pintar() {
+      var v = control.value;
+      capa.style.clipPath = 'inset(0 ' + (100 - v) + '% 0 0)';
+      manija.style.left = v + '%';
+    }
+    control.addEventListener('input', pintar);
+    pintar();
+  })();
+</script>
+
+<style>
+  #shopify-section-{{ section.id }} .bn-ad__marco {
+    position: relative; overflow: hidden; border-radius: var(--radio);
+    background: var(--arena); line-height: 0;
+  }
+  #shopify-section-{{ section.id }} .bn-ad__img { width: 100%; height: auto; display: block; }
+  #shopify-section-{{ section.id }} .bn-ad__capa {
+    position: absolute; inset: 0; clip-path: inset(0 50% 0 0);
+  }
+  #shopify-section-{{ section.id }} .bn-ad__capa .bn-ad__img {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  }
+  #shopify-section-{{ section.id }} .bn-ad__etiqueta {
+    position: absolute; top: 16px; z-index: 3;
+    font-family: var(--fuente-cuerpo); font-size: 0.6875rem;
+    letter-spacing: 0.1em; text-transform: uppercase; line-height: 1;
+    padding: 8px 12px; border-radius: var(--radio);
+    background: rgba(245,241,236,0.92); color: var(--tinta);
+  }
+  #shopify-section-{{ section.id }} .bn-ad__etiqueta--izq { left: 16px; }
+  #shopify-section-{{ section.id }} .bn-ad__etiqueta--der { right: 16px; }
+  #shopify-section-{{ section.id }} .bn-ad__control {
+    position: absolute; inset: 0; z-index: 4;
+    width: 100%; height: 100%; margin: 0; opacity: 0; cursor: ew-resize;
+    -webkit-appearance: none; appearance: none; background: transparent;
+  }
+  #shopify-section-{{ section.id }} .bn-ad__control:focus-visible { opacity: 1; outline: 2px solid var(--acento); }
+  #shopify-section-{{ section.id }} .bn-ad__manija {
+    position: absolute; top: 0; bottom: 0; left: 50%; z-index: 3;
+    width: 2px; margin-left: -1px; background: var(--arena-clara);
+    box-shadow: 0 0 0 1px rgba(28,25,23,0.12); pointer-events: none;
+  }
+  #shopify-section-{{ section.id }} .bn-ad__manija::after {
+    content: ''; position: absolute; top: 50%; left: 50%;
+    width: 40px; height: 40px; margin: -20px 0 0 -20px;
+    border: 2px solid var(--arena-clara); border-radius: 50%;
+    background: rgba(28,25,23,0.18); backdrop-filter: blur(2px);
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Antes / después",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "titulo", "label": "Título", "default": "El mismo baño. Un sábado de diferencia." },
+    { "type": "text", "id": "bajada", "label": "Bajada", "default": "Sin obra, sin pintar, sin taladro." },
+    { "type": "image_picker", "id": "imagen_antes", "label": "Antes" },
+    { "type": "text", "id": "alt_antes", "label": "Texto alternativo del antes", "default": "Baño antes de ordenar" },
+    { "type": "image_picker", "id": "imagen_despues", "label": "Después" },
+    { "type": "text", "id": "alt_despues", "label": "Texto alternativo del después", "default": "El mismo baño ordenado" },
+    { "type": "text", "id": "rotulo_antes", "label": "Rótulo izquierdo", "default": "Antes" },
+    { "type": "text", "id": "rotulo_despues", "label": "Rótulo derecho", "default": "Después" }
+  ],
+  "presets": [{ "name": "Antes / después" }]
+}
+{% endschema %}

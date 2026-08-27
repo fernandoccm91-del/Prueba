@@ -1,0 +1,124 @@
+{%- comment -%}
+  Preguntas frecuentes — acordeón nativo con <details>, sin JavaScript.
+  Incluye datos estructurados FAQPage para los resultados enriquecidos de Google.
+{%- endcomment -%}
+
+<section class="bn-seccion bn-faq">
+  <div class="bn-contenedor bn-faq__contenedor">
+    <div class="bn-faq__cabecera">
+      <h2 class="bn-titulo bn-titulo--l">{{ section.settings.titulo }}</h2>
+      {%- if section.settings.bajada != blank -%}
+        <p class="bn-texto">{{ section.settings.bajada }}</p>
+      {%- endif -%}
+      {%- if section.settings.contacto_texto != blank -%}
+        <p class="bn-texto bn-faq__contacto">
+          <a href="{{ section.settings.contacto_url | default: '#' }}" class="bn-enlace">
+            {{ section.settings.contacto_texto }}
+          </a>
+        </p>
+      {%- endif -%}
+    </div>
+
+    <div class="bn-faq__lista">
+      {%- for bloque in section.blocks -%}
+        <details class="bn-faq__item" {{ bloque.shopify_attributes }}>
+          <summary class="bn-faq__pregunta">
+            {{ bloque.settings.pregunta }}
+            <span class="bn-faq__signo" aria-hidden="true"></span>
+          </summary>
+          <div class="bn-faq__respuesta bn-texto">{{ bloque.settings.respuesta }}</div>
+        </details>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{%- if section.blocks.size > 0 -%}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {%- for bloque in section.blocks -%}
+        {
+          "@type": "Question",
+          "name": {{ bloque.settings.pregunta | json }},
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": {{ bloque.settings.respuesta | strip_html | json }}
+          }
+        }{% unless forloop.last %},{% endunless %}
+      {%- endfor -%}
+    ]
+  }
+  </script>
+{%- endif -%}
+
+<style>
+  #shopify-section-{{ section.id }} .bn-faq__contenedor {
+    display: grid; grid-template-columns: 1fr 1.4fr; gap: 64px; align-items: start;
+  }
+  #shopify-section-{{ section.id }} .bn-faq__cabecera > * + * { margin-top: 12px; }
+  #shopify-section-{{ section.id }} .bn-faq__contacto { margin-top: 24px; }
+  #shopify-section-{{ section.id }} .bn-faq__item {
+    border-bottom: 1px solid var(--piedra);
+  }
+  #shopify-section-{{ section.id }} .bn-faq__item:first-child { border-top: 1px solid var(--piedra); }
+  #shopify-section-{{ section.id }} .bn-faq__pregunta {
+    display: flex; align-items: center; justify-content: space-between; gap: 24px;
+    padding: 20px 0; cursor: pointer; list-style: none;
+    font-family: var(--fuente-cuerpo); font-size: 1rem; font-weight: 500; color: var(--tinta);
+  }
+  #shopify-section-{{ section.id }} .bn-faq__pregunta::-webkit-details-marker { display: none; }
+  #shopify-section-{{ section.id }} .bn-faq__signo {
+    position: relative; width: 14px; height: 14px; flex: none;
+  }
+  #shopify-section-{{ section.id }} .bn-faq__signo::before,
+  #shopify-section-{{ section.id }} .bn-faq__signo::after {
+    content: ''; position: absolute; background: var(--tinta);
+    top: 50%; left: 0; width: 14px; height: 1px; margin-top: -0.5px;
+    transition: transform 0.2s ease;
+  }
+  #shopify-section-{{ section.id }} .bn-faq__signo::after { transform: rotate(90deg); }
+  #shopify-section-{{ section.id }} .bn-faq__item[open] .bn-faq__signo::after { transform: rotate(0deg); }
+  #shopify-section-{{ section.id }} .bn-faq__respuesta { padding: 0 0 24px; max-width: 62ch; }
+  #shopify-section-{{ section.id }} .bn-faq__respuesta p { margin: 0 0 12px; }
+  #shopify-section-{{ section.id }} .bn-faq__respuesta p:last-child { margin-bottom: 0; }
+  @media (max-width: 989px) {
+    #shopify-section-{{ section.id }} .bn-faq__contenedor { grid-template-columns: 1fr; gap: 32px; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Preguntas frecuentes",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "titulo", "label": "Título", "default": "Preguntas frecuentes" },
+    { "type": "text", "id": "bajada", "label": "Bajada", "default": "Lo que nos preguntan antes de comprar." },
+    { "type": "text", "id": "contacto_texto", "label": "Enlace de contacto", "default": "¿Otra duda? Escríbenos →" },
+    { "type": "url", "id": "contacto_url", "label": "URL de contacto" }
+  ],
+  "blocks": [
+    {
+      "type": "pregunta",
+      "name": "Pregunta",
+      "settings": [
+        { "type": "text", "id": "pregunta", "label": "Pregunta" },
+        { "type": "richtext", "id": "respuesta", "label": "Respuesta" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Preguntas frecuentes",
+      "blocks": [
+        { "type": "pregunta", "settings": { "pregunta": "¿Los productos vienen coordinados entre sí?", "respuesta": "<p>Sí. Todo el catálogo está en tres paletas —arena, blanco hueso y negro mate— y cualquier combinación funciona. Ese es el punto.</p>" } },
+        { "type": "pregunta", "settings": { "pregunta": "¿Necesito taladro para instalar?", "respuesta": "<p>Para casi nada. El organizador de ducha, los ganchos y el dispensador de pared van con adhesivo industrial 3M que aguanta hasta 5 kg y sale sin dañar la pintura. El toallero-repisa sí necesita anclaje.</p>" } },
+        { "type": "pregunta", "settings": { "pregunta": "¿Hacen boleta o factura?", "respuesta": "<p>Las dos. La boleta electrónica llega automática a tu correo. Si necesitas factura, la pides en el checkout con tu RUT y giro.</p>" } },
+        { "type": "pregunta", "settings": { "pregunta": "¿Qué pasa si llega quebrado?", "respuesta": "<p>Nos mandas una foto por correo y te despachamos el reemplazo el mismo día. No te pedimos devolver el producto dañado.</p>" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

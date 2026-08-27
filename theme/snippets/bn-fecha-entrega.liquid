@@ -1,0 +1,97 @@
+{%- comment -%}
+  Fecha de entrega concreta en la ficha de producto.
+
+  "Llega entre el jueves 3 y el sábado 5 de septiembre" convierte muchísimo
+  mejor que "3 a 5 días hábiles". Es el cambio de una línea con más impacto
+  que existe en una ficha de producto.
+
+  Uso:
+    {% render 'bn-fecha-entrega', dias_min: 2, dias_max: 4, zona: 'Santiago' %}
+    {% render 'bn-fecha-entrega', dias_min: 3, dias_max: 5, zona: 'regiones' %}
+
+  Notas:
+  - Liquid corre en los servidores de Shopify en UTC. `desfase_horas` lo
+    corrige a hora de Chile continental (-3 en horario de verano, -4 en
+    invierno). Actualízalo dos veces al año o déjalo en -4.
+  - Salta sábados y domingos, pero NO los feriados chilenos. Si necesitas esa
+    precisión, usa una app de fechas de entrega o un metafield de tienda que
+    actualices por temporada.
+  - Los pedidos hechos después de las 14:00 hora local salen al día hábil
+    siguiente.
+{%- endcomment -%}
+
+{%- liquid
+  assign dias_min = dias_min | default: 2
+  assign dias_max = dias_max | default: 4
+  assign zona = zona | default: 'Santiago'
+  assign desfase_horas = desfase_horas | default: -4
+
+  assign seg_dia = 86400
+  assign ajuste = desfase_horas | times: 3600
+  assign ahora = 'now' | date: '%s' | plus: 0
+  assign ahora_local = ahora | plus: ajuste
+
+  assign corte = 0
+  assign hora_actual = ahora_local | date: '%H' | plus: 0
+  if hora_actual >= 14
+    assign corte = 1
+  endif
+
+  assign objetivo_min = dias_min | plus: corte
+  assign objetivo_max = dias_max | plus: corte
+
+  assign meses = 'enero,febrero,marzo,abril,mayo,junio,julio,agosto,septiembre,octubre,noviembre,diciembre' | split: ','
+  assign nombres_dia = 'domingo,lunes,martes,miércoles,jueves,viernes,sábado' | split: ','
+
+  assign habiles = 0
+  assign ts_min = ahora_local
+  assign ts_max = ahora_local
+
+  for offset in (1..21)
+    assign candidato = offset | times: seg_dia | plus: ahora_local
+    assign dow = candidato | date: '%w' | plus: 0
+    if dow != 0 and dow != 6
+      assign habiles = habiles | plus: 1
+      if habiles == objetivo_min
+        assign ts_min = candidato
+      endif
+      if habiles == objetivo_max
+        assign ts_max = candidato
+        break
+      endif
+    endif
+  endfor
+
+  assign dia_min = ts_min | date: '%-d'
+  assign dow_min = ts_min | date: '%w' | plus: 0
+  assign mes_min = ts_min | date: '%-m' | minus: 1
+
+  assign dia_max = ts_max | date: '%-d'
+  assign dow_max = ts_max | date: '%w' | plus: 0
+  assign mes_max = ts_max | date: '%-m' | minus: 1
+-%}
+
+<p class="bn-entrega">
+  <span class="bn-entrega__icono" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25">
+      <path d="M1 3h13v13H1zM14 8h4l3 3v5h-7z"/>
+      <circle cx="5.5" cy="18.5" r="2"/><circle cx="17.5" cy="18.5" r="2"/>
+    </svg>
+  </span>
+  <span>
+    Llega entre el <strong>{{ nombres_dia[dow_min] }} {{ dia_min }}{% unless mes_min == mes_max %} de {{ meses[mes_min] }}{% endunless %}</strong>
+    y el <strong>{{ nombres_dia[dow_max] }} {{ dia_max }} de {{ meses[mes_max] }}</strong>
+    a {{ zona }}
+  </span>
+</p>
+
+<style>
+  .bn-entrega {
+    display: flex; align-items: flex-start; gap: 10px; margin: 16px 0 0;
+    font-family: var(--fuente-cuerpo); font-size: 0.875rem;
+    line-height: 1.45; color: var(--tinta-suave);
+  }
+  .bn-entrega__icono { width: 18px; height: 18px; flex: none; margin-top: 1px; color: var(--tinta); }
+  .bn-entrega__icono svg { width: 100%; height: 100%; }
+  .bn-entrega strong { color: var(--tinta); font-weight: 500; }
+</style>

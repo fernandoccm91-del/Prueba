@@ -1,0 +1,142 @@
+{%- comment -%}
+  Producto héroe — un solo producto con tres argumentos y media grande.
+  Pensado para la alfombra de diatomea: soporta imagen o video en bucle.
+{%- endcomment -%}
+
+<section class="bn-seccion bn-seccion--arena bn-heroe">
+  <div class="bn-contenedor bn-heroe__grilla bn-heroe__grilla--{{ section.settings.posicion_media }}">
+
+    <div class="bn-heroe__media">
+      {%- if section.settings.video != blank -%}
+        {{ section.settings.video | video_tag: image_size: '1200x', autoplay: true, loop: true, muted: true, controls: false }}
+      {%- elsif section.settings.imagen != blank -%}
+        <img src="{{ section.settings.imagen | image_url: width: 1400 }}"
+             srcset="{{ section.settings.imagen | image_url: width: 700 }} 700w,
+                     {{ section.settings.imagen | image_url: width: 1400 }} 1400w"
+             sizes="(min-width: 990px) 50vw, 100vw"
+             alt="{{ section.settings.imagen.alt | escape }}"
+             loading="lazy" width="1400"
+             height="{{ 1400 | times: section.settings.imagen.aspect_ratio | round }}">
+      {%- else -%}
+        <div class="bn-heroe__media-vacia"></div>
+      {%- endif -%}
+    </div>
+
+    <div class="bn-heroe__texto">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="bn-eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+
+      <h2 class="bn-titulo bn-titulo--l">{{ section.settings.titulo }}</h2>
+
+      {%- if section.settings.cuerpo != blank -%}
+        <div class="bn-texto bn-texto--grande bn-heroe__cuerpo">{{ section.settings.cuerpo }}</div>
+      {%- endif -%}
+
+      {%- if section.blocks.size > 0 -%}
+        <ul class="bn-heroe__argumentos" role="list">
+          {%- for bloque in section.blocks -%}
+            <li {{ bloque.shopify_attributes }}>
+              <strong>{{ bloque.settings.titulo }}</strong>
+              <span>{{ bloque.settings.detalle }}</span>
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+
+      {%- assign producto = section.settings.producto -%}
+      <div class="bn-heroe__acciones">
+        <a href="{{ producto.url | default: section.settings.boton_url | default: '#' }}" class="bn-boton">
+          {{ section.settings.boton_texto | default: 'Ver el producto' }}
+        </a>
+        {%- if producto != blank -%}
+          <span class="bn-heroe__precio">{{ producto.price | money_without_trailing_zeros }}</span>
+        {%- endif -%}
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<style>
+  #shopify-section-{{ section.id }} .bn-heroe__grilla {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;
+  }
+  #shopify-section-{{ section.id }} .bn-heroe__grilla--derecha .bn-heroe__media { order: 2; }
+  #shopify-section-{{ section.id }} .bn-heroe__media {
+    aspect-ratio: 4 / 5; overflow: hidden; border-radius: var(--radio); background: var(--arena);
+  }
+  #shopify-section-{{ section.id }} .bn-heroe__media img,
+  #shopify-section-{{ section.id }} .bn-heroe__media video {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+  }
+  #shopify-section-{{ section.id }} .bn-heroe__cuerpo { margin-top: 20px; max-width: 46ch; }
+  #shopify-section-{{ section.id }} .bn-heroe__cuerpo p { margin: 0 0 12px; }
+  #shopify-section-{{ section.id }} .bn-heroe__argumentos {
+    list-style: none; margin: 32px 0; padding: 0;
+    border-top: 1px solid var(--piedra);
+  }
+  #shopify-section-{{ section.id }} .bn-heroe__argumentos li {
+    display: grid; grid-template-columns: 12rem 1fr; gap: 16px;
+    padding: 16px 0; border-bottom: 1px solid var(--piedra);
+    font-family: var(--fuente-cuerpo); font-size: 0.9375rem;
+  }
+  #shopify-section-{{ section.id }} .bn-heroe__argumentos strong { font-weight: 500; color: var(--tinta); }
+  #shopify-section-{{ section.id }} .bn-heroe__argumentos span { color: var(--tinta-suave); }
+  #shopify-section-{{ section.id }} .bn-heroe__acciones {
+    display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+  }
+  #shopify-section-{{ section.id }} .bn-heroe__precio {
+    font-family: var(--fuente-cuerpo); font-size: 1.0625rem; color: var(--tinta-suave);
+  }
+  @media (max-width: 989px) {
+    #shopify-section-{{ section.id }} .bn-heroe__grilla { grid-template-columns: 1fr; gap: 40px; }
+    #shopify-section-{{ section.id }} .bn-heroe__grilla--derecha .bn-heroe__media { order: 0; }
+    #shopify-section-{{ section.id }} .bn-heroe__argumentos li { grid-template-columns: 1fr; gap: 4px; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Producto héroe",
+  "tag": "section",
+  "max_blocks": 4,
+  "settings": [
+    { "type": "product", "id": "producto", "label": "Producto" },
+    { "type": "image_picker", "id": "imagen", "label": "Imagen" },
+    { "type": "video", "id": "video", "label": "Video en bucle (opcional)",
+      "info": "Ideal: 8 segundos del agua absorbiéndose. Reemplaza a la imagen si lo cargas." },
+    { "type": "select", "id": "posicion_media", "label": "Posición de la imagen", "default": "izquierda",
+      "options": [
+        { "value": "izquierda", "label": "Izquierda" },
+        { "value": "derecha", "label": "Derecha" }
+      ] },
+    { "type": "text", "id": "eyebrow", "label": "Antetítulo", "default": "Piedra de diatomea" },
+    { "type": "text", "id": "titulo", "label": "Título", "default": "La alfombra que se seca sola" },
+    { "type": "richtext", "id": "cuerpo", "label": "Cuerpo",
+      "default": "<p>Absorbe el agua al instante y se seca en minutos. Sin humedad, sin olor a encierro, sin lavarla cada semana.</p>" },
+    { "type": "text", "id": "boton_texto", "label": "Texto del botón", "default": "Ver la alfombra" },
+    { "type": "url", "id": "boton_url", "label": "Enlace (si no eliges producto)" }
+  ],
+  "blocks": [
+    {
+      "type": "argumento",
+      "name": "Argumento",
+      "settings": [
+        { "type": "text", "id": "titulo", "label": "Título", "default": "Seca en 60 segundos" },
+        { "type": "text", "id": "detalle", "label": "Detalle", "default": "El agua desaparece apenas la pisas." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Producto héroe",
+      "blocks": [
+        { "type": "argumento", "settings": { "titulo": "Seca en 60 segundos", "detalle": "El agua desaparece apenas la pisas." } },
+        { "type": "argumento", "settings": { "titulo": "Sin olor", "detalle": "No acumula humedad, así que no acumula hongos." } },
+        { "type": "argumento", "settings": { "titulo": "Antideslizante", "detalle": "Base de silicona que no se mueve del piso." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

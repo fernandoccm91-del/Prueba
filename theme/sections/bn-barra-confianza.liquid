@@ -1,0 +1,109 @@
+{%- comment -%}
+  Barra de confianza — cuatro garantías, justo bajo el hero.
+  Responde las objeciones de riesgo antes de que aparezcan.
+{%- endcomment -%}
+
+<section class="bn-seccion bn-seccion--arena-media bn-confianza">
+  <div class="bn-contenedor">
+    <ul class="bn-confianza__lista" role="list">
+      {%- for bloque in section.blocks -%}
+        <li class="bn-confianza__item" {{ bloque.shopify_attributes }}>
+          <span class="bn-confianza__icono" aria-hidden="true">
+            {%- case bloque.settings.icono -%}
+              {%- when 'camion' -%}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25">
+                  <path d="M1 3h13v13H1zM14 8h4l3 3v5h-7z"/><circle cx="5.5" cy="18.5" r="2"/><circle cx="17.5" cy="18.5" r="2"/>
+                </svg>
+              {%- when 'retorno' -%}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25">
+                  <path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/>
+                </svg>
+              {%- when 'candado' -%}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25">
+                  <rect x="4" y="10" width="16" height="11" rx="1.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+                </svg>
+              {%- when 'reloj' -%}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25">
+                  <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>
+                </svg>
+              {%- else -%}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25">
+                  <path d="m4 12 5 5L20 6"/>
+                </svg>
+            {%- endcase -%}
+          </span>
+          <span class="bn-confianza__texto">
+            <strong>{{ bloque.settings.titulo }}</strong>
+            {%- if bloque.settings.detalle != blank -%}
+              <span>{{ bloque.settings.detalle }}</span>
+            {%- endif -%}
+          </span>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</section>
+
+<style>
+  #shopify-section-{{ section.id }} .bn-seccion { padding-block: 32px; }
+  #shopify-section-{{ section.id }} .bn-confianza__lista {
+    display: grid; grid-template-columns: repeat({{ section.blocks.size | at_least: 1 }}, 1fr);
+    gap: 24px; list-style: none; margin: 0; padding: 0;
+  }
+  #shopify-section-{{ section.id }} .bn-confianza__item {
+    display: flex; align-items: center; gap: 12px; justify-content: center;
+  }
+  #shopify-section-{{ section.id }} .bn-confianza__icono {
+    width: 22px; height: 22px; flex: none; color: var(--tinta);
+  }
+  #shopify-section-{{ section.id }} .bn-confianza__icono svg { width: 100%; height: 100%; }
+  #shopify-section-{{ section.id }} .bn-confianza__texto {
+    display: flex; flex-direction: column;
+    font-family: var(--fuente-cuerpo); font-size: 0.875rem; line-height: 1.35;
+  }
+  #shopify-section-{{ section.id }} .bn-confianza__texto strong { font-weight: 500; color: var(--tinta); }
+  #shopify-section-{{ section.id }} .bn-confianza__texto span { color: var(--tinta-suave); font-size: 0.8125rem; }
+  @media (max-width: 989px) {
+    #shopify-section-{{ section.id }} .bn-confianza__lista { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  }
+  @media (max-width: 749px) {
+    #shopify-section-{{ section.id }} .bn-confianza__item { justify-content: flex-start; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Barra de confianza",
+  "tag": "section",
+  "max_blocks": 4,
+  "blocks": [
+    {
+      "type": "garantia",
+      "name": "Garantía",
+      "settings": [
+        { "type": "select", "id": "icono", "label": "Ícono", "default": "camion",
+          "options": [
+            { "value": "camion", "label": "Camión" },
+            { "value": "retorno", "label": "Devolución" },
+            { "value": "candado", "label": "Candado" },
+            { "value": "reloj", "label": "Reloj" },
+            { "value": "check", "label": "Check" }
+          ] },
+        { "type": "text", "id": "titulo", "label": "Título", "default": "Envío gratis" },
+        { "type": "text", "id": "detalle", "label": "Detalle", "default": "En compras sobre $45.000" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Barra de confianza",
+      "blocks": [
+        { "type": "garantia", "settings": { "icono": "camion", "titulo": "Envío gratis", "detalle": "En compras sobre $45.000" } },
+        { "type": "garantia", "settings": { "icono": "retorno", "titulo": "30 días para devolver", "detalle": "Nosotros pagamos el retorno" } },
+        { "type": "garantia", "settings": { "icono": "candado", "titulo": "Pago seguro", "detalle": "Webpay y Mercado Pago" } },
+        { "type": "garantia", "settings": { "icono": "reloj", "titulo": "Despacho en 48 h", "detalle": "En Región Metropolitana" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

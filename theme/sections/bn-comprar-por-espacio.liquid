@@ -1,0 +1,96 @@
+{%- comment -%}
+  Comprar por espacio — navegación por zona del baño, no por tipo de objeto.
+  El patrón de Dorai Home: el cliente piensa en "mi lavamanos", no en "dispensadores".
+{%- endcomment -%}
+
+<section class="bn-seccion bn-espacios">
+  <div class="bn-contenedor">
+    <div class="bn-cabecera-seccion bn-centro">
+      <h2 class="bn-titulo bn-titulo--l">{{ section.settings.titulo }}</h2>
+      {%- if section.settings.bajada != blank -%}
+        <p class="bn-texto">{{ section.settings.bajada }}</p>
+      {%- endif -%}
+    </div>
+
+    <div class="bn-grilla bn-grilla--3">
+      {%- for bloque in section.blocks -%}
+        {%- assign coleccion = bloque.settings.coleccion -%}
+        <a href="{{ coleccion.url | default: '#' }}" class="bn-espacio" {{ bloque.shopify_attributes }}>
+          <span class="bn-espacio__media">
+            {%- if bloque.settings.imagen != blank -%}
+              <img src="{{ bloque.settings.imagen | image_url: width: 800 }}" alt="" loading="lazy"
+                   width="800" height="{{ 800 | times: bloque.settings.imagen.aspect_ratio | round }}">
+            {%- elsif coleccion.featured_image -%}
+              <img src="{{ coleccion.featured_image | image_url: width: 800 }}" alt="" loading="lazy"
+                   width="800" height="{{ 800 | times: coleccion.featured_image.aspect_ratio | round }}">
+            {%- endif -%}
+          </span>
+          <span class="bn-espacio__cuerpo">
+            <span class="bn-espacio__titulo">{{ bloque.settings.titulo | default: coleccion.title }}</span>
+            {%- if bloque.settings.detalle != blank -%}
+              <span class="bn-espacio__detalle">{{ bloque.settings.detalle }}</span>
+            {%- endif -%}
+          </span>
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+<style>
+  #shopify-section-{{ section.id }} .bn-espacio {
+    display: block; text-decoration: none; color: inherit;
+  }
+  #shopify-section-{{ section.id }} .bn-espacio__media {
+    display: block; aspect-ratio: 3 / 4; background: var(--arena);
+    overflow: hidden; border-radius: var(--radio);
+  }
+  #shopify-section-{{ section.id }} .bn-espacio__media img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    transition: transform 0.5s ease;
+  }
+  #shopify-section-{{ section.id }} .bn-espacio:hover .bn-espacio__media img { transform: scale(1.03); }
+  #shopify-section-{{ section.id }} .bn-espacio__cuerpo {
+    display: flex; flex-direction: column; gap: 4px; padding-top: 16px;
+    font-family: var(--fuente-cuerpo);
+  }
+  #shopify-section-{{ section.id }} .bn-espacio__titulo {
+    font-size: 1.0625rem; font-weight: 500; color: var(--tinta);
+  }
+  #shopify-section-{{ section.id }} .bn-espacio__detalle { font-size: 0.9375rem; color: var(--tinta-suave); }
+  #shopify-section-{{ section.id }} .bn-espacio:focus-visible { outline: 2px solid var(--acento); outline-offset: 4px; }
+</style>
+
+{% schema %}
+{
+  "name": "Comprar por espacio",
+  "tag": "section",
+  "max_blocks": 4,
+  "settings": [
+    { "type": "text", "id": "titulo", "label": "Título", "default": "¿Por dónde partimos?" },
+    { "type": "text", "id": "bajada", "label": "Bajada" }
+  ],
+  "blocks": [
+    {
+      "type": "espacio",
+      "name": "Espacio",
+      "settings": [
+        { "type": "collection", "id": "coleccion", "label": "Colección" },
+        { "type": "image_picker", "id": "imagen", "label": "Imagen (opcional)" },
+        { "type": "text", "id": "titulo", "label": "Título (opcional)" },
+        { "type": "text", "id": "detalle", "label": "Detalle" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Comprar por espacio",
+      "blocks": [
+        { "type": "espacio", "settings": { "titulo": "El lavamanos", "detalle": "Lo primero que se ve." } },
+        { "type": "espacio", "settings": { "titulo": "La ducha", "detalle": "Orden sin perforar la muralla." } },
+        { "type": "espacio", "settings": { "titulo": "La pared", "detalle": "Toalleros y repisas que suman espacio." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,58 @@
+{%- comment -%}
+  Barra de progreso hacia el envío gratis. Para el carro lateral (drawer).
+
+  "Te faltan $7.010 para el envío gratis" es el empujón más eficiente que
+  existe para subir el ticket promedio, y de paso resuelve la objeción de
+  costo de envío antes del checkout — la causa número uno de abandono en Chile.
+
+  Uso:
+    {% render 'bn-barra-envio-gratis', umbral: 4500000 %}
+
+  El umbral va en centavos, como todos los montos de Shopify:
+  $45.000 CLP = 4500000.
+{%- endcomment -%}
+
+{%- liquid
+  assign umbral = umbral | default: 4500000
+  assign total = cart.total_price | default: 0
+  assign falta = umbral | minus: total
+  if falta < 0
+    assign falta = 0
+  endif
+  assign avance = total | times: 100 | divided_by: umbral
+  if avance > 100
+    assign avance = 100
+  endif
+-%}
+
+<div class="bn-envio-gratis" data-avance="{{ avance }}">
+  <p class="bn-envio-gratis__texto">
+    {%- if falta > 0 -%}
+      Te faltan <strong>{{ falta | money_without_trailing_zeros }}</strong> para el envío gratis
+    {%- else -%}
+      <strong>Tienes envío gratis.</strong> Nosotros pagamos el despacho.
+    {%- endif -%}
+  </p>
+  <div class="bn-envio-gratis__pista"
+       role="progressbar"
+       aria-valuenow="{{ avance }}" aria-valuemin="0" aria-valuemax="100"
+       aria-label="Progreso hacia el envío gratis">
+    <span class="bn-envio-gratis__relleno" style="width: {{ avance }}%;"></span>
+  </div>
+</div>
+
+<style>
+  .bn-envio-gratis { padding: 16px 0; }
+  .bn-envio-gratis__texto {
+    margin: 0 0 10px; font-family: var(--fuente-cuerpo);
+    font-size: 0.8125rem; color: var(--tinta-suave);
+  }
+  .bn-envio-gratis__texto strong { color: var(--tinta); font-weight: 500; }
+  .bn-envio-gratis__pista {
+    height: 3px; background: var(--arena); border-radius: 999px; overflow: hidden;
+  }
+  .bn-envio-gratis__relleno {
+    display: block; height: 100%; background: var(--tinta);
+    transition: width 0.35s ease;
+  }
+</style>

@@ -1,0 +1,140 @@
+{%- comment -%}
+  Sets completos — el bloque que más factura.
+  Va ANTES de los productos sueltos. Muestra el ahorro en pesos, no en porcentaje.
+{%- endcomment -%}
+
+<section class="bn-seccion bn-sets">
+  <div class="bn-contenedor">
+    <div class="bn-cabecera-seccion bn-centro">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="bn-eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+      <h2 class="bn-titulo bn-titulo--l">{{ section.settings.titulo }}</h2>
+      {%- if section.settings.bajada != blank -%}
+        <p class="bn-texto">{{ section.settings.bajada }}</p>
+      {%- endif -%}
+    </div>
+
+    <div class="bn-grilla bn-grilla--3">
+      {%- for bloque in section.blocks -%}
+        {%- assign producto = bloque.settings.producto -%}
+        <article class="bn-set" {{ bloque.shopify_attributes }}>
+          <a href="{{ producto.url | default: '#' }}" class="bn-set__media" tabindex="-1" aria-hidden="true">
+            {%- if bloque.settings.imagen != blank -%}
+              <img src="{{ bloque.settings.imagen | image_url: width: 800 }}"
+                   alt="" loading="lazy" width="800"
+                   height="{{ 800 | times: bloque.settings.imagen.aspect_ratio | round }}">
+            {%- elsif producto.featured_image -%}
+              <img src="{{ producto.featured_image | image_url: width: 800 }}"
+                   alt="" loading="lazy" width="800"
+                   height="{{ 800 | times: producto.featured_image.aspect_ratio | round }}">
+            {%- endif -%}
+          </a>
+
+          <div class="bn-set__cuerpo">
+            {%- if producto != blank and producto.compare_at_price > producto.price -%}
+              {%- assign ahorro = producto.compare_at_price | minus: producto.price -%}
+              <span class="bn-insignia bn-insignia--ahorro">
+                Ahorras {{ ahorro | money_without_trailing_zeros }}
+              </span>
+            {%- elsif bloque.settings.etiqueta_ahorro != blank -%}
+              <span class="bn-insignia bn-insignia--ahorro">{{ bloque.settings.etiqueta_ahorro }}</span>
+            {%- endif -%}
+
+            <h3 class="bn-titulo bn-titulo--m bn-set__titulo">
+              <a href="{{ producto.url | default: '#' }}">
+                {{ bloque.settings.titulo | default: producto.title }}
+              </a>
+            </h3>
+
+            {%- if bloque.settings.descripcion != blank -%}
+              <p class="bn-texto bn-set__descripcion">{{ bloque.settings.descripcion }}</p>
+            {%- endif -%}
+
+            {%- if producto != blank -%}
+              <p class="bn-set__precio">
+                {%- if producto.compare_at_price > producto.price -%}
+                  <del>{{ producto.compare_at_price | money_without_trailing_zeros }}</del>
+                  <ins>{{ producto.price | money_without_trailing_zeros }}</ins>
+                {%- else -%}
+                  {{ producto.price | money_without_trailing_zeros }}
+                {%- endif -%}
+              </p>
+            {%- endif -%}
+
+            <a href="{{ producto.url | default: '#' }}" class="bn-boton bn-boton--fantasma bn-boton--ancho">
+              {{ bloque.settings.boton_texto | default: 'Ver el set' }}
+            </a>
+          </div>
+        </article>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+<style>
+  #shopify-section-{{ section.id }} .bn-set {
+    display: flex; flex-direction: column;
+    background: var(--blanco); border-radius: var(--radio); overflow: hidden;
+  }
+  #shopify-section-{{ section.id }} .bn-set__media {
+    display: block; aspect-ratio: 1 / 1; background: var(--arena); overflow: hidden;
+  }
+  #shopify-section-{{ section.id }} .bn-set__media img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    transition: transform 0.5s ease;
+  }
+  #shopify-section-{{ section.id }} .bn-set:hover .bn-set__media img { transform: scale(1.03); }
+  #shopify-section-{{ section.id }} .bn-set__cuerpo {
+    padding: 24px; display: flex; flex-direction: column; gap: 12px; flex: 1;
+  }
+  #shopify-section-{{ section.id }} .bn-set__cuerpo > .bn-insignia { align-self: flex-start; }
+  #shopify-section-{{ section.id }} .bn-set__titulo a { color: inherit; text-decoration: none; }
+  #shopify-section-{{ section.id }} .bn-set__descripcion { font-size: 0.9375rem; }
+  #shopify-section-{{ section.id }} .bn-set__precio {
+    font-family: var(--fuente-cuerpo); font-size: 1.0625rem; color: var(--tinta);
+    margin: 0; margin-top: auto;
+  }
+  #shopify-section-{{ section.id }} .bn-set__precio del { color: var(--piedra); margin-right: 8px; }
+  #shopify-section-{{ section.id }} .bn-set__precio ins { color: var(--tinta); text-decoration: none; font-weight: 500; }
+</style>
+
+{% schema %}
+{
+  "name": "Sets completos",
+  "tag": "section",
+  "max_blocks": 3,
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Antetítulo", "default": "Ya combinados" },
+    { "type": "text", "id": "titulo", "label": "Título", "default": "Sets completos" },
+    { "type": "text", "id": "bajada", "label": "Bajada",
+      "default": "Ya combinados. Ya pensados. Ya con descuento." }
+  ],
+  "blocks": [
+    {
+      "type": "set",
+      "name": "Set",
+      "settings": [
+        { "type": "product", "id": "producto", "label": "Producto (el bundle)" },
+        { "type": "image_picker", "id": "imagen", "label": "Imagen (opcional)",
+          "info": "Si la dejas vacía usa la imagen destacada del producto." },
+        { "type": "text", "id": "titulo", "label": "Título (opcional)" },
+        { "type": "textarea", "id": "descripcion", "label": "Descripción" },
+        { "type": "text", "id": "etiqueta_ahorro", "label": "Etiqueta de ahorro (respaldo)",
+          "info": "Solo se usa si el producto no tiene precio comparativo." },
+        { "type": "text", "id": "boton_texto", "label": "Texto del botón", "default": "Ver el set" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Sets completos",
+      "blocks": [
+        { "type": "set", "settings": { "titulo": "El Lavamanos", "descripcion": "Set de 4 piezas + bandeja. Todo lo que se ve cuando entras." } },
+        { "type": "set", "settings": { "titulo": "La Ducha", "descripcion": "Organizador, dispensador y ganchos. Sin taladrar nada." } },
+        { "type": "set", "settings": { "titulo": "El Baño Completo", "descripcion": "Las nueve piezas. El baño entero resuelto de una vez." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,145 @@
+{%- comment -%}
+  "Se ve mejor con" — bundle sugerido dentro de la ficha de producto.
+
+  Es una sección de tipo `section` para poder arrastrarla dentro de la
+  plantilla de producto desde el editor de temas (Online Store 2.0).
+
+  Agrega los tres productos al carro de una vez. El descuento real lo aplica
+  una regla de Shopify Discounts (compra X + Y = descuento) o una app de
+  bundles: acá solo mostramos el ahorro y facilitamos el "agregar todo".
+{%- endcomment -%}
+
+{%- liquid
+  assign items = section.blocks
+  assign total = 0
+  for bloque in items
+    assign p = bloque.settings.producto
+    if p != blank
+      assign total = total | plus: p.price
+    endif
+  endfor
+  assign ahorro_pct = section.settings.ahorro_pct | default: 0
+  assign ahorro = total | times: ahorro_pct | divided_by: 100
+  assign total_bundle = total | minus: ahorro
+-%}
+
+{%- if items.size > 0 -%}
+<section class="bn-seccion bn-bundle">
+  <div class="bn-contenedor">
+    <h2 class="bn-titulo bn-titulo--m bn-bundle__titulo">{{ section.settings.titulo }}</h2>
+
+    <form method="post" action="{{ routes.cart_add_url }}" class="bn-bundle__form">
+      <input type="hidden" name="return_to" value="{{ routes.cart_url }}">
+
+      <div class="bn-bundle__items">
+        {%- for bloque in items -%}
+          {%- assign p = bloque.settings.producto -%}
+          <div class="bn-bundle__item" {{ bloque.shopify_attributes }}>
+            {%- if p != blank -%}
+              <input type="hidden" name="items[{{ forloop.index0 }}][id]" value="{{ p.selected_or_first_available_variant.id }}">
+              <input type="hidden" name="items[{{ forloop.index0 }}][quantity]" value="1">
+            {%- endif -%}
+
+            <span class="bn-bundle__media">
+              {%- if p.featured_image -%}
+                <img src="{{ p.featured_image | image_url: width: 300 }}" alt="" loading="lazy"
+                     width="150" height="150">
+              {%- endif -%}
+            </span>
+            <span class="bn-bundle__info">
+              <span class="bn-bundle__nombre">{{ p.title | default: 'Producto sin asignar' }}</span>
+              {%- if p != blank -%}
+                <span class="bn-bundle__precio">{{ p.price | money_without_trailing_zeros }}</span>
+              {%- endif -%}
+            </span>
+          </div>
+          {%- unless forloop.last -%}
+            <span class="bn-bundle__mas" aria-hidden="true">+</span>
+          {%- endunless -%}
+        {%- endfor -%}
+      </div>
+
+      <div class="bn-bundle__resumen">
+        <p class="bn-bundle__total">
+          {%- if ahorro > 0 -%}
+            <del>{{ total | money_without_trailing_zeros }}</del>
+            <ins>{{ total_bundle | money_without_trailing_zeros }}</ins>
+          {%- else -%}
+            {{ total | money_without_trailing_zeros }}
+          {%- endif -%}
+        </p>
+        {%- if ahorro > 0 -%}
+          <span class="bn-insignia bn-insignia--ahorro">
+            Llevando los {{ items.size }} ahorras {{ ahorro | money_without_trailing_zeros }}
+          </span>
+        {%- endif -%}
+        <button type="submit" class="bn-boton bn-boton--ancho">
+          {{ section.settings.boton_texto }}
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
+{%- endif -%}
+
+<style>
+  #shopify-section-{{ section.id }} .bn-seccion { padding-block: 48px; }
+  #shopify-section-{{ section.id }} .bn-bundle__titulo { margin-bottom: 24px; }
+  #shopify-section-{{ section.id }} .bn-bundle__form {
+    display: grid; grid-template-columns: 1fr 280px; gap: 40px; align-items: center;
+    border: 1px solid var(--piedra); border-radius: var(--radio); padding: 24px;
+  }
+  #shopify-section-{{ section.id }} .bn-bundle__items {
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  }
+  #shopify-section-{{ section.id }} .bn-bundle__item { display: flex; align-items: center; gap: 12px; }
+  #shopify-section-{{ section.id }} .bn-bundle__media {
+    width: 72px; height: 72px; flex: none; background: var(--arena);
+    border-radius: var(--radio); overflow: hidden;
+  }
+  #shopify-section-{{ section.id }} .bn-bundle__media img { width: 100%; height: 100%; object-fit: cover; }
+  #shopify-section-{{ section.id }} .bn-bundle__info {
+    display: flex; flex-direction: column; gap: 2px;
+    font-family: var(--fuente-cuerpo); font-size: 0.875rem;
+  }
+  #shopify-section-{{ section.id }} .bn-bundle__nombre { color: var(--tinta); max-width: 18ch; }
+  #shopify-section-{{ section.id }} .bn-bundle__precio { color: var(--tinta-suave); }
+  #shopify-section-{{ section.id }} .bn-bundle__mas { color: var(--piedra); font-size: 1.25rem; }
+  #shopify-section-{{ section.id }} .bn-bundle__resumen {
+    display: flex; flex-direction: column; gap: 12px; align-items: flex-start;
+  }
+  #shopify-section-{{ section.id }} .bn-bundle__total {
+    margin: 0; font-family: var(--fuente-cuerpo); font-size: 1.25rem; color: var(--tinta);
+  }
+  #shopify-section-{{ section.id }} .bn-bundle__total del { color: var(--piedra); font-size: 1rem; margin-right: 8px; }
+  #shopify-section-{{ section.id }} .bn-bundle__total ins { text-decoration: none; font-weight: 500; }
+  @media (max-width: 989px) {
+    #shopify-section-{{ section.id }} .bn-bundle__form { grid-template-columns: 1fr; gap: 24px; }
+    #shopify-section-{{ section.id }} .bn-bundle__resumen { align-items: stretch; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Bundle en ficha",
+  "tag": "section",
+  "max_blocks": 4,
+  "settings": [
+    { "type": "text", "id": "titulo", "label": "Título", "default": "Se ve mejor con" },
+    { "type": "range", "id": "ahorro_pct", "min": 0, "max": 30, "step": 1, "unit": "%",
+      "label": "Descuento del bundle", "default": 15,
+      "info": "Solo muestra el ahorro. El descuento real se aplica con una regla de Shopify Discounts o una app de bundles." },
+    { "type": "text", "id": "boton_texto", "label": "Texto del botón", "default": "Agregar los tres al carro" }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Producto",
+      "settings": [
+        { "type": "product", "id": "producto", "label": "Producto" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Bundle en ficha" }]
+}
+{% endschema %}

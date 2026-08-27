@@ -1,0 +1,29 @@
+{%- comment -%}
+  Insignias de confianza en línea, justo bajo el botón de compra.
+
+  Uso:
+    {% render 'bn-insignias-ficha', producto: product %}
+{%- endcomment -%}
+
+<ul class="bn-insignias-ficha" role="list">
+  <li>Devolución gratis por 30 días</li>
+  <li>Pago seguro con Webpay</li>
+  {%- if producto and producto.available -%}
+    <li>Stock disponible</li>
+  {%- endif -%}
+</ul>
+
+<style>
+  .bn-insignias-ficha {
+    display: flex; flex-wrap: wrap; gap: 8px 20px;
+    list-style: none; margin: 14px 0 0; padding: 0;
+    font-family: var(--fuente-cuerpo); font-size: 0.8125rem; color: var(--tinta-suave);
+  }
+  .bn-insignias-ficha li { display: flex; align-items: center; gap: 6px; }
+  .bn-insignias-ficha li::before {
+    content: ''; width: 12px; height: 12px; flex: none;
+    background: currentColor;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 12 5 5L20 6'/%3E%3C/svg%3E") center/contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 12 5 5L20 6'/%3E%3C/svg%3E") center/contain no-repeat;
+  }
+</style>
